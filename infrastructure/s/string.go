@@ -1,7 +1,10 @@
 package s
 
 import (
+	"fmt"
+	"os"
 	"strconv"
+	"time"
 
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/json"
 )
@@ -147,4 +150,13 @@ func (s S) DefaultFloat32(defaultVal float32) float32 {
 // ToJSON to json.
 func (s S) ToJSON(v interface{}) error {
 	return json.Unmarshal(s.Bytes(), v)
+}
+
+var pid = os.Getpid()
+
+// NewTraceID create trace id.
+func NewTraceID() string {
+	return fmt.Sprintf("trace-id-%d-%s",
+		pid,
+		time.Now().Format("2006.01.02.15.04.05.999999"))
 }

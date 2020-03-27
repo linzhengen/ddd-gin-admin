@@ -6,7 +6,7 @@
 + Application: This layer serves as a passage between the domain and the interface layer. The sends the requests from the interface layer to the domain layer, which processes it and returns a response.
 + Interface: This layer holds everything that interacts with other systems, such as web services, RMI interfaces or web applications, and batch processing frontend.
 <div align="center">
-    <img src="./doc/ddd_layer.jpg">
+    <img src="doc/img/ddd_layer.jpg">
 </div>
 
 ## references

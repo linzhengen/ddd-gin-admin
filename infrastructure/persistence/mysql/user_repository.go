@@ -1,13 +1,15 @@
-package persistence
+package mysql
 
 import (
 	"context"
+
+	"github.com/jinzhu/gorm"
 
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/s"
 
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/hash"
 
-	"github.com/linzhengen/ddd-gin-admin/infrastructure/persistence/model"
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/persistence/mysql/model"
 
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
@@ -16,13 +18,13 @@ import (
 
 // UserRepository is struct.
 type UserRepository struct {
-	UserModel model.User
+	UserModel *model.User
 }
 
 // NewUserRepository constructor.
-func NewUserRepository(m model.User) *UserRepository {
+func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{
-		UserModel: m,
+		UserModel: model.NewUser(db),
 	}
 }
 

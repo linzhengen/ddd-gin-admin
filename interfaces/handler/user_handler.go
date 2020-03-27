@@ -9,6 +9,13 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/ginplus"
 )
 
+// News constructor.
+func NewUser(us application.UserRepository) *User {
+	return &User{
+		us: us,
+	}
+}
+
 // User struct defines the dependencies that will be used.
 type User struct {
 	us application.UserRepository
@@ -41,13 +48,6 @@ func (u *User) Get(c *gin.Context) {
 		return
 	}
 	ginplus.ResSuccess(c, item.CleanSecure())
-}
-
-// News constructor.
-func NewUser(us application.UserRepository) *User {
-	return &User{
-		us: us,
-	}
 }
 
 // Create create user.
