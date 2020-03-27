@@ -11,13 +11,13 @@ import (
 )
 
 // InitStore init store.
-func InitStore() (func(), error) {
+func InitStore() (*gorm.DB, func(), error) {
 	var storeCall func()
 	cfg := configs.Env()
 
 	db, err := initGorm()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	storeCall = func() {
@@ -29,11 +29,11 @@ func InitStore() (func(), error) {
 	if cfg.GormEnableAutoMigrate {
 		err = mysql.AutoMigrate(db)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
-	return storeCall, nil
+	return db, storeCall, nil
 }
 
 // initGorm init gorm.

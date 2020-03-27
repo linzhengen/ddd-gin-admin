@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/persistence/mysql"
+
 	"github.com/linzhengen/ddd-gin-admin/interfaces/routes"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
@@ -17,7 +19,7 @@ import (
 )
 
 // InitWeb init web.
-func InitWeb() *gin.Engine {
+func InitWeb(mysqlRepo *mysql.Repositories) *gin.Engine {
 	cfg := configs.Env()
 	gin.SetMode(cfg.RunMode)
 
@@ -31,24 +33,24 @@ func InitWeb() *gin.Engine {
 	app.Use(middleware.LoggerMiddleware(middleware.AllowPathPrefixNoSkipper(apiPrefixes...)))
 	app.Use(middleware.RecoveryMiddleware())
 
-	routes.RegisterRouter(app)
+	routes.RegisterRouter(app, mysqlRepo)
 	return app
 }
 
 // InitHTTPServer init http server
-func InitHTTPServer(ctx context.Context) func() {
+func InitHTTPServer(ctx context.Context, mysqlRepo *mysql.Repositories) func() {
 	cfg := configs.Env()
 	addr := fmt.Sprintf("%s:%d", cfg.HttpHost, cfg.HttpPort)
 	srv := &http.Server{
 		Addr:         addr,
-		Handler:      InitWeb(),
+		Handler:      InitWeb(mysqlRepo),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
 	}
 
 	go func() {
-		logger.Printf(ctx, "HTTP服务开始启动，地址监听在：[%s]", addr)
+		logger.Printf(ctx, "http server is starting，listen address：[%s]", addr)
 		var err error
 		err = srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {

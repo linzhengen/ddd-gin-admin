@@ -38,6 +38,7 @@ func main() {
 	ctx := logger.NewTraceIDContext(context.Background(), s.NewTraceID())
 	span := logger.StartSpanWithCall(ctx)
 
+	call := Init(ctx)
 EXIT:
 	for {
 		sig := <-sc

@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/persistence/mysql"
+
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/logger"
@@ -50,15 +52,22 @@ func Init(ctx context.Context, opts ...Option) func() {
 
 	loggerCall, err := InitLogger()
 	handleError(err)
+	db, storeCall, err := InitStore()
+	handleError(err)
+	mysqlRepo, err := mysql.NewRepositories(db)
+	handleError(err)
 
 	// 初始化HTTP服务
-	httpCall := InitHTTPServer(ctx)
+	httpCall := InitHTTPServer(ctx, mysqlRepo)
 	return func() {
 		if httpCall != nil {
 			httpCall()
 		}
 		if loggerCall != nil {
 			loggerCall()
+		}
+		if storeCall != nil {
+			storeCall()
 		}
 	}
 }
