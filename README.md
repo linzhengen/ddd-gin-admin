@@ -1,4 +1,5 @@
 # ddd-gin-admin
+[![CircleCI](https://circleci.com/gh/linzhengen/fetch-file-go/tree/master.svg?style=svg)](https://circleci.com/gh/linzhengen/fetch-file-go/tree/master)
 
 ## DDD comprises of 4 Layers:
 + Domain: This is where the domain and business logic of the application is defined.
