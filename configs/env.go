@@ -15,7 +15,7 @@ type EnvConfig struct {
 	// http
 	HttpHost         string        `envconfig:"HTTP_HOST" default:"0.0.0.0"`
 	HttpPort         int           `envconfig:"HTTP_PORT" default:"8080"`
-	HttpShutdownTime time.Duration `envconfig:"HTTP_SHUTDOWN_TIME" default:"30"`
+	HttpShutdownTime time.Duration `envconfig:"HTTP_SHUTDOWN_TIME" default:"30s"`
 
 	// log
 	LogLevel      int    `envconfig:"LOG_LEVEL" default:"5"`       // 1:fatal 2:error,3:warn,4:info,5:debug
@@ -33,7 +33,7 @@ type EnvConfig struct {
 	GormTablePrefix       string        `envconfig:"GORM_TABLE_PREFIX" default:""`
 
 	// mysql
-	MysqlHost       string `envconfig:"MYSQL_HOST" default:"127.0.0.1"`
+	MysqlHost       string `envconfig:"MYSQL_HOST" default:"mysql"`
 	MysqlPort       int    `envconfig:"MYSQL_PORT" default:"3306"`
 	MysqlUser       string `envconfig:"MYSQL_USER" default:"admin"`
 	MysqlPassword   string `envconfig:"MYSQL_PASSWORD" default:"pass"`

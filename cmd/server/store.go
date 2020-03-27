@@ -42,7 +42,6 @@ func initGorm() (*gorm.DB, error) {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s",
 		cfg.MysqlUser, cfg.MysqlPassword, cfg.MysqlHost, cfg.MysqlPort, cfg.MysqlDbName, cfg.MysqlParameters)
-
 	return mysql.NewDB(&mysql.DbConfig{
 		Debug:        cfg.GormDebug,
 		DBType:       cfg.GormDbType,

@@ -48,7 +48,7 @@ func Init(ctx context.Context, opts ...Option) func() {
 	err := configs.InitEnv()
 	handleError(err)
 
-	logger.Printf(ctx, "start server，run mode：%s，version：%s，进程号：%d", configs.Env().RunMode, o.Version, os.Getpid())
+	logger.Printf(ctx, "start server，run mode：%s，version：%s，pid：%d", configs.Env().RunMode, o.Version, os.Getpid())
 
 	loggerCall, err := InitLogger()
 	handleError(err)

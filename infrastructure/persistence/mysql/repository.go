@@ -6,6 +6,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // DbConfig ...

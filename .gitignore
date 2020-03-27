@@ -15,5 +15,5 @@
 # vendor/
 
 # binary
-./cmd/server/server
+cmd/server/server
 
