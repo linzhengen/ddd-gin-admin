@@ -1,0 +1,43 @@
+version: 2.1
+executors:
+  default:
+    working_directory: /src
+    environment:
+      TZ: "/usr/share/zoneinfo/Asia/Tokyo"
+    docker:
+      - image: circleci/golang:1.14
+
+jobs:
+  golint:
+    executor: default
+    steps:
+      - checkout
+      - go mod download
+      - make lint
+  govet:
+    executor: default
+    steps:
+      - checkout
+      - go mod download
+      - make vet
+  gofmtcheck:
+    executor: default
+    steps:
+      - checkout
+      - go mod download
+      - make fmt-check
+  test:
+    executor: default
+    steps:
+      - checkout
+      - go mod download
+      - make test
+
+workflows:
+  version: 2
+  makecheck:
+    jobs:
+      - golint
+      - govet
+      - gofmtcheck
+      - test
