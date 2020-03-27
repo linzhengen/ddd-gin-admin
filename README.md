@@ -10,5 +10,5 @@
 </div>
 
 ## references
-https://dev.to/stevensunflash/using-domain-driven-design-ddd-in-golang-3ee5
-https://github.com/LyricTian/gin-admin
++ https://dev.to/stevensunflash/using-domain-driven-design-ddd-in-golang-3ee5
++ https://github.com/LyricTian/gin-admin
