@@ -1,7 +1,7 @@
 version: 2.1
 executors:
   default:
-    working_directory: /src
+    working_directory: /go/src/github.com/linzhengen/ddd-gin-admin
     environment:
       TZ: "/usr/share/zoneinfo/Asia/Tokyo"
       GO111MODULE: "on"
