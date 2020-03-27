@@ -9,7 +9,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/ginplus"
 )
 
-// News constructor.
+// NewUser constructor.
 func NewUser(us application.UserRepository) *User {
 	return &User{
 		us: us,

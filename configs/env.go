@@ -13,9 +13,9 @@ type EnvConfig struct {
 	RunMode string `envconfig:"RUN_MODE" required:"true" default:"debug"` // (debug/test/release)
 
 	// http
-	HttpHost         string        `envconfig:"HTTP_HOST" default:"0.0.0.0"`
-	HttpPort         int           `envconfig:"HTTP_PORT" default:"8080"`
-	HttpShutdownTime time.Duration `envconfig:"HTTP_SHUTDOWN_TIME" default:"30s"`
+	HTTPHost         string        `envconfig:"HTTP_HOST" default:"0.0.0.0"`
+	HTTPPort         int           `envconfig:"HTTP_PORT" default:"8080"`
+	HTTPShutdownTime time.Duration `envconfig:"HTTP_SHUTDOWN_TIME" default:"30s"`
 
 	// log
 	LogLevel      int    `envconfig:"LOG_LEVEL" default:"5"`       // 1:fatal 2:error,3:warn,4:info,5:debug
@@ -46,6 +46,7 @@ func InitEnv() error {
 	return envconfig.Process("", &env)
 }
 
+// Env return processed env values.
 func Env() EnvConfig {
 	return env
 }

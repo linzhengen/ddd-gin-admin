@@ -40,7 +40,7 @@ func InitWeb(mysqlRepo *mysql.Repositories) *gin.Engine {
 // InitHTTPServer init http server
 func InitHTTPServer(ctx context.Context, mysqlRepo *mysql.Repositories) func() {
 	cfg := configs.Env()
-	addr := fmt.Sprintf("%s:%d", cfg.HttpHost, cfg.HttpPort)
+	addr := fmt.Sprintf("%s:%d", cfg.HTTPHost, cfg.HTTPPort)
 	srv := &http.Server{
 		Addr:         addr,
 		Handler:      InitWeb(mysqlRepo),
@@ -59,7 +59,7 @@ func InitHTTPServer(ctx context.Context, mysqlRepo *mysql.Repositories) func() {
 	}()
 
 	return func() {
-		ctx, cancel := context.WithTimeout(ctx, cfg.HttpShutdownTime)
+		ctx, cancel := context.WithTimeout(ctx, cfg.HTTPShutdownTime)
 		defer cancel()
 
 		srv.SetKeepAlivesEnabled(false)

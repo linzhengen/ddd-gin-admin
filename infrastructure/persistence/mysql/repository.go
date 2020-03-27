@@ -7,6 +7,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 
+	// import mysql drive.
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
@@ -34,7 +35,7 @@ func NewRepositories(db *gorm.DB) (*Repositories, error) {
 	}, nil
 }
 
-// closes the database connection.
+// Close closes the database connection.
 func (s *Repositories) Close() error {
 	return s.db.Close()
 }
