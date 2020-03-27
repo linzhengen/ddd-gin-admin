@@ -1,0 +1,12 @@
+FROM golang:1.14-alpine
+
+ENV GO111MODULE=on
+
+WORKDIR /src
+
+RUN set -ex; \
+    apk add --update --no-cache git && \
+    go get -u github.com/cosmtrek/air
+
+COPY go.mod go.sum ./
+RUN go mod download
