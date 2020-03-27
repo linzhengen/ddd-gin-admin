@@ -4,6 +4,7 @@ executors:
     working_directory: /src
     environment:
       TZ: "/usr/share/zoneinfo/Asia/Tokyo"
+      GO111MODULE: "on"
     docker:
       - image: circleci/golang:1.14
 
@@ -12,26 +13,42 @@ jobs:
     executor: default
     steps:
       - checkout
-      - go mod download
-      - make lint
+      - run:
+          name: "go mod download"
+          command: go mod download
+      - run:
+          name: "run lint"
+          command: make lint
   govet:
     executor: default
     steps:
       - checkout
-      - go mod download
-      - make vet
+      - run:
+          name: "go mod download"
+          command: go mod download
+      - run:
+          name: "run vet"
+          command: make vet
   gofmtcheck:
     executor: default
     steps:
       - checkout
-      - go mod download
-      - make fmt-check
+      - run:
+          name: "go mod download"
+          command: go mod download
+      - run:
+          name: "run fmt-check"
+          command: make fmt-check
   test:
     executor: default
     steps:
       - checkout
-      - go mod download
-      - make test
+      - run:
+          name: "go mod download"
+          command: go mod download
+      - run:
+          name: "run test"
+          command: make test
 
 workflows:
   version: 2
