@@ -1,0 +1,216 @@
+# run mode(debug|test|release)
+RunMode = "debug"
+
+# Static file directory (you can also use -www to specify when starting server)
+WWW = ""
+
+# Whether to enable swagger
+Swagger = true
+
+# Whether to print configuration parameters at startup
+PrintConfig = true
+
+[HTTP]
+# http listening address
+Host = "0.0.0.0"
+# http listening port
+Port = 10088
+# Certification path
+CertFile = ""
+# Certificate key
+KeyFile = ""
+# http graceful shutdown wait timeout time (in seconds)
+ShutdownTimeout = 30
+# Maximum allowed content length (64M)
+MaxContentLength = 67108864
+# Maximum log length allowed for output
+MaxLoggerLength = 4096
+
+[Menu]
+# Use enable to initialize menu data
+Enable = true
+# Data file (yaml, you can also use -menu to specify when starting server)
+Data = ""
+
+[Casbin]
+# Whether to enable casbin
+Enable = true
+# debug mode
+Debug = false
+# Model configuration file (can also be specified with -m when starting server)
+Model = ""
+# Whether to enable the regular automatic loading strategy
+AutoLoad = false
+# Periodic automatic loading strategy time interval (in seconds)
+AutoLoadInternal = 60
+
+[Log]
+# Log level (1: fatal 2: error, 3: warn, 4: info, 5: debug, 6: trace)
+Level = 5
+# Log format (support output format: text/json)
+Format = "text"
+# Log output (support: stdout/stderr/file)
+Output = "stdout"
+# Specify the file path for log output
+OutputFile = "data/gin-admin.log"
+# Whether to enable the log hook
+EnableHook = false
+# Write the log level of the hook
+HookLevels = ["info","warn","error"]
+# Log hook (support: gorm/mongo)
+Hook = "gorm"
+# The maximum number of worker threads for writing hooks
+HookMaxThread = 1
+# The maximum number of buffers written to the hook
+HookMaxBuffer = 512
+
+[LogGormHook]
+# Database type (currently supported database type: mysql/sqlite3/postgres)
+DBType = "sqlite3"
+# Set the maximum time that the connection can be reused (unit: second)
+MaxLifetime = 7200
+# Set the maximum number of open connections for the database
+MaxOpenConns = 1
+# Set the maximum number of connections in the free connection pool
+MaxIdleConns = 1
+# Database table name
+Table = "g_logger"
+
+[LogMongoHook]
+# Database table name
+Collection = "g_logger"
+
+# Service monitoring (GOPS: https://github.com/google/gops)
+[Monitor]
+# Whether to enable
+Enable = false
+# HTTP listening address and port
+Addr = "127.0.0.1:16060"
+# Configuration file directory (empty, use the default directory)
+ConfigDir = ""
+
+[Root]
+# Login Username
+UserName = "root"
+# login password
+Password = "abc-123"
+# Displayed real name
+RealName = "Super Administrator"
+
+# redis configuration information
+[Redis]
+# address
+Addr = "127.0.0.1:6379"
+# password
+Password = ""
+
+[JWTAuth]
+# Whether to enable
+Enable = true
+# Signature method (support: HS512/HS384/HS512)
+SigningMethod = "HS512"
+# Signature key
+SigningKey = "gin-admin"
+# Expiration time (in seconds)
+Expired = 7200
+# Storage (support: file/redis)
+Store = "file"
+# file path
+FilePath = "data/jwt_auth.db"
+# redis database (if the storage method is redis, specify the stored database)
+RedisDB = 10
+# The key name prefix stored in the redis database
+RedisPrefix = "auth_"
+
+[Captcha]
+# Storage method (support: memory/redis)
+Store = "memory"
+# Number length
+Length = 4
+# Picture width
+Width = 400
+# Picture height
+Height = 160
+# redis database (if the storage method is redis, specify the stored database)
+RedisDB = 10
+# The key name prefix stored in the redis database
+RedisPrefix = "captcha_"
+
+# Request frequency limit (if redis is available, use redis, otherwise use memory storage)
+[RateLimiter]
+# Whether to enable
+Enable = false
+# The maximum number of requests allowed per user per minute
+Count = 300
+# redis database (if the storage method is redis, specify the stored database)
+RedisDB = 10
+
+[CORS]
+# Whether to enable
+Enable = false
+# List of domain names that allow cross-domain requests (* means all are allowed)
+AllowOrigins = ["*"]
+# List of request methods that allow cross-domain requests
+AllowMethods = ["GET","POST","PUT","DELETE","PATCH"]
+# List of non-simple headers that clients are allowed to use with cross-domain requests
+AllowHeaders = []
+# Whether the request can include user credentials such as cookies, HTTP authentication or client SSL certificates
+AllowCredentials = true
+# The time for which the results of the preflight request can be cached (in seconds)
+MaxAge = 7200
+
+[GZIP]
+# Whether to enable
+Enable = false
+# Excluded file extension
+ExcludedExtentions = [".png",".gif",".jpeg",".jpg"]
+# Excluded request path
+ExcludedPaths = []
+
+[Gorm]
+# Whether to enable debugging mode
+Debug = true
+# Database type (currently supported database type: mysql/sqlite3/postgres)
+DBType = "sqlite3"
+# Set the maximum time that the connection can be reused (unit: second)
+MaxLifetime = 7200
+# Set the maximum number of open connections for the database
+MaxOpenConns = 150
+# Set the maximum number of connections in the free connection pool
+MaxIdleConns = 50
+# Database table name prefix
+TablePrefix = "g_"
+# Whether to enable automatic mapping of database table structure
+EnableAutoMigrate = true
+
+[MySQL]
+# Connection address
+Host = "127.0.0.1"
+# Connection port
+Port = 3306
+# username
+User = "root"
+# password
+Password = "123456"
+# Database
+DBName = "gin-admin"
+# Connection parameters
+Parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
+
+[Postgres]
+# Connection address
+Host = "127.0.0.1"
+# Connection port
+Port = 5432
+# username
+User = "root"
+# password
+Password = "123456"
+# Database
+DBName = "gin-admin"
+# SSL mode
+SSLMode = "disable"
+
+[Sqlite3]
+# Database path
+Path = "data/gin-admin.db"

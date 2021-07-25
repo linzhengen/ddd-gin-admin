@@ -1,71 +1,35 @@
-GO ?= go
-GOFMT ?= gofmt "-s"
-PACKAGES ?= $(shell $(GO) list ./...)
-VETPACKAGES ?= $(shell $(GO) list ./...)
-GOFILES := $(shell find . -name "*.go")
-TESTFOLDER := $(shell $(GO) list ./... | grep -E 'gin$$|binding$$|render$$')
-TESTTAGS ?= ""
+.PHONY: start build
 
-.PHONY: test
-test:
-	echo "mode: count" > coverage.out
-	for d in $(TESTFOLDER); do \
-		$(GO) test -tags $(TESTTAGS) -v -covermode=count -coverprofile=profile.out $$d > tmp.out; \
-		cat tmp.out; \
-		if grep -q "^--- FAIL" tmp.out; then \
-			rm tmp.out; \
-			exit 1; \
-		elif grep -q "build failed" tmp.out; then \
-			rm tmp.out; \
-			exit 1; \
-		elif grep -q "setup failed" tmp.out; then \
-			rm tmp.out; \
-			exit 1; \
-		fi; \
-		if [ -f profile.out ]; then \
-			cat profile.out | grep -v "mode:" >> coverage.out; \
-			rm profile.out; \
-		fi; \
-	done
+NOW = $(shell date -u '+%Y%m%d%I%M%S')
 
-.PHONY: fmt
-fmt:
-	$(GOFMT) -w $(GOFILES)
+RELEASE_VERSION = v1.0.0
 
-.PHONY: fmt-check
-fmt-check:
-	@diff=$$($(GOFMT) -d $(GOFILES)); \
-	if [ -n "$$diff" ]; then \
-		echo "Please run 'make fmt' and commit the result:"; \
-		echo "$${diff}"; \
-		exit 1; \
-	fi;
+APP 			= main
+SERVER_BIN  	= ./main/${APP}
+RELEASE_ROOT 	= release
+RELEASE_SERVER 	= release/${APP}
+GIT_COUNT 		= $(shell git rev-list --all --count)
+GIT_HASH        = $(shell git rev-parse --short HEAD)
+RELEASE_TAG     = $(RELEASE_VERSION).$(GIT_COUNT).$(GIT_HASH)
 
-vet:
-	$(GO) vet $(VETPACKAGES)
+all: start
 
-.PHONY: lint
-lint:
-	@hash golint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) get -u golang.org/x/lint/golint; \
-	fi
-	for PKG in $(PACKAGES); do golint -set_exit_status $$PKG || exit 1; done;
+build:
+	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN) ./main
 
-.PHONY: misspell-check
-misspell-check:
-	@hash misspell > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) get -u github.com/client9/misspell/cmd/misspell; \
-	fi
-	misspell -error $(GOFILES)
+start:
+	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" ./main/main.go web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml
 
-.PHONY: misspell
-misspell:
-	@hash misspell > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) get -u github.com/client9/misspell/cmd/misspell; \
-	fi
-	misspell -w $(GOFILES)
+swagger:
+	@swag init --generalInfo ./main/main.go --output ./interfaces/swagger
 
-.PHONY: tools
-tools:
-	go install golang.org/x/lint/golint; \
-	go install github.com/client9/misspell/cmd/misspell;
+wire:
+	@wire gen ./injector
+
+clean:
+	rm -rf data release $(SERVER_BIN) data
+
+pack: build
+	rm -rf $(RELEASE_ROOT) && mkdir -p $(RELEASE_SERVER)
+	cp -r $(SERVER_BIN) configs $(RELEASE_SERVER)
+	cd $(RELEASE_ROOT) && tar -cvf $(APP).tar ${APP} && rm -rf ${APP}

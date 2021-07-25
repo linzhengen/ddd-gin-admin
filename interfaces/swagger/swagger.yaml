@@ -1,0 +1,1457 @@
+basePath: /api
+definitions:
+  schema.Demo:
+    properties:
+      code:
+        description: Code
+        type: string
+      created_at:
+        description: CreatedAt
+        type: string
+      creator:
+        description: Creator
+        type: string
+      id:
+        description: ID
+        type: string
+      memo:
+        description: Memo
+        type: string
+      name:
+        description: Nmae
+        type: string
+      status:
+        description: Status(1:enable 2:disable)
+        type: integer
+      updated_at:
+        description: UpdatedAt
+        type: string
+    required:
+    - code
+    - name
+    - status
+    type: object
+  schema.ErrorItem:
+    properties:
+      code:
+        description: Error Code
+        type: integer
+      message:
+        description: Error Message
+        type: string
+    type: object
+  schema.ErrorResult:
+    properties:
+      error:
+        $ref: '#/definitions/schema.ErrorItem'
+        description: Error
+        type: object
+    type: object
+  schema.IDResult:
+    properties:
+      id:
+        type: string
+    type: object
+  schema.ListResult:
+    properties:
+      list:
+        description: List
+        type: object
+      pagination:
+        $ref: '#/definitions/schema.PaginationResult'
+        description: Pagination
+        type: object
+    type: object
+  schema.LoginCaptcha:
+    properties:
+      captcha_id:
+        description: Captcha ID
+        type: string
+    type: object
+  schema.LoginParam:
+    properties:
+      captcha_code:
+        description: Captcha Code
+        type: string
+      captcha_id:
+        description: Captcha ID
+        type: string
+      password:
+        description: Password(md5)
+        type: string
+      user_name:
+        description: User Name
+        type: string
+    required:
+    - captcha_code
+    - captcha_id
+    - password
+    - user_name
+    type: object
+  schema.LoginTokenInfo:
+    properties:
+      access_token:
+        description: Access Token
+        type: string
+      expires_at:
+        description: Expires At
+        type: integer
+      token_type:
+        description: Token Type
+        type: string
+    type: object
+  schema.Menu:
+    properties:
+      actions:
+        $ref: '#/definitions/schema.MenuActions'
+        description: Actions
+        type: object
+      created_at:
+        description: CreatedAt
+        type: string
+      creator:
+        description: Creator
+        type: string
+      icon:
+        description: Icon
+        type: string
+      id:
+        description: ID
+        type: string
+      memo:
+        description: Memo
+        type: string
+      name:
+        description: Name
+        type: string
+      parent_id:
+        description: Parent ID
+        type: string
+      parent_path:
+        description: Parent Path
+        type: string
+      router:
+        description: Router
+        type: string
+      sequence:
+        description: Sequence
+        type: integer
+      show_status:
+        description: Show Status(1:show 2:hide)
+        type: integer
+      status:
+        description: Menu Status(1:enable 2:disable)
+        type: integer
+      updated_at:
+        description: UpdatedAt
+        type: string
+    required:
+    - name
+    - show_status
+    - status
+    type: object
+  schema.MenuAction:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      menu_id:
+        type: string
+      name:
+        type: string
+      resources:
+        $ref: '#/definitions/schema.MenuActionResources'
+        type: object
+    required:
+    - code
+    - menu_id
+    - name
+    type: object
+  schema.MenuActionResource:
+    properties:
+      action_id:
+        type: string
+      id:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+    required:
+    - method
+    - path
+    type: object
+  schema.MenuActionResources:
+    items:
+      $ref: '#/definitions/schema.MenuActionResource'
+    type: array
+  schema.MenuActions:
+    items:
+      $ref: '#/definitions/schema.MenuAction'
+    type: array
+  schema.PaginationResult:
+    properties:
+      current:
+        description: Current Page
+        type: integer
+      pageSize:
+        description: Page Size
+        type: integer
+      total:
+        description: Total count
+        type: integer
+    type: object
+  schema.Role:
+    properties:
+      created_at:
+        description: CreatedAt
+        type: string
+      creator:
+        description: Creator
+        type: string
+      id:
+        description: ID
+        type: string
+      memo:
+        description: Memo
+        type: string
+      name:
+        description: Name
+        type: string
+      role_menus:
+        $ref: '#/definitions/schema.RoleMenus'
+        description: RoleMenus
+        type: object
+      sequence:
+        description: Sequence
+        type: integer
+      status:
+        description: Status(1:enable 2:disable)
+        type: integer
+      updated_at:
+        description: UpdatedAt
+        type: string
+    required:
+    - name
+    - role_menus
+    - status
+    type: object
+  schema.RoleMenu:
+    properties:
+      action_id:
+        description: Action ID
+        type: string
+      id:
+        description: ID
+        type: string
+      menu_id:
+        description: Menu ID
+        type: string
+      role_id:
+        description: Role ID
+        type: string
+    required:
+    - action_id
+    - menu_id
+    - role_id
+    type: object
+  schema.RoleMenus:
+    items:
+      $ref: '#/definitions/schema.RoleMenu'
+    type: array
+  schema.Roles:
+    items:
+      $ref: '#/definitions/schema.Role'
+    type: array
+  schema.StatusResult:
+    properties:
+      status:
+        description: Result status
+        type: string
+    type: object
+  schema.UpdatePasswordParam:
+    properties:
+      new_password:
+        description: New Password
+        type: string
+      old_password:
+        description: Old Password
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  schema.User:
+    properties:
+      created_at:
+        description: CreatedAt
+        type: string
+      creator:
+        description: Creator
+        type: string
+      email:
+        description: Email
+        type: string
+      id:
+        description: ID
+        type: string
+      password:
+        description: Password
+        type: string
+      phone:
+        description: Phone
+        type: string
+      real_name:
+        description: Real Name
+        type: string
+      status:
+        description: Status(1:enable 2:disable)
+        type: integer
+      user_name:
+        description: User Name
+        type: string
+      user_roles:
+        $ref: '#/definitions/schema.UserRoles'
+        description: UserRoles
+        type: object
+    required:
+    - real_name
+    - status
+    - user_name
+    - user_roles
+    type: object
+  schema.UserLoginInfo:
+    properties:
+      real_name:
+        description: Real Name
+        type: string
+      roles:
+        $ref: '#/definitions/schema.Roles'
+        description: Role
+        type: object
+      user_id:
+        description: User ID
+        type: string
+      user_name:
+        description: User Name
+        type: string
+    type: object
+  schema.UserRole:
+    properties:
+      id:
+        description: ID
+        type: string
+      role_id:
+        description: Role ID
+        type: string
+      user_id:
+        description: User ID
+        type: string
+    type: object
+  schema.UserRoles:
+    items:
+      $ref: '#/definitions/schema.UserRole'
+    type: array
+info:
+  contact: {}
+  description: RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
+  license: {}
+  title: ddd-gin-admin
+  version: 1.0.0
+paths:
+  /api/v1/demos:
+    get:
+      parameters:
+      - default: 1
+        description: Current page
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: Search value
+        in: query
+        name: queryValue
+        type: string
+      responses:
+        "200":
+          description: Search result
+          schema:
+            $ref: '#/definitions/schema.ListResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Search Summary
+      tags:
+      - Demo
+    post:
+      parameters:
+      - description: Create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.Demo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.IDResult'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create
+      tags:
+      - Demo
+  /api/v1/demos/{id}:
+    delete:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete
+      tags:
+      - Demo
+    get:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.Demo'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "404":
+          description: '{error:{code:0,message:NotFound}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Search
+      tags:
+      - Demo
+    put:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.Demo'
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update
+      tags:
+      - Demo
+  /api/v1/demos/{id}/disable:
+    patch:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Disable
+      tags:
+      - Demo
+  /api/v1/demos/{id}/enable:
+    patch:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable
+      tags:
+      - Demo
+  /api/v1/menus:
+    get:
+      parameters:
+      - default: 1
+        description: Current page
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: Search value
+        in: query
+        name: queryValue
+        type: string
+      - description: Status(1:enable 2:disable)
+        in: query
+        name: status
+        type: integer
+      - description: Show status(1:show 2:hide)
+        in: query
+        name: showStatus
+        type: integer
+      - description: Parent ID
+        in: query
+        name: parentID
+        type: string
+      responses:
+        "200":
+          description: Search Result
+          schema:
+            $ref: '#/definitions/schema.ListResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Search
+      tags:
+      - Menu
+    post:
+      parameters:
+      - description: Create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.Menu'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.IDResult'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create
+      tags:
+      - Menu
+  /api/v1/menus.tree:
+    get:
+      parameters:
+      - description: Status(1:enable 2:disable)
+        in: query
+        name: status
+        type: integer
+      - description: Parent ID
+        in: query
+        name: parentID
+        type: string
+      responses:
+        "200":
+          description: Search Result
+          schema:
+            $ref: '#/definitions/schema.ListResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Search menu tree
+      tags:
+      - Menu
+  /api/v1/menus/{id}:
+    delete:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete
+      tags:
+      - Menu
+    get:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.Menu'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "404":
+          description: '{error:{code:0,message:NotFound}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get by ID
+      tags:
+      - Menu
+    put:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.Menu'
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update
+      tags:
+      - Menu
+  /api/v1/menus/{id}/disable:
+    patch:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Disable
+      tags:
+      - Menu
+  /api/v1/menus/{id}/enable:
+    patch:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable
+      tags:
+      - Menu
+  /api/v1/pub/current/menutree:
+    get:
+      responses:
+        "200":
+          description: Search Result
+          schema:
+            $ref: '#/definitions/schema.ListResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user menu tree
+      tags:
+      - Login
+  /api/v1/pub/current/password:
+    put:
+      parameters:
+      - description: Request parameters
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.UpdatePasswordParam'
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update password
+      tags:
+      - Login
+  /api/v1/pub/current/user:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.UserLoginInfo'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get current user info
+      tags:
+      - Login
+  /api/v1/pub/login:
+    post:
+      parameters:
+      - description: Request parameters
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.LoginParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.LoginTokenInfo'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      summary: Login
+      tags:
+      - Login
+  /api/v1/pub/login/captcha:
+    get:
+      parameters:
+      - description: Captcha ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Reload
+        in: query
+        name: reload
+        type: string
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: 图形验证码
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      summary: Response captcha
+      tags:
+      - Login
+  /api/v1/pub/login/captchaid:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.LoginCaptcha'
+      summary: Get Captcha
+      tags:
+      - Login
+  /api/v1/pub/login/exit:
+    post:
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+      summary: Logout
+      tags:
+      - Login
+  /api/v1/pub/refresh-token:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.LoginTokenInfo'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Refresh token
+      tags:
+      - Login
+  /api/v1/roles:
+    get:
+      parameters:
+      - default: 1
+        description: Current page
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: Search value
+        in: query
+        name: queryValue
+        type: string
+      - description: Status(1:enable 2:disable)
+        in: query
+        name: status
+        type: integer
+      responses:
+        "200":
+          description: Search Result
+          schema:
+            $ref: '#/definitions/schema.ListResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Search
+      tags:
+      - Role
+    post:
+      parameters:
+      - description: Create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.Role'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.IDResult'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create
+      tags:
+      - Role
+  /api/v1/roles.select:
+    get:
+      parameters:
+      - description: Search value
+        in: query
+        name: queryValue
+        type: string
+      - description: Status(1:enable 2:disable)
+        in: query
+        name: status
+        type: integer
+      responses:
+        "200":
+          description: Search Result
+          schema:
+            $ref: '#/definitions/schema.ListResult'
+        "400":
+          description: '{error:{code:0,message:未知的查询类型}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Search selected data
+      tags:
+      - Role
+  /api/v1/roles/{id}:
+    delete:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete
+      tags:
+      - Role
+    get:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.Role'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "404":
+          description: '{error:{code:0,message:NotFound}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get by ID
+      tags:
+      - Role
+    put:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.Role'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.Role'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update
+      tags:
+      - Role
+  /api/v1/roles/{id}/disable:
+    patch:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Disable
+      tags:
+      - Role
+  /api/v1/roles/{id}/enable:
+    patch:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable
+      tags:
+      - Role
+  /api/v1/users:
+    get:
+      parameters:
+      - default: 1
+        description: Current page
+        in: query
+        name: current
+        required: true
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: Search value
+        in: query
+        name: queryValue
+        type: string
+      - description: 角色ID(多个以英文逗号分隔)
+        in: query
+        name: roleIDs
+        type: string
+      - description: 状态(1:启用 2:停用)
+        in: query
+        name: status
+        type: integer
+      responses:
+        "200":
+          description: Search Result
+          schema:
+            $ref: '#/definitions/schema.ListResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Search
+      tags:
+      - User
+    post:
+      parameters:
+      - description: Create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.User'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.IDResult'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Create
+      tags:
+      - User
+  /api/v1/users/{id}:
+    delete:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete
+      tags:
+      - User
+    get:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.User'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "404":
+          description: '{error:{code:0,message:NotFound}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get by ID
+      tags:
+      - User
+    put:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schema.User'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.User'
+        "400":
+          description: '{error:{code:0,message:BadRequest}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Update
+      tags:
+      - User
+  /api/v1/users/{id}/disable:
+    patch:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Disable
+      tags:
+      - User
+  /api/v1/users/{id}/enable:
+    patch:
+      parameters:
+      - description: UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{status:OK}'
+          schema:
+            $ref: '#/definitions/schema.StatusResult'
+        "401":
+          description: '{error:{code:0,message:Unauthorized}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+        "500":
+          description: '{error:{code:0,message:SystemError}}'
+          schema:
+            $ref: '#/definitions/schema.ErrorResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable
+      tags:
+      - User
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
