@@ -5,7 +5,7 @@ import "time"
 type Demo struct {
 	ID        string    `json:"id"`                                    // ID
 	Code      string    `json:"code" binding:"required"`               // Code
-	Name      string    `json:"name" binding:"required"`               // Nmae
+	Name      string    `json:"name" binding:"required"`               // Name
 	Memo      string    `json:"memo"`                                  // Memo
 	Status    int       `json:"status" binding:"required,max=2,min=1"` // Status(1:enable 2:disable)
 	Creator   string    `json:"creator"`                               // Creator

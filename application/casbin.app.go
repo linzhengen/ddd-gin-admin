@@ -15,6 +15,7 @@ type chCasbinPolicyItem struct {
 	e   *casbin.SyncedEnforcer
 }
 
+//nolint:gochecknoinits
 func init() {
 	chCasbinPolicy = make(chan *chCasbinPolicyItem, 1)
 	go func() {

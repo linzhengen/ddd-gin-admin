@@ -17,6 +17,7 @@ type SchemaUser schema.User
 
 func (a SchemaUser) ToUser() *User {
 	item := new(User)
+	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }
@@ -37,6 +38,7 @@ type User struct {
 
 func (a User) ToSchemaUser() *schema.User {
 	item := new(schema.User)
+	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }

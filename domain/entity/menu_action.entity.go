@@ -16,6 +16,7 @@ type SchemaMenuAction schema.MenuAction
 
 func (a SchemaMenuAction) ToMenuAction() *MenuAction {
 	item := new(MenuAction)
+	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }
@@ -29,6 +30,7 @@ type MenuAction struct {
 
 func (a MenuAction) ToSchemaMenuAction() *schema.MenuAction {
 	item := new(schema.MenuAction)
+	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }

@@ -84,6 +84,7 @@ func (a Users) ToUserShows(mUserRoles map[string]UserRoles, mRoles map[string]*R
 	list := make(UserShows, len(a))
 	for i, item := range a {
 		showItem := new(UserShow)
+		//nolint:errcheck
 		structure.Copy(item, showItem)
 		for _, roleID := range mUserRoles[item.ID].ToRoleIDs() {
 			if v, ok := mRoles[roleID]; ok {

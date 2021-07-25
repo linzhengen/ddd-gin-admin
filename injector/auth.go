@@ -53,6 +53,7 @@ func InitAuth() (auth.Author, func(), error) {
 
 	auth := jwtauth.New(store, opts...)
 	cleanFunc := func() {
+		//nolint:errcheck
 		auth.Release()
 	}
 	return auth, cleanFunc, nil

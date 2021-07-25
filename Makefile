@@ -33,3 +33,9 @@ pack: build
 	rm -rf $(RELEASE_ROOT) && mkdir -p $(RELEASE_SERVER)
 	cp -r $(SERVER_BIN) configs $(RELEASE_SERVER)
 	cd $(RELEASE_ROOT) && tar -cvf $(APP).tar ${APP} && rm -rf ${APP}
+
+lint:
+	@hash golangci-lint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.41.1; \
+	fi
+	golangci-lint run ./...

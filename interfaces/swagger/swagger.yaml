@@ -18,7 +18,7 @@ definitions:
         description: Memo
         type: string
       name:
-        description: Nmae
+        description: Name
         type: string
       status:
         description: Status(1:enable 2:disable)

@@ -168,7 +168,6 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 		if err != nil && err != http.ErrServerClosed {
 			panic(err)
 		}
-
 	}()
 
 	return func() {

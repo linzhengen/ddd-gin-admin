@@ -17,6 +17,7 @@ type SchemaDemo schema.Demo
 
 func (a SchemaDemo) ToDemo() *Demo {
 	item := new(Demo)
+	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }
@@ -35,6 +36,7 @@ type Demo struct {
 
 func (a Demo) ToSchemaDemo() *schema.Demo {
 	item := new(schema.Demo)
+	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }

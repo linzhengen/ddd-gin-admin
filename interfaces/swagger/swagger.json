@@ -1771,7 +1771,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "Nmae",
+                    "description": "Name",
                     "type": "string"
                 },
                 "status": {

@@ -14,6 +14,7 @@ func TestAuth(t *testing.T) {
 
 	jwtAuth := New(store)
 
+	//nolint:errcheck
 	defer jwtAuth.Release()
 
 	ctx := context.Background()

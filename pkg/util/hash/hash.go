@@ -1,12 +1,15 @@
 package hash
 
 import (
+	//nolint:gosec
 	"crypto/md5"
+	//nolint:gosec
 	"crypto/sha1"
 	"fmt"
 )
 
 func MD5(b []byte) string {
+	//nolint:gosec
 	h := md5.New()
 	_, _ = h.Write(b)
 	return fmt.Sprintf("%x", h.Sum(nil))
@@ -17,6 +20,7 @@ func MD5String(s string) string {
 }
 
 func SHA1(b []byte) string {
+	//nolint:gosec
 	h := sha1.New()
 	_, _ = h.Write(b)
 	return fmt.Sprintf("%x", h.Sum(nil))

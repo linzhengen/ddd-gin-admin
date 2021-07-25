@@ -94,9 +94,11 @@ func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
-	} else if oldItem.Name != item.Name {
+	}
+	if oldItem.Name != item.Name {
 		err := a.checkName(ctx, item)
 		if err != nil {
 			return err
@@ -107,7 +109,7 @@ func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
 	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
-		addRoleMenus, delRoleMenus := a.compareRoleMenus(ctx, oldItem.RoleMenus, item.RoleMenus)
+		addRoleMenus, delRoleMenus := a.compareRoleMenus(oldItem.RoleMenus, item.RoleMenus)
 		for _, rmitem := range addRoleMenus {
 			rmitem.ID = uuid.MustString()
 			rmitem.RoleID = id
@@ -133,7 +135,7 @@ func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
 	return nil
 }
 
-func (a *Role) compareRoleMenus(ctx context.Context, oldRoleMenus, newRoleMenus schema.RoleMenus) (addList, delList schema.RoleMenus) {
+func (a *Role) compareRoleMenus(oldRoleMenus, newRoleMenus schema.RoleMenus) (addList, delList schema.RoleMenus) {
 	mOldRoleMenus := oldRoleMenus.ToMap()
 	mNewRoleMenus := newRoleMenus.ToMap()
 

@@ -123,8 +123,9 @@ func (a *JWTAuth) DestroyToken(ctx context.Context, tokenString string) error {
 		return err
 	}
 
-	// 如果设定了存储，则将未过期的令牌放入
+	// save black list token when use store
 	return a.callStore(func(store Store) error {
+		//nolint:gosimple
 		expired := time.Unix(claims.ExpiresAt, 0).Sub(time.Now())
 		return store.Set(ctx, tokenString, expired)
 	})

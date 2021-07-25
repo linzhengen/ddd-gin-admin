@@ -201,7 +201,6 @@ func (a *Menu) createActions(ctx context.Context, menuID string, items schema.Me
 				return err
 			}
 		}
-
 	}
 	return nil
 }
@@ -236,9 +235,11 @@ func (a *Menu) Update(ctx context.Context, id string, item schema.Menu) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
-	} else if oldItem.Name != item.Name {
+	}
+	if oldItem.Name != item.Name {
 		if err := a.checkName(ctx, item); err != nil {
 			return err
 		}
@@ -274,7 +275,7 @@ func (a *Menu) Update(ctx context.Context, id string, item schema.Menu) error {
 }
 
 func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newItems schema.MenuActions) error {
-	addActions, delActions, updateActions := a.compareActions(ctx, oldItems, newItems)
+	addActions, delActions, updateActions := a.compareActions(oldItems, newItems)
 
 	err := a.createActions(ctx, menuID, addActions)
 	if err != nil {
@@ -306,7 +307,7 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		}
 
 		// update new and delete, not update
-		addResources, delResources := a.compareResources(ctx, oitem.Resources, item.Resources)
+		addResources, delResources := a.compareResources(oitem.Resources, item.Resources)
 		for _, aritem := range addResources {
 			aritem.ID = uuid.MustString()
 			aritem.ActionID = oitem.ID
@@ -327,7 +328,7 @@ func (a *Menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 	return nil
 }
 
-func (a *Menu) compareActions(ctx context.Context, oldActions, newActions schema.MenuActions) (addList, delList, updateList schema.MenuActions) {
+func (a *Menu) compareActions(oldActions, newActions schema.MenuActions) (addList, delList, updateList schema.MenuActions) {
 	mOldActions := oldActions.ToMap()
 	mNewActions := newActions.ToMap()
 
@@ -346,7 +347,7 @@ func (a *Menu) compareActions(ctx context.Context, oldActions, newActions schema
 	return
 }
 
-func (a *Menu) compareResources(ctx context.Context, oldResources, newResources schema.MenuActionResources) (addList, delList schema.MenuActionResources) {
+func (a *Menu) compareResources(oldResources, newResources schema.MenuActionResources) (addList, delList schema.MenuActionResources) {
 	mOldResources := oldResources.ToMap()
 	mNewResources := newResources.ToMap()
 

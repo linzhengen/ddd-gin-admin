@@ -66,9 +66,11 @@ func (a *Demo) Update(ctx context.Context, id string, item schema.Demo) error {
 	oldItem, err := a.DemoModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
-	} else if oldItem.Code != item.Code {
+	}
+	if oldItem.Code != item.Code {
 		if err := a.checkCode(ctx, item.Code); err != nil {
 			return err
 		}

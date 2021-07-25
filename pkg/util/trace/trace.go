@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	version string
+	// version string
 	incrNum uint64
-	pid     = os.Getpid()
+	// pid     = os.Getpid()
 )
 
 // NewTraceID New trace id

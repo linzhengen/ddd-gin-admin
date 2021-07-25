@@ -102,9 +102,11 @@ func (a *Login) checkAndGetUser(ctx context.Context, userID string) (*schema.Use
 	user, err := a.UserModel.Get(ctx, userID)
 	if err != nil {
 		return nil, err
-	} else if user == nil {
+	}
+	if user == nil {
 		return nil, errors.ErrInvalidUser
-	} else if user.Status != 1 {
+	}
+	if user.Status != 1 {
 		return nil, errors.ErrUserDisable
 	}
 	return user, nil

@@ -17,6 +17,7 @@ type SchemaMenu schema.Menu
 
 func (a SchemaMenu) ToMenu() *Menu {
 	item := new(Menu)
+	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }
@@ -40,6 +41,7 @@ type Menu struct {
 
 func (a Menu) ToSchemaMenu() *schema.Menu {
 	item := new(schema.Menu)
+	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }

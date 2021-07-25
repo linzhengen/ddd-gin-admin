@@ -12,6 +12,7 @@ import (
 // NewStore 创建基于buntdb的文件存储
 func NewStore(path string) (*Store, error) {
 	if path != ":memory:" {
+		//nolint:errcheck
 		os.MkdirAll(filepath.Dir(path), 0777)
 	}
 

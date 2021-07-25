@@ -45,6 +45,7 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 	}
 
 	// Router register
+	//nolint:errcheck
 	r.Register(app)
 
 	// Swagger

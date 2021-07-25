@@ -50,8 +50,7 @@ func InitLogger() (func(), error) {
 			hookLevels = append(hookLevels, plvl)
 		}
 
-		switch {
-		case c.Hook.IsGorm():
+		if c.Hook.IsGorm() {
 			hc := config.C.LogGormHook
 
 			var dsn string

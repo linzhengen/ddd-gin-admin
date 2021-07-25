@@ -119,9 +119,11 @@ func (a *User) Update(ctx context.Context, id string, item schema.User) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
-	} else if oldItem.UserName != item.UserName {
+	}
+	if oldItem.UserName != item.UserName {
 		err := a.checkUserName(ctx, item)
 		if err != nil {
 			return err
@@ -138,7 +140,7 @@ func (a *User) Update(ctx context.Context, id string, item schema.User) error {
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
 	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
-		addUserRoles, delUserRoles := a.compareUserRoles(ctx, oldItem.UserRoles, item.UserRoles)
+		addUserRoles, delUserRoles := a.compareUserRoles(oldItem.UserRoles, item.UserRoles)
 		for _, rmitem := range addUserRoles {
 			rmitem.ID = uuid.MustString()
 			rmitem.UserID = id
@@ -165,7 +167,7 @@ func (a *User) Update(ctx context.Context, id string, item schema.User) error {
 	return nil
 }
 
-func (a *User) compareUserRoles(ctx context.Context, oldUserRoles, newUserRoles schema.UserRoles) (addList, delList schema.UserRoles) {
+func (a *User) compareUserRoles(oldUserRoles, newUserRoles schema.UserRoles) (addList, delList schema.UserRoles) {
 	mOldUserRoles := oldUserRoles.ToMap()
 	mNewUserRoles := newUserRoles.ToMap()
 
