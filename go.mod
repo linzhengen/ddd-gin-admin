@@ -9,7 +9,6 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/casbin/casbin/v2 v2.34.1
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gin-contrib/cors v1.3.1
@@ -17,6 +16,7 @@ require (
 	github.com/go-openapi/spec v0.20.3 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis_rate v6.5.0+incompatible
+	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/google/gops v0.3.19
 	github.com/google/uuid v1.1.2
 	github.com/google/wire v0.5.0
