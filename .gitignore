@@ -15,5 +15,10 @@
 # vendor/
 
 # binary
-cmd/server/server
+main/main
 
+# ide
+.idea
+
+# data
+data
