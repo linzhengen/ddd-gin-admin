@@ -30,7 +30,7 @@ var VERSION = "0.2.0"
 // @in header
 // @name Authorization
 // @schemes http https
-// @basePath /api
+// @basePath /
 func main() {
 	logger.SetVersion(VERSION)
 	ctx := logger.NewTagContext(context.Background(), "__main__")
