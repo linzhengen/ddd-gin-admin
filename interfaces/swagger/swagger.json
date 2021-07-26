@@ -14,7 +14,7 @@
         },
         "version": "0.2.0"
     },
-    "basePath": "/api",
+    "basePath": "/",
     "paths": {
         "/api/v1/demos": {
             "get": {

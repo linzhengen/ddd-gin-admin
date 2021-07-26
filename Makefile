@@ -39,3 +39,6 @@ lint:
 		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.41.1; \
 	fi
 	golangci-lint run ./...
+
+gen-swagger-html:
+	docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli help generate

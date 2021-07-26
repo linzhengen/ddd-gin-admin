@@ -1,4 +1,4 @@
-basePath: /api
+basePath: /
 definitions:
   schema.Demo:
     properties:
