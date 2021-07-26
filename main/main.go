@@ -19,11 +19,13 @@ import (
 )
 
 // VERSION You can specify the version number by compiling：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "1.0.0"
+var VERSION = "0.2.0"
 
 // @title ddd-gin-admin
-// @version 1.0.0
+// @version 0.2.0
 // @description RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization

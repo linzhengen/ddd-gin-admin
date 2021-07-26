@@ -356,9 +356,11 @@ definitions:
 info:
   contact: {}
   description: RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
-  license: {}
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: ddd-gin-admin
-  version: 1.0.0
+  version: 0.2.0
 paths:
   /api/v1/demos:
     get:

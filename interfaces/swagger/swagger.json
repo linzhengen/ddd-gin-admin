@@ -8,8 +8,11 @@
         "description": "RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.",
         "title": "ddd-gin-admin",
         "contact": {},
-        "license": {},
-        "version": "1.0.0"
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "0.2.0"
     },
     "basePath": "/api",
     "paths": {
