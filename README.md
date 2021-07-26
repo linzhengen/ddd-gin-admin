@@ -2,10 +2,28 @@
 [![golangci-lint](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml)
 
 ## Swagger UI
-https://linzhengen.github.io/ddd-gin-admin/docs/swagger-ui/
+- GitHub Page: https://linzhengen.github.io/ddd-gin-admin/docs/swagger-ui/
+- Localhost: http://localhost:10088/swagger/index.html
 <div align="center">
     <img src="docs/img/swagger.png">
 </div>
+
+## Project setup
+```
+go mod download
+```
+## Compiles and hot-reloads for development
+```
+make start
+```
+## Lint
+```
+make lint
+```
+## Build binary
+```
+make build
+```
 
 ## DDD comprises 4 Layers:
 + Domain: This is where the domain and business logic of the application is defined.

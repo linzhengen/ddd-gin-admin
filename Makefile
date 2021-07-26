@@ -40,5 +40,3 @@ lint:
 	fi
 	golangci-lint run ./...
 
-gen-swagger-html:
-	docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli help generate
