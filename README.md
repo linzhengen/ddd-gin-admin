@@ -1,4 +1,6 @@
 # ddd-gin-admin
+The RBAC authority management scaffold based on DDD + GIN + GORM + CASBIN + WIRE is designed to provide a set of lightweight middle and back-end development frameworks to facilitate and quickly complete the development of business requirements.
+
 [![golangci-lint](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml)
 
 ## Swagger UI
