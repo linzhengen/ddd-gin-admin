@@ -1,0 +1,21 @@
+# doc: https://skaffold.dev/docs/references/yaml
+apiVersion: skaffold/v2beta19
+kind: Config
+build:
+  artifacts:
+    - image: seion/ddd-gin-admin
+      context: .
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  helm:
+    releases:
+      - name: ddd-gin-admin
+        repo: https://linzhengen.github.io/helm-charts
+        remoteChart: web
+        version: 0.1.4
+        namespace: ddd-gin-admin
+        createNamespace: true
+        valuesFiles:
+          - ./helm/base.values.yaml
+          - ./heml/local.values.yaml

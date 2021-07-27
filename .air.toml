@@ -4,16 +4,16 @@
 # . or absolute path, please note that the directories following must be under root
 root = "."
 # Optional! If `watch_dir` is empty, use `root`.
-watch_dir = "
+watch_dir = ""
 tmp_dir = "tmp"
 
 [build]
 # Just plain old shell command. You could use `make` as well.
-cmd = "wire gen ./injector && go build -o ./main ./main/main"
+cmd = "wire gen ./injector && go build -o ./main/app ./main"
 # Binary file yields from `cmd`.
-bin = "./main/main"
+bin = "./main/app"
 # Customize binary.
-full_bin = "./main/main web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml"
+full_bin = "./main/app web -c ./configs/config.toml -m ./configs/model.conf --menu ./configs/menu.yaml"
 # This log file places in your tmp_dir.
 log = "air_errors.log"
 # Watch these filename extensions.

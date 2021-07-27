@@ -16,7 +16,7 @@ tmp
 # vendor/
 
 # binary
-main/main
+main/app
 
 # ide
 .idea
