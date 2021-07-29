@@ -179,7 +179,7 @@ MaxOpenConns = 150
 # Set the maximum number of connections in the free connection pool
 MaxIdleConns = 50
 # Database table name prefix
-TablePrefix = "g_"
+TablePrefix = ""
 # Whether to enable automatic mapping of database table structure
 EnableAutoMigrate = true
 
@@ -191,9 +191,9 @@ Port = 3306
 # username
 User = "root"
 # password
-Password = "123456"
+Password = "password#123"
 # Database
-DBName = "gin-admin"
+DBName = "ddd-gin-admin"
 # Connection parameters
 Parameters = "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
 

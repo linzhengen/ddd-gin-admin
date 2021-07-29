@@ -19,9 +19,7 @@ func MustLoad(fpaths ...string) {
 	once.Do(func() {
 		loaders := []multiconfig.Loader{
 			&multiconfig.TagLoader{},
-			&multiconfig.EnvironmentLoader{},
 		}
-
 		for _, fpath := range fpaths {
 			if strings.HasSuffix(fpath, "toml") {
 				loaders = append(loaders, &multiconfig.TOMLLoader{Path: fpath})
@@ -33,7 +31,8 @@ func MustLoad(fpaths ...string) {
 				loaders = append(loaders, &multiconfig.YAMLLoader{Path: fpath})
 			}
 		}
-
+		// Can be overwritten config with environment variable
+		loaders = append(loaders, &multiconfig.EnvironmentLoader{})
 		m := multiconfig.DefaultLoader{
 			Loader:    multiconfig.MultiLoader(loaders...),
 			Validator: multiconfig.MultiValidator(&multiconfig.RequiredValidator{}),

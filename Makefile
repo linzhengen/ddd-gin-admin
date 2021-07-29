@@ -57,3 +57,11 @@ docker-push:
 	time docker build --file ./Dockerfile --no-cache --tag seion/ddd-gin-admin .
 	docker login
 	docker push seion/ddd-gin-admin
+
+.PHONY: skaffold-build
+skaffold-build:
+	skaffold build --file-output output.json
+
+.PHONY: skaffold-dev
+skaffold-dev:
+	skaffold dev -v debug -p dev

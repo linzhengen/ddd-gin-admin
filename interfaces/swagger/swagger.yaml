@@ -47,6 +47,15 @@ definitions:
         description: Error
         type: object
     type: object
+  schema.HealthCheck:
+    properties:
+      checked_at:
+        description: CheckedAt
+        type: string
+      status:
+        description: Status
+        type: string
+    type: object
   schema.IDResult:
     properties:
       id:
@@ -362,6 +371,16 @@ info:
   title: ddd-gin-admin
   version: 0.2.0
 paths:
+  /api/health:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.HealthCheck'
+      summary: HealthCheck
+      tags:
+      - HealthCheck
   /api/v1/demos:
     get:
       parameters:
