@@ -16,7 +16,10 @@ go mod download
 ```
 ## Compiles and hot-reloads for development
 ```
-make start
+# Via air
+make serve
+# Via skaffold dev with minikube
+make skaffold-dev
 ```
 ## Lint
 ```

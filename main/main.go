@@ -19,7 +19,7 @@ import (
 )
 
 // VERSION You can specify the version number by compiling：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "0.2.0"
+var VERSION = "0.3.0"
 
 // @title ddd-gin-admin
 // @version 0.2.0
@@ -34,7 +34,6 @@ var VERSION = "0.2.0"
 func main() {
 	logger.SetVersion(VERSION)
 	ctx := logger.NewTagContext(context.Background(), "__main__")
-
 	app := cli.NewApp()
 	app.Name = "ddd-gin-admin"
 	app.Version = VERSION

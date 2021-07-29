@@ -16,6 +16,22 @@
     },
     "basePath": "/",
     "paths": {
+        "/api/health": {
+            "get": {
+                "tags": [
+                    "HealthCheck"
+                ],
+                "summary": "HealthCheck",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.HealthCheck"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/demos": {
             "get": {
                 "security": [
@@ -1807,6 +1823,19 @@
                     "description": "Error",
                     "type": "object",
                     "$ref": "#/definitions/schema.ErrorItem"
+                }
+            }
+        },
+        "schema.HealthCheck": {
+            "type": "object",
+            "properties": {
+                "checked_at": {
+                    "description": "CheckedAt",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Status",
+                    "type": "string"
                 }
             }
         },

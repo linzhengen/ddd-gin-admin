@@ -26,6 +26,7 @@ type Router struct {
 	MenuAPI        *handler.Menu
 	RoleAPI        *handler.Role
 	UserAPI        *handler.User
+	HealthAPI      *handler.HealthCheck
 }
 
 func (a *Router) Register(app *gin.Engine) error {

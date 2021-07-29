@@ -116,6 +116,7 @@ func BuildInjector() (*Injector, func(), error) {
 	handlerUser := &handler.User{
 		UserSrv: applicationUser,
 	}
+	healthCheck := &handler.HealthCheck{}
 	routerRouter := &router.Router{
 		Auth:           author,
 		CasbinEnforcer: syncedEnforcer,
@@ -124,6 +125,7 @@ func BuildInjector() (*Injector, func(), error) {
 		MenuAPI:        handlerMenu,
 		RoleAPI:        handlerRole,
 		UserAPI:        handlerUser,
+		HealthAPI:      healthCheck,
 	}
 	engine := InitGinEngine(routerRouter)
 	injector := &Injector{

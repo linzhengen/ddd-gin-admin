@@ -8,7 +8,6 @@ import (
 // RegisterAPI register api group router
 func (a *Router) RegisterAPI(app *gin.Engine) {
 	g := app.Group("/api")
-
 	g.Use(middleware.UserAuthMiddleware(a.Auth,
 		middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
 	))
@@ -18,7 +17,7 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 	))
 
 	g.Use(middleware.RateLimiterMiddleware())
-
+	g.GET("health", a.HealthAPI.Get)
 	v1 := g.Group("/v1")
 	{
 		pub := v1.Group("/pub")

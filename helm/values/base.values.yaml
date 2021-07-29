@@ -1,0 +1,5 @@
+fullnameOverridet: ddd-gin-admin
+livenessProbe:
+  path: /api/health
+readinessProbe:
+  path: /api/health
