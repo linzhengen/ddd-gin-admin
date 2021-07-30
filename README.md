@@ -21,6 +21,10 @@ make serve
 # Via skaffold dev with minikube
 make skaffold-dev
 ```
+## Starting tunnel via minikube for service ddd-gin-admin-web
+```
+minikube service ddd-gin-admin-web --url -n ddd-gin-admin
+```
 ## Lint
 ```
 make lint
