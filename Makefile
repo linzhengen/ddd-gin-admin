@@ -65,3 +65,7 @@ skaffold-build:
 .PHONY: skaffold-dev
 skaffold-dev:
 	skaffold dev -v debug -p dev
+
+.PHONY: tunnel-svc-with-minikube
+tunnel-svc-with-minikube:
+	minikube service ddd-gin-admin-web --url -n ddd-gin-admin
