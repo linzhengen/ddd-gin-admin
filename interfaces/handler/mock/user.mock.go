@@ -10,9 +10,9 @@ var UserSet = wire.NewSet(wire.Struct(new(User), "*"))
 type User struct {
 }
 
-// Query Search
+// Query Search user
 // @Tags User
-// @Summary Search
+// @Summary Search user
 // @Security ApiKeyAuth
 // @Param current query int true "Current page" default(1)
 // @Param pageSize query int true "Page size" default(10)
@@ -26,7 +26,6 @@ type User struct {
 func (a *User) Query(c *gin.Context) {
 }
 
-// Get Get by ID
 // Get Get by ID
 // @Tags User
 // @Summary Get by ID

@@ -24,7 +24,8 @@ func (a *Demo) Get(ctx context.Context, id string, opts ...schema.DemoQueryOptio
 	item, err := a.DemoModel.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
-	} else if item == nil {
+	}
+	if item == nil {
 		return nil, errors.ErrNotFound
 	}
 
@@ -40,8 +41,9 @@ func (a *Demo) checkCode(ctx context.Context, code string) error {
 	})
 	if err != nil {
 		return err
-	} else if result.PageResult.Total > 0 {
-		return errors.New400Response("编号已经存在")
+	}
+	if result.PageResult.Total > 0 {
+		return errors.New400Response("Code already exists")
 	}
 
 	return nil
@@ -86,7 +88,8 @@ func (a *Demo) Delete(ctx context.Context, id string) error {
 	oldItem, err := a.DemoModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
@@ -97,7 +100,8 @@ func (a *Demo) UpdateStatus(ctx context.Context, id string, status int) error {
 	oldItem, err := a.DemoModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
 	}
 

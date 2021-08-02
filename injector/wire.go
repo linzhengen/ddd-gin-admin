@@ -5,13 +5,13 @@ package injector
 
 import (
 	"github.com/linzhengen/ddd-gin-admin/application"
-	adapter2 "github.com/linzhengen/ddd-gin-admin/domain/adapter"
 	"github.com/linzhengen/ddd-gin-admin/interfaces/handler"
 
 	// "github.com/linzhengen/ddd-gin-admin/infrastructure/api/mock"
 	"github.com/google/wire"
 	"github.com/linzhengen/ddd-gin-admin/interfaces/router"
 
+	"github.com/linzhengen/ddd-gin-admin/domain/adapter"
 	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
 )
 
@@ -27,7 +27,7 @@ func BuildInjector() (*Injector, func(), error) {
 		application.ServiceSet,
 		handler.APISet,
 		router.RouterSet,
-		adapter2.CasbinAdapterSet,
+		adapter.CasbinAdapterSet,
 		InjectorSet,
 	)
 	return new(Injector), nil, nil

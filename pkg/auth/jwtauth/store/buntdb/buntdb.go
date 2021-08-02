@@ -9,7 +9,6 @@ import (
 	"github.com/tidwall/buntdb"
 )
 
-// NewStore 创建基于buntdb的文件存储
 func NewStore(path string) (*Store, error) {
 	if path != ":memory:" {
 		//nolint:errcheck
@@ -26,12 +25,10 @@ func NewStore(path string) (*Store, error) {
 	}, nil
 }
 
-// Store buntdb存储
 type Store struct {
 	db *buntdb.DB
 }
 
-// Set ...
 func (a *Store) Set(ctx context.Context, tokenString string, expiration time.Duration) error {
 	return a.db.Update(func(tx *buntdb.Tx) error {
 		var opts *buntdb.SetOptions
@@ -43,7 +40,6 @@ func (a *Store) Set(ctx context.Context, tokenString string, expiration time.Dur
 	})
 }
 
-// Delete 删除键
 func (a *Store) Delete(ctx context.Context, tokenString string) error {
 	return a.db.Update(func(tx *buntdb.Tx) error {
 		_, err := tx.Delete(tokenString)
@@ -54,7 +50,6 @@ func (a *Store) Delete(ctx context.Context, tokenString string) error {
 	})
 }
 
-// Check ...
 func (a *Store) Check(ctx context.Context, tokenString string) (bool, error) {
 	var exists bool
 	err := a.db.View(func(tx *buntdb.Tx) error {
@@ -68,7 +63,6 @@ func (a *Store) Check(ctx context.Context, tokenString string) (bool, error) {
 	return exists, err
 }
 
-// Close ...
 func (a *Store) Close() error {
 	return a.db.Close()
 }

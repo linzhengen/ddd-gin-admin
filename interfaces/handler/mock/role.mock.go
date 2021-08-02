@@ -10,9 +10,9 @@ var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
 type Role struct {
 }
 
-// Query Search
+// Query Search role
 // @Tags Role
-// @Summary Search
+// @Summary Search role
 // @Security ApiKeyAuth
 // @Param current query int true "Current page" default(1)
 // @Param pageSize query int true "Page size" default(10)

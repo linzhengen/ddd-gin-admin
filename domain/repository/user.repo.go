@@ -67,7 +67,8 @@ func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 	ok, err := FindOne(ctx, entity.GetUserDB(ctx, a.DB).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
-	} else if !ok {
+	}
+	if !ok {
 		return nil, nil
 	}
 

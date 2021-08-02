@@ -62,14 +62,16 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.
 	})
 	if err != nil {
 		return nil, err
-	} else if len(result.Data) == 0 {
+	}
+	if len(result.Data) == 0 {
 		return nil, errors.ErrInvalidUserName
 	}
 
 	item := result.Data[0]
 	if item.Password != hash.SHA1String(password) {
 		return nil, errors.ErrInvalidPassword
-	} else if item.Status != 1 {
+	}
+	if item.Status != 1 {
 		return nil, errors.ErrUserDisable
 	}
 
@@ -179,7 +181,8 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	})
 	if err != nil {
 		return nil, err
-	} else if len(userRoleResult.Data) == 0 {
+	}
+	if len(userRoleResult.Data) == 0 {
 		return nil, errors.ErrNoPerm
 	}
 
@@ -188,7 +191,8 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	})
 	if err != nil {
 		return nil, err
-	} else if len(roleMenuResult.Data) == 0 {
+	}
+	if len(roleMenuResult.Data) == 0 {
 		return nil, errors.ErrNoPerm
 	}
 
@@ -198,7 +202,8 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	})
 	if err != nil {
 		return nil, err
-	} else if len(menuResult.Data) == 0 {
+	}
+	if len(menuResult.Data) == 0 {
 		return nil, errors.ErrNoPerm
 	}
 
@@ -231,14 +236,14 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 
 func (a *Login) UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error {
 	if schema.CheckIsRootUser(ctx, userID) {
-		return errors.New400Response("root用户不允许更新密码")
+		return errors.New400Response("The root user is not allowed to update the password")
 	}
 
 	user, err := a.checkAndGetUser(ctx, userID)
 	if err != nil {
 		return err
 	} else if hash.SHA1String(params.OldPassword) != user.Password {
-		return errors.New400Response("旧密码不正确")
+		return errors.New400Response("The old password is invalid")
 	}
 
 	params.NewPassword = hash.SHA1String(params.NewPassword)

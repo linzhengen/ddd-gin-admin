@@ -30,7 +30,8 @@ func (a *User) QueryShow(ctx context.Context, params schema.UserQueryParam, opts
 	result, err := a.UserModel.Query(ctx, params, opts...)
 	if err != nil {
 		return nil, err
-	} else if result == nil {
+	}
+	if result == nil {
 		return nil, nil
 	}
 
@@ -55,7 +56,8 @@ func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 	item, err := a.UserModel.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
-	} else if item == nil {
+	}
+	if item == nil {
 		return nil, errors.ErrNotFound
 	}
 
@@ -100,7 +102,7 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.IDResult, 
 
 func (a *User) checkUserName(ctx context.Context, item schema.User) error {
 	if item.UserName == schema.GetRootUser().UserName {
-		return errors.New400Response("用户名不合法")
+		return errors.New400Response("The user name is invalid")
 	}
 
 	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
@@ -109,8 +111,9 @@ func (a *User) checkUserName(ctx context.Context, item schema.User) error {
 	})
 	if err != nil {
 		return err
-	} else if result.PageResult.Total > 0 {
-		return errors.New400Response("用户名已经存在")
+	}
+	if result.PageResult.Total > 0 {
+		return errors.New400Response("The user name already exists")
 	}
 	return nil
 }
@@ -189,7 +192,8 @@ func (a *User) Delete(ctx context.Context, id string) error {
 	oldItem, err := a.UserModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
@@ -213,7 +217,8 @@ func (a *User) UpdateStatus(ctx context.Context, id string, status int) error {
 	oldItem, err := a.UserModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
 	}
 	oldItem.Status = status

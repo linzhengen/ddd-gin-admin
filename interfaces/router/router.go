@@ -17,7 +17,6 @@ type IRouter interface {
 	Prefixes() []string
 }
 
-// Router 路由管理器
 type Router struct {
 	Auth           auth.Author
 	CasbinEnforcer *casbin.SyncedEnforcer

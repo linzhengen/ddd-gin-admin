@@ -47,7 +47,8 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 	})
 	if err != nil {
 		return err
-	} else if len(roleResult.Data) == 0 {
+	}
+	if len(roleResult.Data) == 0 {
 		return nil
 	}
 
@@ -92,7 +93,8 @@ func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model)
 	})
 	if err != nil {
 		return err
-	} else if len(userResult.Data) > 0 {
+	}
+	if len(userResult.Data) > 0 {
 		userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{})
 		if err != nil {
 			return err

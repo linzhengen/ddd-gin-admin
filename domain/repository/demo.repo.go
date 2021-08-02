@@ -58,7 +58,8 @@ func (a *Demo) Get(ctx context.Context, id string, opts ...schema.DemoQueryOptio
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
-	} else if !ok {
+	}
+	if !ok {
 		return nil, nil
 	}
 

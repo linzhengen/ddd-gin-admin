@@ -10,10 +10,10 @@ var DemoSet = wire.NewSet(wire.Struct(new(Demo), "*"))
 type Demo struct {
 }
 
-// Query Search
+// Query Search demo
 // @Tags Demo
 // @Security ApiKeyAuth
-// @Summary Search Summary
+// @Summary Search demo
 // @Param current query int true "Current page" default(1)
 // @Param pageSize query int true "Page size" default(10)
 // @Param queryValue query string false "Search value"
@@ -24,10 +24,10 @@ type Demo struct {
 func (a *Demo) Query(c *gin.Context) {
 }
 
-// Get Search
+// Get Search by ID
 // @Tags Demo
 // @Security ApiKeyAuth
-// @Summary Search
+// @Summary Search by ID
 // @Param id path string true "UUID"
 // @Success 200 {object} schema.Demo
 // @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"

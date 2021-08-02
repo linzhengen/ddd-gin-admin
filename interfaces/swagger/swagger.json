@@ -42,7 +42,7 @@
                 "tags": [
                     "Demo"
                 ],
-                "summary": "Search Summary",
+                "summary": "Search demo",
                 "parameters": [
                     {
                         "type": "integer",
@@ -147,7 +147,7 @@
                 "tags": [
                     "Demo"
                 ],
-                "summary": "Search",
+                "summary": "Search by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -374,7 +374,7 @@
                 "tags": [
                     "Menu"
                 ],
-                "summary": "Search",
+                "summary": "Search menu",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1034,7 +1034,7 @@
                 "tags": [
                     "Role"
                 ],
-                "summary": "Search",
+                "summary": "Search role",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1425,7 +1425,7 @@
                 "tags": [
                     "User"
                 ],
-                "summary": "Search",
+                "summary": "Search user",
                 "parameters": [
                     {
                         "type": "integer",

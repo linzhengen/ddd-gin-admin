@@ -57,7 +57,8 @@ func (a *MenuAction) Get(ctx context.Context, id string, opts ...schema.MenuActi
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
-	} else if !ok {
+	}
+	if !ok {
 		return nil, nil
 	}
 

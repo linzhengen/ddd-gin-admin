@@ -57,7 +57,8 @@ func (a *RoleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQu
 	ok, err := FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
-	} else if !ok {
+	}
+	if !ok {
 		return nil, nil
 	}
 

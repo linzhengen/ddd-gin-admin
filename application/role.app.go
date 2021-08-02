@@ -29,7 +29,8 @@ func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 	item, err := a.RoleModel.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
-	} else if item == nil {
+	}
+	if item == nil {
 		return nil, errors.ErrNotFound
 	}
 
@@ -84,8 +85,9 @@ func (a *Role) checkName(ctx context.Context, item schema.Role) error {
 	})
 	if err != nil {
 		return err
-	} else if result.PageResult.Total > 0 {
-		return errors.New400Response("角色名称已经存在")
+	}
+	if result.PageResult.Total > 0 {
+		return errors.New400Response("The role name already exists")
 	}
 	return nil
 }
@@ -157,7 +159,8 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 	oldItem, err := a.RoleModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
@@ -167,8 +170,9 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 	})
 	if err != nil {
 		return err
-	} else if userResult.PageResult.Total > 0 {
-		return errors.New400Response("该角色已被赋予用户，不允许删除")
+	}
+	if userResult.PageResult.Total > 0 {
+		return errors.New400Response("The role has been assigned to the user and cannot be deleted")
 	}
 
 	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
@@ -191,7 +195,8 @@ func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
 	oldItem, err := a.RoleModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
 	}
 

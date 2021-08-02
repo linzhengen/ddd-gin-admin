@@ -68,7 +68,8 @@ func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 	ok, err := FindOne(ctx, entity.GetRoleDB(ctx, a.DB).Where("id=?", id), &role)
 	if err != nil {
 		return nil, errors.WithStack(err)
-	} else if !ok {
+	}
+	if !ok {
 		return nil, nil
 	}
 

@@ -9,9 +9,9 @@ var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
 
 type Menu struct{}
 
-// Query Search
+// Query Search menu
 // @Tags Menu
-// @Summary Search
+// @Summary Search menu
 // @Security ApiKeyAuth
 // @Param current query int true "Current page" default(1)
 // @Param pageSize query int true "Page size" default(10)
@@ -39,7 +39,7 @@ func (a *Menu) Query(c *gin.Context) {
 func (a *Menu) QueryTree(c *gin.Context) {
 }
 
-// Get Search menu
+// Get Search by ID
 // @Tags Menu
 // @Summary Get by ID
 // @Security ApiKeyAuth

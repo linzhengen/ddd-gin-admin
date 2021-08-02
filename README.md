@@ -16,9 +16,9 @@ go mod download
 ```
 ## Compiles and hot-reloads for development
 ```
-# Via air
-make serve
-# Via skaffold dev with minikube
+# via air
+make air
+# aia skaffold dev with minikube
 make skaffold-dev
 ```
 ## Starting tunnel via minikube for service ddd-gin-admin-web

@@ -28,7 +28,8 @@ func (a *Menu) InitData(ctx context.Context, dataFile string) error {
 	})
 	if err != nil {
 		return err
-	} else if result.PageResult.Total > 0 {
+	}
+	if result.PageResult.Total > 0 {
 		return nil
 	}
 
@@ -106,7 +107,8 @@ func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 	item, err := a.MenuModel.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
-	} else if item == nil {
+	}
+	if item == nil {
 		return nil, errors.ErrNotFound
 	}
 
@@ -125,7 +127,8 @@ func (a *Menu) QueryActions(ctx context.Context, id string) (schema.MenuActions,
 	})
 	if err != nil {
 		return nil, err
-	} else if len(result.Data) == 0 {
+	}
+	if len(result.Data) == 0 {
 		return nil, nil
 	}
 
@@ -151,8 +154,9 @@ func (a *Menu) checkName(ctx context.Context, item schema.Menu) error {
 	})
 	if err != nil {
 		return err
-	} else if result.PageResult.Total > 0 {
-		return errors.New400Response("菜单名称已经存在")
+	}
+	if result.PageResult.Total > 0 {
+		return errors.New400Response("The menu name already exists")
 	}
 	return nil
 }
@@ -213,7 +217,8 @@ func (a *Menu) getParentPath(ctx context.Context, parentID string) (string, erro
 	pitem, err := a.MenuModel.Get(ctx, parentID)
 	if err != nil {
 		return "", err
-	} else if pitem == nil {
+	}
+	if pitem == nil {
 		return "", errors.ErrInvalidParent
 	}
 
@@ -392,7 +397,8 @@ func (a *Menu) Delete(ctx context.Context, id string) error {
 	oldItem, err := a.MenuModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
 	}
 
@@ -402,7 +408,8 @@ func (a *Menu) Delete(ctx context.Context, id string) error {
 	})
 	if err != nil {
 		return err
-	} else if result.PageResult.Total > 0 {
+	}
+	if result.PageResult.Total > 0 {
 		return errors.ErrNotAllowDeleteWithChild
 	}
 
@@ -425,7 +432,8 @@ func (a *Menu) UpdateStatus(ctx context.Context, id string, status int) error {
 	oldItem, err := a.MenuModel.Get(ctx, id)
 	if err != nil {
 		return err
-	} else if oldItem == nil {
+	}
+	if oldItem == nil {
 		return errors.ErrNotFound
 	}
 

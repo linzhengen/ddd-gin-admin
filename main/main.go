@@ -19,7 +19,7 @@ import (
 )
 
 // VERSION You can specify the version number by compiling：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "0.3.0"
+var VERSION = "0.4.0"
 
 // @title ddd-gin-admin
 // @version 0.2.0
@@ -37,7 +37,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "ddd-gin-admin"
 	app.Version = VERSION
-	app.Usage = "RBAC scaffolding based on GIN + GORM + CASBIN + WIRE."
+	app.Usage = "RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE."
 	app.Commands = []*cli.Command{
 		newWebCmd(ctx),
 	}

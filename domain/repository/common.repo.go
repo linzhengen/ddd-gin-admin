@@ -32,7 +32,8 @@ func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, 
 			return nil, err
 		}
 		return &schema.PaginationResult{Total: count}, nil
-	} else if !pp.Pagination {
+	}
+	if !pp.Pagination {
 		err := db.Find(out).Error
 		return nil, err
 	}
@@ -54,14 +55,16 @@ func FindPage(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out i
 	err := db.Count(&count).Error
 	if err != nil {
 		return 0, err
-	} else if count == 0 {
+	}
+	if count == 0 {
 		return count, nil
 	}
 
 	current, pageSize := pp.GetCurrent(), pp.GetPageSize()
 	if current > 0 && pageSize > 0 {
 		db = db.Offset((current - 1) * pageSize).Limit(pageSize)
-	} else if pageSize > 0 {
+	}
+	if pageSize > 0 {
 		db = db.Limit(pageSize)
 	}
 
