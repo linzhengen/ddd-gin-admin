@@ -1,11 +1,11 @@
-package injector
+package api
 
 import (
 	"github.com/LyricTian/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/config"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/middleware"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/router"
+	middleware "github.com/linzhengen/ddd-gin-admin/interfaces/api/middleware"
+	"github.com/linzhengen/ddd-gin-admin/interfaces/api/router"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
 )

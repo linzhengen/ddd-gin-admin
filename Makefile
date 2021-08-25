@@ -29,7 +29,7 @@ start:
 
 .PHONY: swagger
 swagger:
-	@swag init --generalInfo ./main/main.go --output ./interfaces/swagger
+	@swag init --generalInfo ./main/main.go --output ./interfaces/api/swagger
 
 .PHONY: wire
 wire:

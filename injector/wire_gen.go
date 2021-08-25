@@ -9,22 +9,23 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/application"
 	"github.com/linzhengen/ddd-gin-admin/domain/adapter"
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/handler"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/router"
+	"github.com/linzhengen/ddd-gin-admin/injector/api"
+	"github.com/linzhengen/ddd-gin-admin/interfaces/api/handler"
+	"github.com/linzhengen/ddd-gin-admin/interfaces/api/router"
 )
 
 import (
-	_ "github.com/linzhengen/ddd-gin-admin/interfaces/swagger"
+	_ "github.com/linzhengen/ddd-gin-admin/interfaces/api/swagger"
 )
 
 // Injectors from wire.go:
 
-func BuildInjector() (*Injector, func(), error) {
-	author, cleanup, err := InitAuth()
+func BuildApiInjector() (*api.Injector, func(), error) {
+	author, cleanup, err := api.InitAuth()
 	if err != nil {
 		return nil, nil, err
 	}
-	db, cleanup2, err := InitGormDB()
+	db, cleanup2, err := api.InitGormDB()
 	if err != nil {
 		cleanup()
 		return nil, nil, err
@@ -51,7 +52,7 @@ func BuildInjector() (*Injector, func(), error) {
 		UserModel:         user,
 		UserRoleModel:     userRole,
 	}
-	syncedEnforcer, cleanup3, err := InitCasbin(casbinAdapter)
+	syncedEnforcer, cleanup3, err := api.InitCasbin(casbinAdapter)
 	if err != nil {
 		cleanup2()
 		cleanup()
@@ -117,8 +118,8 @@ func BuildInjector() (*Injector, func(), error) {
 		UserAPI:        handlerUser,
 		HealthAPI:      healthCheck,
 	}
-	engine := InitGinEngine(routerRouter)
-	injector := &Injector{
+	engine := api.InitGinEngine(routerRouter)
+	injector := &api.Injector{
 		Engine:         engine,
 		Auth:           author,
 		CasbinEnforcer: syncedEnforcer,

@@ -4,7 +4,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/handler"
+	"github.com/linzhengen/ddd-gin-admin/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 )
 

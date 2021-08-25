@@ -1,4 +1,4 @@
-package injector
+package api
 
 import (
 	"github.com/golang-jwt/jwt"

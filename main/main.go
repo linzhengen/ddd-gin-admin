@@ -6,14 +6,17 @@ Swagger：https://github.com/swaggo/swag#declarative-comments-format
 Usage：
 
 	go get -u github.com/swaggo/swag/main/swag
-	swag init --generalInfo ./main/main.go --output ./interfaces/swagger */
+	swag init --generalInfo ./main/main.go --output ./interfaces/api/swagger */
 package main
 
 import (
 	"context"
 	"os"
 
+	"github.com/linzhengen/ddd-gin-admin/injector/api"
+
 	"github.com/linzhengen/ddd-gin-admin/injector"
+
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 	"github.com/urfave/cli/v2"
 )
@@ -74,12 +77,12 @@ func newWebCmd(ctx context.Context) *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			return injector.Run(ctx,
-				injector.SetConfigFile(c.String("conf")),
-				injector.SetModelFile(c.String("model")),
-				injector.SetWWWDir(c.String("www")),
-				injector.SetMenuFile(c.String("menu")),
-				injector.SetVersion(VERSION))
+			return injector.RunServer(ctx,
+				api.SetConfigFile(c.String("conf")),
+				api.SetModelFile(c.String("model")),
+				api.SetWWWDir(c.String("www")),
+				api.SetMenuFile(c.String("menu")),
+				api.SetVersion(VERSION))
 		},
 	}
 }

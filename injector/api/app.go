@@ -1,13 +1,10 @@
-package injector
+package api
 
 import (
 	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/LyricTian/captcha"
@@ -16,12 +13,9 @@ import (
 	"github.com/google/gops/agent"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/config"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
-
-	// 引入swagger
-	_ "github.com/linzhengen/ddd-gin-admin/interfaces/swagger"
 )
 
-type options struct {
+type Options struct {
 	ConfigFile string
 	ModelFile  string
 	MenuFile   string
@@ -29,92 +23,41 @@ type options struct {
 	Version    string
 }
 
-type Option func(*options)
+type Option func(*Options)
 
 // SetConfigFile set config file
 func SetConfigFile(s string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.ConfigFile = s
 	}
 }
 
 // SetModelFile set casbin mode file
 func SetModelFile(s string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.ModelFile = s
 	}
 }
 
 // SetWWWDir set static file dir path
 func SetWWWDir(s string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.WWWDir = s
 	}
 }
 
 // SetMenuFile set menu file
 func SetMenuFile(s string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.MenuFile = s
 	}
 }
 
 // SetVersion set app version
 func SetVersion(s string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.Version = s
 	}
-}
-
-func Init(ctx context.Context, opts ...Option) (func(), error) {
-	var o options
-	for _, opt := range opts {
-		opt(&o)
-	}
-
-	config.MustLoad(o.ConfigFile)
-	if v := o.ModelFile; v != "" {
-		config.C.Casbin.Model = v
-	}
-	if v := o.WWWDir; v != "" {
-		config.C.WWW = v
-	}
-	if v := o.MenuFile; v != "" {
-		config.C.Menu.Data = v
-	}
-	config.PrintWithJSON()
-
-	logger.WithContext(ctx).Printf("starting server，run mode：%s，ver：%s，pid：%d", config.C.RunMode, o.Version, os.Getpid())
-
-	loggerCleanFunc, err := InitLogger()
-	if err != nil {
-		return nil, err
-	}
-
-	monitorCleanFunc := InitMonitor(ctx)
-
-	InitCaptcha()
-
-	injector, injectorCleanFunc, err := BuildInjector()
-	if err != nil {
-		return nil, err
-	}
-
-	if config.C.Menu.Enable && config.C.Menu.Data != "" {
-		err = injector.MenuBll.InitData(ctx, config.C.Menu.Data)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	httpServerCleanFunc := InitHTTPServer(ctx, injector.Engine)
-
-	return func() {
-		httpServerCleanFunc()
-		injectorCleanFunc()
-		monitorCleanFunc()
-		loggerCleanFunc()
-	}, nil
 }
 
 func InitCaptcha() {
@@ -179,34 +122,4 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 			logger.WithContext(ctx).Errorf(err.Error())
 		}
 	}
-}
-
-func Run(ctx context.Context, opts ...Option) error {
-	state := 1
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	cleanFunc, err := Init(ctx, opts...)
-	if err != nil {
-		return err
-	}
-
-EXIT:
-	for {
-		sig := <-sc
-		logger.WithContext(ctx).Infof("catched signal[%s]", sig.String())
-		switch sig {
-		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-			state = 0
-			break EXIT
-		case syscall.SIGHUP:
-		default:
-			break EXIT
-		}
-	}
-
-	cleanFunc()
-	logger.WithContext(ctx).Infof("stopping server")
-	time.Sleep(time.Second)
-	os.Exit(state)
-	return nil
 }

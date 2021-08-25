@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/middleware"
+	middleware "github.com/linzhengen/ddd-gin-admin/interfaces/api/middleware"
 )
 
 // RegisterAPI register api group router
