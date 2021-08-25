@@ -94,15 +94,12 @@ type Casbin struct {
 	AutoLoadInternal int
 }
 
-// LogHook 日志钩子
 type LogHook string
 
-// IsGorm 是否是gorm钩子
 func (h LogHook) IsGorm() bool {
 	return h == "gorm"
 }
 
-// IsMongo 是否是mongo钩子
 func (h LogHook) IsMongo() bool {
 	return h == "mongo"
 }

@@ -5,7 +5,7 @@ The RBAC authority management scaffold based on DDD + GIN + GORM + CASBIN + WIRE
 
 ## Swagger UI
 - GitHub Page: https://linzhengen.github.io/ddd-gin-admin/docs/swagger-ui/
-- Localhost: http://localhost:10088/swagger/index.html
+- Localhost: http://localhost:8080/swagger/index.html
 <div align="center">
     <img src="docs/img/swagger.png">
 </div>

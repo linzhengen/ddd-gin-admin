@@ -14,7 +14,7 @@ PrintConfig = true
 # http listening address
 Host = "0.0.0.0"
 # http listening port
-Port = 10088
+Port = 8080
 # Certification path
 CertFile = ""
 # Certificate key

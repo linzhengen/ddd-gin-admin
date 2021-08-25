@@ -1,9 +1,9 @@
-containerPort: 10088
+containerPort: 8080
 
 livenessProbe:
-  port: 10088
+  port: 8080
 readinessProbe:
-  port: 10088
+  port: 8080
 env:
   CONFIG_GORM_DBTYPE: mysql
   CONFIG_MYSQL_HOST: mariadb.mariadb.svc.cluster.local
