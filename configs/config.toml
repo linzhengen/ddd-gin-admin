@@ -48,7 +48,7 @@ AutoLoadInternal = 60
 # Log level (1: fatal 2: error, 3: warn, 4: info, 5: debug, 6: trace)
 Level = 5
 # Log format (support output format: text/json)
-Format = "text"
+Format = "json"
 # Log output (support: stdout/stderr/file)
 Output = "stdout"
 # Specify the file path for log output
