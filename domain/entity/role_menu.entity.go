@@ -16,7 +16,6 @@ type SchemaRoleMenu schema.RoleMenu
 
 func (a SchemaRoleMenu) ToRoleMenu() *RoleMenu {
 	item := new(RoleMenu)
-	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }
@@ -30,7 +29,6 @@ type RoleMenu struct {
 
 func (a RoleMenu) ToSchemaRoleMenu() *schema.RoleMenu {
 	item := new(schema.RoleMenu)
-	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }

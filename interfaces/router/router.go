@@ -20,7 +20,6 @@ type IRouter interface {
 type Router struct {
 	Auth           auth.Author
 	CasbinEnforcer *casbin.SyncedEnforcer
-	DemoAPI        *handler.Demo
 	LoginAPI       *handler.Login
 	MenuAPI        *handler.Menu
 	RoleAPI        *handler.Role

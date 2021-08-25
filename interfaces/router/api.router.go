@@ -39,17 +39,6 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 			pub.POST("/refresh-token", a.LoginAPI.RefreshToken)
 		}
 
-		gDemo := v1.Group("demos")
-		{
-			gDemo.GET("", a.DemoAPI.Query)
-			gDemo.GET(":id", a.DemoAPI.Get)
-			gDemo.POST("", a.DemoAPI.Create)
-			gDemo.PUT(":id", a.DemoAPI.Update)
-			gDemo.DELETE(":id", a.DemoAPI.Delete)
-			gDemo.PATCH(":id/enable", a.DemoAPI.Enable)
-			gDemo.PATCH(":id/disable", a.DemoAPI.Disable)
-		}
-
 		gMenu := v1.Group("menus")
 		{
 			gMenu.GET("", a.MenuAPI.Query)

@@ -17,7 +17,6 @@ type SchemaRole schema.Role
 
 func (a SchemaRole) ToRole() *Role {
 	item := new(Role)
-	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }
@@ -36,7 +35,6 @@ type Role struct {
 
 func (a Role) ToSchemaRole() *schema.Role {
 	item := new(schema.Role)
-	//nolint:errcheck
 	structure.Copy(a, item)
 	return item
 }

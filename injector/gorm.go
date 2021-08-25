@@ -62,7 +62,6 @@ func autoMigrate(db *gorm.DB) error {
 	}
 
 	return db.AutoMigrate(
-		new(entity.Demo),
 		new(entity.MenuAction),
 		new(entity.MenuActionResource),
 		new(entity.Menu),

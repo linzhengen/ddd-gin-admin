@@ -57,15 +57,6 @@ func BuildInjector() (*Injector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	demo := &repository.Demo{
-		DB: db,
-	}
-	applicationDemo := &application.Demo{
-		DemoModel: demo,
-	}
-	handlerDemo := &handler.Demo{
-		DemoSrv: applicationDemo,
-	}
 	menu := &repository.Menu{
 		DB: db,
 	}
@@ -120,7 +111,6 @@ func BuildInjector() (*Injector, func(), error) {
 	routerRouter := &router.Router{
 		Auth:           author,
 		CasbinEnforcer: syncedEnforcer,
-		DemoAPI:        handlerDemo,
 		LoginAPI:       handlerLogin,
 		MenuAPI:        handlerMenu,
 		RoleAPI:        handlerRole,

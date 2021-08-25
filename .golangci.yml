@@ -20,7 +20,7 @@ linters:
     - rowserrcheck
     - staticcheck
     - structcheck
-    - typecheck
+#    - typecheck
     - unconvert
     - unparam
     - varcheck
