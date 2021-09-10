@@ -4,8 +4,9 @@ import (
 	"context"
 	"os"
 
+	"github.com/linzhengen/ddd-gin-admin/domain/repository"
+
 	"github.com/google/wire"
-	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/contextx"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
@@ -16,10 +17,10 @@ import (
 var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
 
 type Menu struct {
-	TransModel              *repo.Trans
-	MenuModel               *repo.Menu
-	MenuActionModel         *repo.MenuAction
-	MenuActionResourceModel *repo.MenuActionResource
+	TransModel              repository.TransRepository
+	MenuModel               repository.MenuRepository
+	MenuActionModel         repository.MenuActionRepository
+	MenuActionResourceModel repository.MenuActionResourceRepository
 }
 
 func (a *Menu) InitData(ctx context.Context, dataFile string) error {

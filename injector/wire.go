@@ -14,14 +14,14 @@ import (
 	// "github.com/linzhengen/ddd-gin-admin/infrastructure/api/mock"
 	"github.com/google/wire"
 	"github.com/linzhengen/ddd-gin-admin/domain/adapter"
-	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/persistence"
 )
 
 func BuildApiInjector() (*api.Injector, func(), error) {
 	wire.Build(
 		// mock.MockSet,
 		api.InitGormDB,
-		repo.RepoSet,
+		persistence.RepoSet,
 		api.InitAuth,
 		api.InitCasbin,
 		api.InitGinEngine,

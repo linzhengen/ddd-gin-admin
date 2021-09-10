@@ -17,11 +17,11 @@ var _ persist.Adapter = (*CasbinAdapter)(nil)
 var CasbinAdapterSet = wire.NewSet(wire.Struct(new(CasbinAdapter), "*"), wire.Bind(new(persist.Adapter), new(*CasbinAdapter)))
 
 type CasbinAdapter struct {
-	RoleModel         *repo.Role
-	RoleMenuModel     *repo.RoleMenu
-	MenuResourceModel *repo.MenuActionResource
-	UserModel         *repo.User
-	UserRoleModel     *repo.UserRole
+	RoleModel         repo.RoleRepository
+	RoleMenuModel     repo.RoleMenuRepository
+	MenuResourceModel repo.MenuActionResourceRepository
+	UserModel         repo.UserRepository
+	UserRoleModel     repo.UserRoleRepository
 }
 
 func (a *CasbinAdapter) LoadPolicy(model casbinModel.Model) error {

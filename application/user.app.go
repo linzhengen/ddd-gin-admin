@@ -3,9 +3,10 @@ package application
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/domain/repository"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
-	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
@@ -16,10 +17,10 @@ var UserSet = wire.NewSet(wire.Struct(new(User), "*"))
 
 type User struct {
 	Enforcer      *casbin.SyncedEnforcer
-	TransModel    *repo.Trans
-	UserModel     *repo.User
-	UserRoleModel *repo.UserRole
-	RoleModel     *repo.Role
+	TransModel    repository.TransRepository
+	UserModel     repository.UserRepository
+	UserRoleModel repository.UserRoleRepository
+	RoleModel     repository.RoleRepository
 }
 
 func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {

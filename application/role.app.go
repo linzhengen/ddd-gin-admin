@@ -5,7 +5,7 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	"github.com/google/wire"
-	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
+	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/uuid"
@@ -15,10 +15,10 @@ var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
 
 type Role struct {
 	Enforcer      *casbin.SyncedEnforcer
-	TransModel    *repo.Trans
-	RoleModel     *repo.Role
-	RoleMenuModel *repo.RoleMenu
-	UserModel     *repo.User
+	TransModel    repository.TransRepository
+	RoleModel     repository.RoleRepository
+	RoleMenuModel repository.RoleMenuRepository
+	UserModel     repository.UserRepository
 }
 
 func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {

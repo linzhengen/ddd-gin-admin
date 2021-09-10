@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/linzhengen/ddd-gin-admin/domain/repository"
+
 	"github.com/LyricTian/captcha"
 	"github.com/google/wire"
-	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
@@ -18,12 +19,12 @@ var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
 
 type Login struct {
 	Auth            auth.Author
-	UserModel       *repo.User
-	UserRoleModel   *repo.UserRole
-	RoleModel       *repo.Role
-	RoleMenuModel   *repo.RoleMenu
-	MenuModel       *repo.Menu
-	MenuActionModel *repo.MenuAction
+	UserModel       repository.UserRepository
+	UserRoleModel   repository.UserRoleRepository
+	RoleModel       repository.RoleRepository
+	RoleMenuModel   repository.RoleMenuRepository
+	MenuModel       repository.MenuRepository
+	MenuActionModel repository.MenuActionRepository
 }
 
 func (a *Login) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptcha, error) {
