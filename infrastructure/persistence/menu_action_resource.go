@@ -13,6 +13,10 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
+func getMenuActionResourceDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
+	return gormx.GetDBWithModel(ctx, defDB, new(entity.MenuActionResource))
+}
+
 func NewMenuActionResource(db *gorm.DB) repository.MenuActionResourceRepository {
 	return &menuActionResource{
 		db: db,
@@ -34,15 +38,15 @@ func (a *menuActionResource) getQueryOption(opts ...schema.MenuActionResourceQue
 func (a *menuActionResource) Query(ctx context.Context, params schema.MenuActionResourceQueryParam, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResourceQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetMenuActionResourceDB(ctx, a.db)
+	db := getMenuActionResourceDB(ctx, a.db)
 	if v := params.MenuID; v != "" {
-		subQuery := entity.GetMenuActionDB(ctx, a.db).
+		subQuery := getMenuActionDB(ctx, a.db).
 			Where("menu_id=?", v).
 			Select("id").SubQuery()
 		db = db.Where("action_id IN ?", subQuery)
 	}
 	if v := params.MenuIDs; len(v) > 0 {
-		subQuery := entity.GetMenuActionDB(ctx, a.db).Where("menu_id IN (?)", v).Select("id").SubQuery()
+		subQuery := getMenuActionDB(ctx, a.db).Where("menu_id IN (?)", v).Select("id").SubQuery()
 		db = db.Where("action_id IN ?", subQuery)
 	}
 
@@ -63,7 +67,7 @@ func (a *menuActionResource) Query(ctx context.Context, params schema.MenuAction
 }
 
 func (a *menuActionResource) Get(ctx context.Context, id string, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResource, error) {
-	db := entity.GetMenuActionResourceDB(ctx, a.db).Where("id=?", id)
+	db := getMenuActionResourceDB(ctx, a.db).Where("id=?", id)
 	var item entity.MenuActionResource
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
@@ -78,28 +82,28 @@ func (a *menuActionResource) Get(ctx context.Context, id string, opts ...schema.
 
 func (a *menuActionResource) Create(ctx context.Context, item schema.MenuActionResource) error {
 	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Create(eitem)
+	result := getMenuActionResourceDB(ctx, a.db).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *menuActionResource) Update(ctx context.Context, id string, item schema.MenuActionResource) error {
 	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+	result := getMenuActionResourceDB(ctx, a.db).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *menuActionResource) Delete(ctx context.Context, id string) error {
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Where("id=?", id).Delete(entity.MenuActionResource{})
+	result := getMenuActionResourceDB(ctx, a.db).Where("id=?", id).Delete(entity.MenuActionResource{})
 	return errors.WithStack(result.Error)
 }
 
 func (a *menuActionResource) DeleteByActionID(ctx context.Context, actionID string) error {
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Where("action_id =?", actionID).Delete(entity.MenuActionResource{})
+	result := getMenuActionResourceDB(ctx, a.db).Where("action_id =?", actionID).Delete(entity.MenuActionResource{})
 	return errors.WithStack(result.Error)
 }
 
 func (a *menuActionResource) DeleteByMenuID(ctx context.Context, menuID string) error {
-	subQuery := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=?", menuID).Select("id").SubQuery()
-	result := entity.GetMenuActionResourceDB(ctx, a.db).Where("action_id IN ?", subQuery).Delete(entity.MenuActionResource{})
+	subQuery := getMenuActionDB(ctx, a.db).Where("menu_id=?", menuID).Select("id").SubQuery()
+	result := getMenuActionResourceDB(ctx, a.db).Where("action_id IN ?", subQuery).Delete(entity.MenuActionResource{})
 	return errors.WithStack(result.Error)
 }

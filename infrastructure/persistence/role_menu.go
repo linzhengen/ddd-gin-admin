@@ -13,6 +13,10 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
+func getRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
+	return gormx.GetDBWithModel(ctx, defDB, new(entity.RoleMenu))
+}
+
 func NewRoleMenu(db *gorm.DB) repository.RoleMenuRepository {
 	return &roleMenu{
 		db: db,
@@ -34,7 +38,7 @@ func (a *roleMenu) getQueryOption(opts ...schema.RoleMenuQueryOptions) schema.Ro
 func (a *roleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenuQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetRoleMenuDB(ctx, a.db)
+	db := getRoleMenuDB(ctx, a.db)
 	if v := params.RoleID; v != "" {
 		db = db.Where("role_id=?", v)
 	}
@@ -59,7 +63,7 @@ func (a *roleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, 
 }
 
 func (a *roleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenu, error) {
-	db := entity.GetRoleMenuDB(ctx, a.db).Where("id=?", id)
+	db := getRoleMenuDB(ctx, a.db).Where("id=?", id)
 	var item entity.RoleMenu
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
@@ -74,22 +78,22 @@ func (a *roleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQu
 
 func (a *roleMenu) Create(ctx context.Context, item schema.RoleMenu) error {
 	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
-	result := entity.GetRoleMenuDB(ctx, a.db).Create(eitem)
+	result := getRoleMenuDB(ctx, a.db).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *roleMenu) Update(ctx context.Context, id string, item schema.RoleMenu) error {
 	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
-	result := entity.GetRoleMenuDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+	result := getRoleMenuDB(ctx, a.db).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *roleMenu) Delete(ctx context.Context, id string) error {
-	result := entity.GetRoleMenuDB(ctx, a.db).Where("id=?", id).Delete(entity.RoleMenu{})
+	result := getRoleMenuDB(ctx, a.db).Where("id=?", id).Delete(entity.RoleMenu{})
 	return errors.WithStack(result.Error)
 }
 
 func (a *roleMenu) DeleteByRoleID(ctx context.Context, roleID string) error {
-	result := entity.GetRoleMenuDB(ctx, a.db).Where("role_id=?", roleID).Delete(entity.RoleMenu{})
+	result := getRoleMenuDB(ctx, a.db).Where("role_id=?", roleID).Delete(entity.RoleMenu{})
 	return errors.WithStack(result.Error)
 }

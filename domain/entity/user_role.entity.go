@@ -1,16 +1,9 @@
 package entity
 
 import (
-	"context"
-
-	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
-
-func GetUserRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return GetDBWithModel(ctx, defDB, new(UserRole))
-}
 
 type SchemaUserRole schema.UserRole
 
