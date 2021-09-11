@@ -3,9 +3,10 @@ package api
 import (
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/persist"
-	"github.com/linzhengen/ddd-gin-admin/infrastructure/config"
 )
 
 func InitCasbin(adapter persist.Adapter) (*casbin.SyncedEnforcer, func(), error) {

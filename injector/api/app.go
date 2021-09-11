@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/captcha/store"
 	"github.com/go-redis/redis"
 	"github.com/google/gops/agent"
-	"github.com/linzhengen/ddd-gin-admin/infrastructure/config"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 

@@ -7,16 +7,16 @@
 package injector
 
 import (
-	"github.com/linzhengen/ddd-gin-admin/application"
-	"github.com/linzhengen/ddd-gin-admin/infrastructure/casbin"
-	"github.com/linzhengen/ddd-gin-admin/infrastructure/persistence"
+	"github.com/linzhengen/ddd-gin-admin/app/application"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/casbin"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/api/handler"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/api/router"
 )
 
 import (
-	_ "github.com/linzhengen/ddd-gin-admin/interfaces/api/swagger"
+	_ "github.com/linzhengen/ddd-gin-admin/app/interfaces/api/swagger"
 )
 
 // Injectors from wire.go:

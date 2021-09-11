@@ -6,7 +6,7 @@ Swagger：https://github.com/swaggo/swag#declarative-comments-format
 Usage：
 
 	go get -u github.com/swaggo/swag/main/swag
-	swag init --generalInfo ./main/main.go --output ./interfaces/api/swagger */
+	swag init --generalInfo ./main/main.go --output ./app/interfaces/api/swagger */
 package main
 
 import (

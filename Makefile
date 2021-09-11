@@ -29,7 +29,10 @@ start:
 
 .PHONY: swagger
 swagger:
-	@swag init --generalInfo ./main/main.go --output ./interfaces/api/swagger
+	@hash swag > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		go install github.com/swaggo/swag/cmd/swag@latest; \
+	fi
+	@swag init --generalInfo ./main/main.go --output ./app/interfaces/api/swagger
 
 .PHONY: wire
 wire:

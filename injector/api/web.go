@@ -3,11 +3,11 @@ package api
 import (
 	"github.com/LyricTian/gzip"
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/infrastructure/config"
-	middleware "github.com/linzhengen/ddd-gin-admin/interfaces/api/middleware"
-	"github.com/linzhengen/ddd-gin-admin/interfaces/api/router"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/middleware"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 func InitGinEngine(r router.Router) *gin.Engine {
