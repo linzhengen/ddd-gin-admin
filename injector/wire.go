@@ -7,29 +7,55 @@ package injector
 
 import (
 	"github.com/linzhengen/ddd-gin-admin/application"
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/casbin"
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/persistence"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 	"github.com/linzhengen/ddd-gin-admin/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/interfaces/api/router"
 
 	// "github.com/linzhengen/ddd-gin-admin/infrastructure/api/mock"
 	"github.com/google/wire"
-	"github.com/linzhengen/ddd-gin-admin/domain/adapter"
-	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
 )
 
-func BuildApiInjector() (*api.Injector, func(), error) {
+func BuildApiInjector() (*ApiInjector, func(), error) {
 	wire.Build(
-		// mock.MockSet,
+		// init,
 		api.InitGormDB,
-		repo.RepoSet,
 		api.InitAuth,
 		api.InitCasbin,
 		api.InitGinEngine,
-		application.ServiceSet,
-		handler.APISet,
-		router.RouterSet,
-		adapter.CasbinAdapterSet,
-		api.InjectorSet,
+
+		// persistence
+		persistence.NewTrans,
+		persistence.NewUser,
+		persistence.NewRole,
+		persistence.NewUserRole,
+		persistence.NewMenu,
+		persistence.NewRoleMenu,
+		persistence.NewMenuAction,
+		persistence.NewMenuActionResource,
+
+		// application
+		application.NewLogin,
+		application.NewMenu,
+		application.NewRole,
+		application.NewUser,
+
+		// handler
+		handler.NewMenu,
+		handler.NewRole,
+		handler.NewLogin,
+		handler.NewUser,
+		handler.NewHealthCheck,
+
+		// router
+		router.NewRouter,
+
+		// lib
+		casbin.NewCasbinAdapter,
+
+		// injector
+		NewApiInjector,
 	)
-	return new(api.Injector), nil, nil
+	return nil, nil, nil
 }

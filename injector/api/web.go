@@ -10,7 +10,7 @@ import (
 	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
-func InitGinEngine(r router.IRouter) *gin.Engine {
+func InitGinEngine(r router.Router) *gin.Engine {
 	gin.SetMode(config.C.RunMode)
 
 	app := gin.New()

@@ -2,19 +2,31 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"github.com/linzhengen/ddd-gin-admin/application"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/ginx"
 )
 
-var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
-
-type Role struct {
-	RoleSrv *application.Role
+type Role interface {
+	Query(c *gin.Context)
+	QuerySelect(c *gin.Context)
+	Get(c *gin.Context)
+	Create(c *gin.Context)
+	Update(c *gin.Context)
+	Delete(c *gin.Context)
+	Enable(c *gin.Context)
+	Disable(c *gin.Context)
 }
 
-func (a *Role) Query(c *gin.Context) {
+func NewRole(roleApp application.Role) Role {
+	return &role{roleApp: roleApp}
+}
+
+type role struct {
+	roleApp application.Role
+}
+
+func (a *role) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.RoleQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -23,7 +35,7 @@ func (a *Role) Query(c *gin.Context) {
 	}
 
 	params.Pagination = true
-	result, err := a.RoleSrv.Query(ctx, params, schema.RoleQueryOptions{
+	result, err := a.roleApp.Query(ctx, params, schema.RoleQueryOptions{
 		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
 	})
 	if err != nil {
@@ -33,7 +45,7 @@ func (a *Role) Query(c *gin.Context) {
 	ginx.ResPage(c, result.Data, result.PageResult)
 }
 
-func (a *Role) QuerySelect(c *gin.Context) {
+func (a *role) QuerySelect(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.RoleQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -41,7 +53,7 @@ func (a *Role) QuerySelect(c *gin.Context) {
 		return
 	}
 
-	result, err := a.RoleSrv.Query(ctx, params, schema.RoleQueryOptions{
+	result, err := a.roleApp.Query(ctx, params, schema.RoleQueryOptions{
 		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
 	})
 	if err != nil {
@@ -51,9 +63,9 @@ func (a *Role) QuerySelect(c *gin.Context) {
 	ginx.ResList(c, result.Data)
 }
 
-func (a *Role) Get(c *gin.Context) {
+func (a *role) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.RoleSrv.Get(ctx, c.Param("id"))
+	item, err := a.roleApp.Get(ctx, c.Param("id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -61,7 +73,7 @@ func (a *Role) Get(c *gin.Context) {
 	ginx.ResSuccess(c, item)
 }
 
-func (a *Role) Create(c *gin.Context) {
+func (a *role) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Role
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -70,7 +82,7 @@ func (a *Role) Create(c *gin.Context) {
 	}
 
 	item.Creator = ginx.GetUserID(c)
-	result, err := a.RoleSrv.Create(ctx, item)
+	result, err := a.roleApp.Create(ctx, item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -78,7 +90,7 @@ func (a *Role) Create(c *gin.Context) {
 	ginx.ResSuccess(c, result)
 }
 
-func (a *Role) Update(c *gin.Context) {
+func (a *role) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Role
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -86,7 +98,7 @@ func (a *Role) Update(c *gin.Context) {
 		return
 	}
 
-	err := a.RoleSrv.Update(ctx, c.Param("id"), item)
+	err := a.roleApp.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -94,9 +106,9 @@ func (a *Role) Update(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *Role) Delete(c *gin.Context) {
+func (a *role) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSrv.Delete(ctx, c.Param("id"))
+	err := a.roleApp.Delete(ctx, c.Param("id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -104,9 +116,9 @@ func (a *Role) Delete(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *Role) Enable(c *gin.Context) {
+func (a *role) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSrv.UpdateStatus(ctx, c.Param("id"), 1)
+	err := a.roleApp.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -114,9 +126,9 @@ func (a *Role) Enable(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *Role) Disable(c *gin.Context) {
+func (a *role) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.RoleSrv.UpdateStatus(ctx, c.Param("id"), 2)
+	err := a.roleApp.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {
 		ginx.ResError(c, err)
 		return

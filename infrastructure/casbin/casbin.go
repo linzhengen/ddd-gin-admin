@@ -1,4 +1,4 @@
-package adapter
+package casbin
 
 import (
 	"context"
@@ -6,25 +6,36 @@ import (
 
 	casbinModel "github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
-	"github.com/google/wire"
-	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
+	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 
-var _ persist.Adapter = (*CasbinAdapter)(nil)
-
-var CasbinAdapterSet = wire.NewSet(wire.Struct(new(CasbinAdapter), "*"), wire.Bind(new(persist.Adapter), new(*CasbinAdapter)))
-
-type CasbinAdapter struct {
-	RoleModel         *repo.Role
-	RoleMenuModel     *repo.RoleMenu
-	MenuResourceModel *repo.MenuActionResource
-	UserModel         *repo.User
-	UserRoleModel     *repo.UserRole
+func NewCasbinAdapter(
+	roleRepo repository.RoleRepository,
+	roleMenuRepo repository.RoleMenuRepository,
+	menuResourceRepo repository.MenuActionResourceRepository,
+	userRepo repository.UserRepository,
+	userRoleRepo repository.UserRoleRepository,
+) persist.Adapter {
+	return &casbinAdapter{
+		roleRepo:         roleRepo,
+		roleMenuRepo:     roleMenuRepo,
+		menuResourceRepo: menuResourceRepo,
+		userRepo:         userRepo,
+		userRoleRepo:     userRoleRepo,
+	}
 }
 
-func (a *CasbinAdapter) LoadPolicy(model casbinModel.Model) error {
+type casbinAdapter struct {
+	roleRepo         repository.RoleRepository
+	roleMenuRepo     repository.RoleMenuRepository
+	menuResourceRepo repository.MenuActionResourceRepository
+	userRepo         repository.UserRepository
+	userRoleRepo     repository.UserRoleRepository
+}
+
+func (a *casbinAdapter) LoadPolicy(model casbinModel.Model) error {
 	ctx := context.Background()
 	err := a.loadRolePolicy(ctx, model)
 	if err != nil {
@@ -41,8 +52,8 @@ func (a *CasbinAdapter) LoadPolicy(model casbinModel.Model) error {
 	return nil
 }
 
-func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model) error {
-	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+func (a *casbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model) error {
+	roleResult, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
 		Status: 1,
 	})
 	if err != nil {
@@ -52,13 +63,13 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 		return nil
 	}
 
-	roleMenuResult, err := a.RoleMenuModel.Query(ctx, schema.RoleMenuQueryParam{})
+	roleMenuResult, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{})
 	if err != nil {
 		return err
 	}
 	mRoleMenus := roleMenuResult.Data.ToRoleIDMap()
 
-	menuResourceResult, err := a.MenuResourceModel.Query(ctx, schema.MenuActionResourceQueryParam{})
+	menuResourceResult, err := a.menuResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{})
 	if err != nil {
 		return err
 	}
@@ -87,15 +98,15 @@ func (a *CasbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 	return nil
 }
 
-func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model) error {
-	userResult, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+func (a *casbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model) error {
+	userResult, err := a.userRepo.Query(ctx, schema.UserQueryParam{
 		Status: 1,
 	})
 	if err != nil {
 		return err
 	}
 	if len(userResult.Data) > 0 {
-		userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{})
+		userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{})
 		if err != nil {
 			return err
 		}
@@ -115,24 +126,24 @@ func (a *CasbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model)
 }
 
 // SavePolicy saves all policy rules to the storage.
-func (a *CasbinAdapter) SavePolicy(model casbinModel.Model) error {
+func (a *casbinAdapter) SavePolicy(model casbinModel.Model) error {
 	return nil
 }
 
 // AddPolicy adds a policy rule to the storage.
 // This is part of the Auto-Save feature.
-func (a *CasbinAdapter) AddPolicy(sec string, ptype string, rule []string) error {
+func (a *casbinAdapter) AddPolicy(sec string, ptype string, rule []string) error {
 	return nil
 }
 
 // RemovePolicy removes a policy rule from the storage.
 // This is part of the Auto-Save feature.
-func (a *CasbinAdapter) RemovePolicy(sec string, ptype string, rule []string) error {
+func (a *casbinAdapter) RemovePolicy(sec string, ptype string, rule []string) error {
 	return nil
 }
 
 // RemoveFilteredPolicy removes policy rules that match the filter from the storage.
 // This is part of the Auto-Save feature.
-func (a *CasbinAdapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
+func (a *casbinAdapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
 	return nil
 }

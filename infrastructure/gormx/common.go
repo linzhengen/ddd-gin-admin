@@ -1,4 +1,4 @@
-package repository
+package gormx
 
 import (
 	"context"
@@ -13,8 +13,13 @@ import (
 type TransFunc func(context.Context) error
 
 func ExecTrans(ctx context.Context, db *gorm.DB, fn TransFunc) error {
-	transModel := &Trans{DB: db}
-	return transModel.Exec(ctx, fn)
+	if _, ok := contextx.FromTrans(ctx); ok {
+		return fn(ctx)
+	}
+
+	return db.Transaction(func(db *gorm.DB) error {
+		return fn(contextx.NewTrans(ctx, db))
+	})
 }
 
 func ExecTransWithLock(ctx context.Context, db *gorm.DB, fn TransFunc) error {

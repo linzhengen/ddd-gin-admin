@@ -3,31 +3,55 @@ package application
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/domain/repository"
+
 	"github.com/casbin/casbin/v2"
-	"github.com/google/wire"
-	repo "github.com/linzhengen/ddd-gin-admin/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/uuid"
 )
 
-var UserSet = wire.NewSet(wire.Struct(new(User), "*"))
-
-type User struct {
-	Enforcer      *casbin.SyncedEnforcer
-	TransModel    *repo.Trans
-	UserModel     *repo.User
-	UserRoleModel *repo.UserRole
-	RoleModel     *repo.Role
+type User interface {
+	Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error)
+	QueryShow(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserShowQueryResult, error)
+	Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error)
+	Create(ctx context.Context, item schema.User) (*schema.IDResult, error)
+	Update(ctx context.Context, id string, item schema.User) error
+	Delete(ctx context.Context, id string) error
+	UpdateStatus(ctx context.Context, id string, status int) error
 }
 
-func (a *User) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
-	return a.UserModel.Query(ctx, params, opts...)
+func NewUser(
+	enforcer *casbin.SyncedEnforcer,
+	transRepo repository.TransRepository,
+	userRepo repository.UserRepository,
+	userRoleRepo repository.UserRoleRepository,
+	roleRepo repository.RoleRepository,
+) User {
+	return &user{
+		enforcer:     enforcer,
+		transRepo:    transRepo,
+		userRepo:     userRepo,
+		userRoleRepo: userRoleRepo,
+		roleRepo:     roleRepo,
+	}
 }
 
-func (a *User) QueryShow(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserShowQueryResult, error) {
-	result, err := a.UserModel.Query(ctx, params, opts...)
+type user struct {
+	enforcer     *casbin.SyncedEnforcer
+	transRepo    repository.TransRepository
+	userRepo     repository.UserRepository
+	userRoleRepo repository.UserRoleRepository
+	roleRepo     repository.RoleRepository
+}
+
+func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
+	return a.userRepo.Query(ctx, params, opts...)
+}
+
+func (a *user) QueryShow(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserShowQueryResult, error) {
+	result, err := a.userRepo.Query(ctx, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -35,14 +59,14 @@ func (a *User) QueryShow(ctx context.Context, params schema.UserQueryParam, opts
 		return nil, nil
 	}
 
-	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserIDs: result.Data.ToIDs(),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+	roleResult, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
 		IDs: userRoleResult.Data.ToRoleIDs(),
 	})
 	if err != nil {
@@ -52,8 +76,8 @@ func (a *User) QueryShow(ctx context.Context, params schema.UserQueryParam, opts
 	return result.ToShowResult(userRoleResult.Data.ToUserIDMap(), roleResult.Data.ToMap()), nil
 }
 
-func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
-	item, err := a.UserModel.Get(ctx, id, opts...)
+func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
+	item, err := a.userRepo.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +85,7 @@ func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 		return nil, errors.ErrNotFound
 	}
 
-	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserID: id,
 	})
 	if err != nil {
@@ -72,7 +96,7 @@ func (a *User) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 	return item, nil
 }
 
-func (a *User) Create(ctx context.Context, item schema.User) (*schema.IDResult, error) {
+func (a *user) Create(ctx context.Context, item schema.User) (*schema.IDResult, error) {
 	err := a.checkUserName(ctx, item)
 	if err != nil {
 		return nil, err
@@ -80,32 +104,32 @@ func (a *User) Create(ctx context.Context, item schema.User) (*schema.IDResult, 
 
 	item.Password = hash.SHA1String(item.Password)
 	item.ID = uuid.MustString()
-	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
+	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
 		for _, urItem := range item.UserRoles {
 			urItem.ID = uuid.MustString()
 			urItem.UserID = item.ID
-			err := a.UserRoleModel.Create(ctx, *urItem)
+			err := a.userRoleRepo.Create(ctx, *urItem)
 			if err != nil {
 				return err
 			}
 		}
 
-		return a.UserModel.Create(ctx, item)
+		return a.userRepo.Create(ctx, item)
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	LoadCasbinPolicy(ctx, a.enforcer)
 	return schema.NewIDResult(item.ID), nil
 }
 
-func (a *User) checkUserName(ctx context.Context, item schema.User) error {
+func (a *user) checkUserName(ctx context.Context, item schema.User) error {
 	if item.UserName == schema.GetRootUser().UserName {
 		return errors.New400Response("The user name is invalid")
 	}
 
-	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+	result, err := a.userRepo.Query(ctx, schema.UserQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 		UserName:        item.UserName,
 	})
@@ -118,7 +142,7 @@ func (a *User) checkUserName(ctx context.Context, item schema.User) error {
 	return nil
 }
 
-func (a *User) Update(ctx context.Context, id string, item schema.User) error {
+func (a *user) Update(ctx context.Context, id string, item schema.User) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
@@ -142,35 +166,35 @@ func (a *User) Update(ctx context.Context, id string, item schema.User) error {
 	item.ID = oldItem.ID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
-	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
+	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
 		addUserRoles, delUserRoles := a.compareUserRoles(oldItem.UserRoles, item.UserRoles)
 		for _, rmitem := range addUserRoles {
 			rmitem.ID = uuid.MustString()
 			rmitem.UserID = id
-			err := a.UserRoleModel.Create(ctx, *rmitem)
+			err := a.userRoleRepo.Create(ctx, *rmitem)
 			if err != nil {
 				return err
 			}
 		}
 
 		for _, rmitem := range delUserRoles {
-			err := a.UserRoleModel.Delete(ctx, rmitem.ID)
+			err := a.userRoleRepo.Delete(ctx, rmitem.ID)
 			if err != nil {
 				return err
 			}
 		}
 
-		return a.UserModel.Update(ctx, id, item)
+		return a.userRepo.Update(ctx, id, item)
 	})
 	if err != nil {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	LoadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
 
-func (a *User) compareUserRoles(oldUserRoles, newUserRoles schema.UserRoles) (addList, delList schema.UserRoles) {
+func (a *user) compareUserRoles(oldUserRoles, newUserRoles schema.UserRoles) (addList, delList schema.UserRoles) {
 	mOldUserRoles := oldUserRoles.ToMap()
 	mNewUserRoles := newUserRoles.ToMap()
 
@@ -188,8 +212,8 @@ func (a *User) compareUserRoles(oldUserRoles, newUserRoles schema.UserRoles) (ad
 	return
 }
 
-func (a *User) Delete(ctx context.Context, id string) error {
-	oldItem, err := a.UserModel.Get(ctx, id)
+func (a *user) Delete(ctx context.Context, id string) error {
+	oldItem, err := a.userRepo.Get(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -197,24 +221,24 @@ func (a *User) Delete(ctx context.Context, id string) error {
 		return errors.ErrNotFound
 	}
 
-	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
-		err := a.UserRoleModel.DeleteByUserID(ctx, id)
+	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
+		err := a.userRoleRepo.DeleteByUserID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		return a.UserModel.Delete(ctx, id)
+		return a.userRepo.Delete(ctx, id)
 	})
 	if err != nil {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	LoadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
 
-func (a *User) UpdateStatus(ctx context.Context, id string, status int) error {
-	oldItem, err := a.UserModel.Get(ctx, id)
+func (a *user) UpdateStatus(ctx context.Context, id string, status int) error {
+	oldItem, err := a.userRepo.Get(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -223,11 +247,11 @@ func (a *User) UpdateStatus(ctx context.Context, id string, status int) error {
 	}
 	oldItem.Status = status
 
-	err = a.UserModel.UpdateStatus(ctx, id, status)
+	err = a.userRepo.UpdateStatus(ctx, id, status)
 	if err != nil {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	LoadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
