@@ -1,17 +1,11 @@
 package entity
 
 import (
-	"context"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
-
-func GetUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return GetDBWithModel(ctx, defDB, new(User))
-}
 
 type SchemaUser schema.User
 

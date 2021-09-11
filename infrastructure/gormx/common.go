@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/config"
+
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/contextx"
@@ -27,6 +29,27 @@ func ExecTransWithLock(ctx context.Context, db *gorm.DB, fn TransFunc) error {
 		ctx = contextx.NewTransLock(ctx)
 	}
 	return ExecTrans(ctx, db, fn)
+}
+
+func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
+	trans, ok := contextx.FromTrans(ctx)
+	if ok && !contextx.FromNoTrans(ctx) {
+		db, ok := trans.(*gorm.DB)
+		if ok {
+			if contextx.FromTransLock(ctx) {
+				if dbType := config.C.Gorm.DBType; dbType == "mysql" ||
+					dbType == "postgres" {
+					db = db.Set("gorm:query_option", "FOR UPDATE")
+				}
+			}
+			return db
+		}
+	}
+	return defDB
+}
+
+func GetDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB {
+	return GetDB(ctx, defDB).Model(m)
 }
 
 func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (*schema.PaginationResult, error) {

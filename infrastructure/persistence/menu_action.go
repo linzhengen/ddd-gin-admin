@@ -13,6 +13,10 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
+func getMenuActionDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
+	return gormx.GetDBWithModel(ctx, defDB, new(entity.MenuAction))
+}
+
 func NewMenuAction(db *gorm.DB) repository.MenuActionRepository {
 	return &menuAction{
 		db: db,
@@ -34,7 +38,7 @@ func (a *menuAction) getQueryOption(opts ...schema.MenuActionQueryOptions) schem
 func (a *menuAction) Query(ctx context.Context, params schema.MenuActionQueryParam, opts ...schema.MenuActionQueryOptions) (*schema.MenuActionQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetMenuActionDB(ctx, a.db)
+	db := getMenuActionDB(ctx, a.db)
 	if v := params.MenuID; v != "" {
 		db = db.Where("menu_id=?", v)
 	}
@@ -59,7 +63,7 @@ func (a *menuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 }
 
 func (a *menuAction) Get(ctx context.Context, id string, opts ...schema.MenuActionQueryOptions) (*schema.MenuAction, error) {
-	db := entity.GetMenuActionDB(ctx, a.db).Where("id=?", id)
+	db := getMenuActionDB(ctx, a.db).Where("id=?", id)
 	var item entity.MenuAction
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
@@ -74,22 +78,22 @@ func (a *menuAction) Get(ctx context.Context, id string, opts ...schema.MenuActi
 
 func (a *menuAction) Create(ctx context.Context, item schema.MenuAction) error {
 	eitem := entity.SchemaMenuAction(item).ToMenuAction()
-	result := entity.GetMenuActionDB(ctx, a.db).Create(eitem)
+	result := getMenuActionDB(ctx, a.db).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *menuAction) Update(ctx context.Context, id string, item schema.MenuAction) error {
 	eitem := entity.SchemaMenuAction(item).ToMenuAction()
-	result := entity.GetMenuActionDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+	result := getMenuActionDB(ctx, a.db).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *menuAction) Delete(ctx context.Context, id string) error {
-	result := entity.GetMenuActionDB(ctx, a.db).Where("id=?", id).Delete(entity.MenuAction{})
+	result := getMenuActionDB(ctx, a.db).Where("id=?", id).Delete(entity.MenuAction{})
 	return errors.WithStack(result.Error)
 }
 
 func (a *menuAction) DeleteByMenuID(ctx context.Context, menuID string) error {
-	result := entity.GetMenuActionDB(ctx, a.db).Where("menu_id=?", menuID).Delete(entity.MenuAction{})
+	result := getMenuActionDB(ctx, a.db).Where("menu_id=?", menuID).Delete(entity.MenuAction{})
 	return errors.WithStack(result.Error)
 }

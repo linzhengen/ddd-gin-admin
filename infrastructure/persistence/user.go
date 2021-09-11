@@ -13,6 +13,10 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
+func getUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
+	return gormx.GetDBWithModel(ctx, defDB, new(entity.User))
+}
+
 func NewUser(db *gorm.DB) repository.UserRepository {
 	return &user{
 		db: db,
@@ -34,7 +38,7 @@ func (a *user) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryO
 func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetUserDB(ctx, a.db)
+	db := getUserDB(ctx, a.db)
 	if v := params.UserName; v != "" {
 		db = db.Where("user_name=?", v)
 	}
@@ -42,7 +46,7 @@ func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 		db = db.Where("status=?", v)
 	}
 	if v := params.RoleIDs; len(v) > 0 {
-		subQuery := entity.GetUserRoleDB(ctx, a.db).
+		subQuery := getUserRoleDB(ctx, a.db).
 			Select("user_id").
 			Where("role_id IN (?)", v).
 			SubQuery()
@@ -71,7 +75,7 @@ func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 
 func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
 	var item entity.User
-	ok, err := gormx.FindOne(ctx, entity.GetUserDB(ctx, a.db).Where("id=?", id), &item)
+	ok, err := gormx.FindOne(ctx, getUserDB(ctx, a.db).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -84,27 +88,27 @@ func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 
 func (a *user) Create(ctx context.Context, item schema.User) error {
 	sitem := entity.SchemaUser(item)
-	result := entity.GetUserDB(ctx, a.db).Create(sitem.ToUser())
+	result := getUserDB(ctx, a.db).Create(sitem.ToUser())
 	return errors.WithStack(result.Error)
 }
 
 func (a *user) Update(ctx context.Context, id string, item schema.User) error {
 	eitem := entity.SchemaUser(item).ToUser()
-	result := entity.GetUserDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+	result := getUserDB(ctx, a.db).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *user) Delete(ctx context.Context, id string) error {
-	result := entity.GetUserDB(ctx, a.db).Where("id=?", id).Delete(entity.User{})
+	result := getUserDB(ctx, a.db).Where("id=?", id).Delete(entity.User{})
 	return errors.WithStack(result.Error)
 }
 
 func (a *user) UpdateStatus(ctx context.Context, id string, status int) error {
-	result := entity.GetUserDB(ctx, a.db).Where("id=?", id).Update("status", status)
+	result := getUserDB(ctx, a.db).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)
 }
 
 func (a *user) UpdatePassword(ctx context.Context, id, password string) error {
-	result := entity.GetUserDB(ctx, a.db).Where("id=?", id).Update("password", password)
+	result := getUserDB(ctx, a.db).Where("id=?", id).Update("password", password)
 	return errors.WithStack(result.Error)
 }

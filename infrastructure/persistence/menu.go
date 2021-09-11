@@ -13,6 +13,10 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
+func getMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
+	return gormx.GetDBWithModel(ctx, defDB, new(entity.Menu))
+}
+
 func NewMenu(db *gorm.DB) repository.MenuRepository {
 	return &menu{
 		db: db,
@@ -34,7 +38,7 @@ func (a *menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryO
 func (a *menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetMenuDB(ctx, a.db)
+	db := getMenuDB(ctx, a.db)
 	if v := params.IDs; len(v) > 0 {
 		db = db.Where("id IN (?)", v)
 	}
@@ -77,7 +81,7 @@ func (a *menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 
 func (a *menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
 	var item entity.Menu
-	ok, err := gormx.FindOne(ctx, entity.GetMenuDB(ctx, a.db).Where("id=?", id), &item)
+	ok, err := gormx.FindOne(ctx, getMenuDB(ctx, a.db).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -90,27 +94,27 @@ func (a *menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 
 func (a *menu) Create(ctx context.Context, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
-	result := entity.GetMenuDB(ctx, a.db).Create(eitem)
+	result := getMenuDB(ctx, a.db).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *menu) Update(ctx context.Context, id string, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
-	result := entity.GetMenuDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+	result := getMenuDB(ctx, a.db).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
 func (a *menu) UpdateParentPath(ctx context.Context, id, parentPath string) error {
-	result := entity.GetMenuDB(ctx, a.db).Where("id=?", id).Update("parent_path", parentPath)
+	result := getMenuDB(ctx, a.db).Where("id=?", id).Update("parent_path", parentPath)
 	return errors.WithStack(result.Error)
 }
 
 func (a *menu) Delete(ctx context.Context, id string) error {
-	result := entity.GetMenuDB(ctx, a.db).Where("id=?", id).Delete(entity.Menu{})
+	result := getMenuDB(ctx, a.db).Where("id=?", id).Delete(entity.Menu{})
 	return errors.WithStack(result.Error)
 }
 
 func (a *menu) UpdateStatus(ctx context.Context, id string, status int) error {
-	result := entity.GetMenuDB(ctx, a.db).Where("id=?", id).Update("status", status)
+	result := getMenuDB(ctx, a.db).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)
 }
