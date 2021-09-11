@@ -19,7 +19,7 @@ log = "air_errors.log"
 # Watch these filename extensions.
 include_ext = ["go", "toml"]
 # Ignore these filename extensions or directories.
-exclude_dir = ["assets", "tmp", "data", "docs", "scripts", "vendor", "interfaces/api/swagger"]
+exclude_dir = ["assets", "tmp", "data", "docs", "scripts", "vendor", "app/interfaces/api/swagger"]
 # Ignore files
 exclude_file = ["injector/wire_gen.go"]
 # There's no necessary to trigger build each time file changes if it's too frequency.

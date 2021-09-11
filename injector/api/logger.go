@@ -5,7 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/linzhengen/ddd-gin-admin/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 	loggerhook "github.com/linzhengen/ddd-gin-admin/pkg/logger/hook"
 	loggergormhook "github.com/linzhengen/ddd-gin-admin/pkg/logger/hook/gorm"
