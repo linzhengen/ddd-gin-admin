@@ -4,29 +4,52 @@ import (
 	"context"
 
 	"github.com/casbin/casbin/v2"
-	"github.com/google/wire"
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/uuid"
 )
 
-var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
-
-type Role struct {
-	Enforcer      *casbin.SyncedEnforcer
-	TransModel    repository.TransRepository
-	RoleModel     repository.RoleRepository
-	RoleMenuModel repository.RoleMenuRepository
-	UserModel     repository.UserRepository
+type Role interface {
+	Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error)
+	Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error)
+	QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMenus, error)
+	Create(ctx context.Context, item schema.Role) (*schema.IDResult, error)
+	Update(ctx context.Context, id string, item schema.Role) error
+	Delete(ctx context.Context, id string) error
+	UpdateStatus(ctx context.Context, id string, status int) error
 }
 
-func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
-	return a.RoleModel.Query(ctx, params, opts...)
+func NewRole(
+	enforcer *casbin.SyncedEnforcer,
+	transRepo repository.TransRepository,
+	roleRepo repository.RoleRepository,
+	roleMenuRepo repository.RoleMenuRepository,
+	userRepo repository.UserRepository,
+) Role {
+	return &role{
+		enforcer:     enforcer,
+		transRepo:    transRepo,
+		roleRepo:     roleRepo,
+		roleMenuRepo: roleMenuRepo,
+		userRepo:     userRepo,
+	}
 }
 
-func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
-	item, err := a.RoleModel.Get(ctx, id, opts...)
+type role struct {
+	enforcer     *casbin.SyncedEnforcer
+	transRepo    repository.TransRepository
+	roleRepo     repository.RoleRepository
+	roleMenuRepo repository.RoleMenuRepository
+	userRepo     repository.UserRepository
+}
+
+func (a *role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
+	return a.roleRepo.Query(ctx, params, opts...)
+}
+
+func (a *role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
+	item, err := a.roleRepo.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +66,8 @@ func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 	return item, nil
 }
 
-func (a *Role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMenus, error) {
-	result, err := a.RoleMenuModel.Query(ctx, schema.RoleMenuQueryParam{
+func (a *role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMenus, error) {
+	result, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
 		RoleID: roleID,
 	})
 	if err != nil {
@@ -53,33 +76,33 @@ func (a *Role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMe
 	return result.Data, nil
 }
 
-func (a *Role) Create(ctx context.Context, item schema.Role) (*schema.IDResult, error) {
+func (a *role) Create(ctx context.Context, item schema.Role) (*schema.IDResult, error) {
 	err := a.checkName(ctx, item)
 	if err != nil {
 		return nil, err
 	}
 
 	item.ID = uuid.MustString()
-	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
+	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
 		for _, rmItem := range item.RoleMenus {
 			rmItem.ID = uuid.MustString()
 			rmItem.RoleID = item.ID
-			err := a.RoleMenuModel.Create(ctx, *rmItem)
+			err := a.roleMenuRepo.Create(ctx, *rmItem)
 			if err != nil {
 				return err
 			}
 		}
-		return a.RoleModel.Create(ctx, item)
+		return a.roleRepo.Create(ctx, item)
 	})
 	if err != nil {
 		return nil, err
 	}
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	LoadCasbinPolicy(ctx, a.enforcer)
 	return schema.NewIDResult(item.ID), nil
 }
 
-func (a *Role) checkName(ctx context.Context, item schema.Role) error {
-	result, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+func (a *role) checkName(ctx context.Context, item schema.Role) error {
+	result, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 		Name:            item.Name,
 	})
@@ -92,7 +115,7 @@ func (a *Role) checkName(ctx context.Context, item schema.Role) error {
 	return nil
 }
 
-func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
+func (a *role) Update(ctx context.Context, id string, item schema.Role) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
@@ -110,34 +133,34 @@ func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
 	item.ID = oldItem.ID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
-	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
+	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
 		addRoleMenus, delRoleMenus := a.compareRoleMenus(oldItem.RoleMenus, item.RoleMenus)
 		for _, rmitem := range addRoleMenus {
 			rmitem.ID = uuid.MustString()
 			rmitem.RoleID = id
-			err := a.RoleMenuModel.Create(ctx, *rmitem)
+			err := a.roleMenuRepo.Create(ctx, *rmitem)
 			if err != nil {
 				return err
 			}
 		}
 
 		for _, rmitem := range delRoleMenus {
-			err := a.RoleMenuModel.Delete(ctx, rmitem.ID)
+			err := a.roleMenuRepo.Delete(ctx, rmitem.ID)
 			if err != nil {
 				return err
 			}
 		}
 
-		return a.RoleModel.Update(ctx, id, item)
+		return a.roleRepo.Update(ctx, id, item)
 	})
 	if err != nil {
 		return err
 	}
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	LoadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
 
-func (a *Role) compareRoleMenus(oldRoleMenus, newRoleMenus schema.RoleMenus) (addList, delList schema.RoleMenus) {
+func (a *role) compareRoleMenus(oldRoleMenus, newRoleMenus schema.RoleMenus) (addList, delList schema.RoleMenus) {
 	mOldRoleMenus := oldRoleMenus.ToMap()
 	mNewRoleMenus := newRoleMenus.ToMap()
 
@@ -155,8 +178,8 @@ func (a *Role) compareRoleMenus(oldRoleMenus, newRoleMenus schema.RoleMenus) (ad
 	return
 }
 
-func (a *Role) Delete(ctx context.Context, id string) error {
-	oldItem, err := a.RoleModel.Get(ctx, id)
+func (a *role) Delete(ctx context.Context, id string) error {
+	oldItem, err := a.roleRepo.Get(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -164,7 +187,7 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 		return errors.ErrNotFound
 	}
 
-	userResult, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+	userResult, err := a.userRepo.Query(ctx, schema.UserQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 		RoleIDs:         []string{id},
 	})
@@ -175,24 +198,24 @@ func (a *Role) Delete(ctx context.Context, id string) error {
 		return errors.New400Response("The role has been assigned to the user and cannot be deleted")
 	}
 
-	err = a.TransModel.Exec(ctx, func(ctx context.Context) error {
-		err := a.RoleMenuModel.DeleteByRoleID(ctx, id)
+	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
+		err := a.roleMenuRepo.DeleteByRoleID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		return a.RoleModel.Delete(ctx, id)
+		return a.roleRepo.Delete(ctx, id)
 	})
 	if err != nil {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	LoadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
 
-func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
-	oldItem, err := a.RoleModel.Get(ctx, id)
+func (a *role) UpdateStatus(ctx context.Context, id string, status int) error {
+	oldItem, err := a.roleRepo.Get(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -200,10 +223,10 @@ func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
 		return errors.ErrNotFound
 	}
 
-	err = a.RoleModel.UpdateStatus(ctx, id, status)
+	err = a.roleRepo.UpdateStatus(ctx, id, status)
 	if err != nil {
 		return err
 	}
-	LoadCasbinPolicy(ctx, a.Enforcer)
+	LoadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }

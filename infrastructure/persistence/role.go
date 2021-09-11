@@ -3,24 +3,27 @@ package persistence
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/gormx"
+
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 
-	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
-var RoleSet = wire.NewSet(wire.Struct(new(Role), "*"))
-
-type Role struct {
-	DB *gorm.DB
+func NewRole(db *gorm.DB) repository.RoleRepository {
+	return &role{
+		db: db,
+	}
 }
 
-var _ repository.RoleRepository = &Role{}
+type role struct {
+	db *gorm.DB
+}
 
-func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {
+func (a *role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {
 	var opt schema.RoleQueryOptions
 	if len(opts) > 0 {
 		opt = opts[0]
@@ -28,10 +31,10 @@ func (a *Role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryO
 	return opt
 }
 
-func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
+func (a *role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetRoleDB(ctx, a.DB)
+	db := entity.GetRoleDB(ctx, a.db)
 	if v := params.IDs; len(v) > 0 {
 		db = db.Where("id IN (?)", v)
 	}
@@ -39,7 +42,7 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		db = db.Where("name=?", v)
 	}
 	if v := params.UserID; v != "" {
-		subQuery := entity.GetUserRoleDB(ctx, a.DB).
+		subQuery := entity.GetUserRoleDB(ctx, a.db).
 			Where("deleted_at is null").
 			Where("user_id=?", v).
 			Select("role_id").SubQuery()
@@ -51,10 +54,10 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(opt.OrderFields))
 
 	var list entity.Roles
-	pr, err := WrapPageQuery(ctx, db, params.PaginationParam, &list)
+	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -66,9 +69,9 @@ func (a *Role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 	return qr, nil
 }
 
-func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
+func (a *role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
 	var role entity.Role
-	ok, err := FindOne(ctx, entity.GetRoleDB(ctx, a.DB).Where("id=?", id), &role)
+	ok, err := gormx.FindOne(ctx, entity.GetRoleDB(ctx, a.db).Where("id=?", id), &role)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -79,24 +82,24 @@ func (a *Role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 	return role.ToSchemaRole(), nil
 }
 
-func (a *Role) Create(ctx context.Context, item schema.Role) error {
+func (a *role) Create(ctx context.Context, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
-	result := entity.GetRoleDB(ctx, a.DB).Create(eitem)
+	result := entity.GetRoleDB(ctx, a.db).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *Role) Update(ctx context.Context, id string, item schema.Role) error {
+func (a *role) Update(ctx context.Context, id string, item schema.Role) error {
 	eitem := entity.SchemaRole(item).ToRole()
-	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
+	result := entity.GetRoleDB(ctx, a.db).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *Role) Delete(ctx context.Context, id string) error {
-	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Delete(entity.Role{})
+func (a *role) Delete(ctx context.Context, id string) error {
+	result := entity.GetRoleDB(ctx, a.db).Where("id=?", id).Delete(entity.Role{})
 	return errors.WithStack(result.Error)
 }
 
-func (a *Role) UpdateStatus(ctx context.Context, id string, status int) error {
-	result := entity.GetRoleDB(ctx, a.DB).Where("id=?", id).Update("status", status)
+func (a *role) UpdateStatus(ctx context.Context, id string, status int) error {
+	result := entity.GetRoleDB(ctx, a.db).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)
 }

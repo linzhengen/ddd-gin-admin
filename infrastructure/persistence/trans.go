@@ -5,25 +5,26 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 
-	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/contextx"
 )
 
-var TransSet = wire.NewSet(wire.Struct(new(Trans), "*"))
-
-type Trans struct {
-	DB *gorm.DB
+func NewTrans(db *gorm.DB) repository.TransRepository {
+	return &trans{
+		db: db,
+	}
 }
 
-var _ repository.TransRepository = &Trans{}
+type trans struct {
+	db *gorm.DB
+}
 
-func (a *Trans) Exec(ctx context.Context, fn func(context.Context) error) error {
+func (a *trans) Exec(ctx context.Context, fn func(context.Context) error) error {
 	if _, ok := contextx.FromTrans(ctx); ok {
 		return fn(ctx)
 	}
 
-	return a.DB.Transaction(func(db *gorm.DB) error {
+	return a.db.Transaction(func(db *gorm.DB) error {
 		return fn(contextx.NewTrans(ctx, db))
 	})
 }

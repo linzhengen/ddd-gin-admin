@@ -6,72 +6,72 @@ import (
 )
 
 // RegisterAPI register api group router
-func (a *Router) RegisterAPI(app *gin.Engine) {
+func (a *router) RegisterAPI(app *gin.Engine) {
 	g := app.Group("/api")
-	g.Use(middleware.UserAuthMiddleware(a.Auth,
+	g.Use(middleware.UserAuthMiddleware(a.auth,
 		middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
 	))
 
-	g.Use(middleware.CasbinMiddleware(a.CasbinEnforcer,
+	g.Use(middleware.CasbinMiddleware(a.casbinEnforcer,
 		middleware.AllowPathPrefixSkipper("/api/v1/pub"),
 	))
 
 	g.Use(middleware.RateLimiterMiddleware())
-	g.GET("health", a.HealthAPI.Get)
+	g.GET("health", a.healthHandler.Get)
 	v1 := g.Group("/v1")
 	{
 		pub := v1.Group("/pub")
 		{
 			gLogin := pub.Group("login")
 			{
-				gLogin.GET("captchaid", a.LoginAPI.GetCaptcha)
-				gLogin.GET("captcha", a.LoginAPI.ResCaptcha)
-				gLogin.POST("", a.LoginAPI.Login)
-				gLogin.POST("exit", a.LoginAPI.Logout)
+				gLogin.GET("captchaid", a.loginHandler.GetCaptcha)
+				gLogin.GET("captcha", a.loginHandler.ResCaptcha)
+				gLogin.POST("", a.loginHandler.Login)
+				gLogin.POST("exit", a.loginHandler.Logout)
 			}
 
 			gCurrent := pub.Group("current")
 			{
-				gCurrent.PUT("password", a.LoginAPI.UpdatePassword)
-				gCurrent.GET("user", a.LoginAPI.GetUserInfo)
-				gCurrent.GET("menutree", a.LoginAPI.QueryUserMenuTree)
+				gCurrent.PUT("password", a.loginHandler.UpdatePassword)
+				gCurrent.GET("user", a.loginHandler.GetUserInfo)
+				gCurrent.GET("menutree", a.loginHandler.QueryUserMenuTree)
 			}
-			pub.POST("/refresh-token", a.LoginAPI.RefreshToken)
+			pub.POST("/refresh-token", a.loginHandler.RefreshToken)
 		}
 
 		gMenu := v1.Group("menus")
 		{
-			gMenu.GET("", a.MenuAPI.Query)
-			gMenu.GET(":id", a.MenuAPI.Get)
-			gMenu.POST("", a.MenuAPI.Create)
-			gMenu.PUT(":id", a.MenuAPI.Update)
-			gMenu.DELETE(":id", a.MenuAPI.Delete)
-			gMenu.PATCH(":id/enable", a.MenuAPI.Enable)
-			gMenu.PATCH(":id/disable", a.MenuAPI.Disable)
+			gMenu.GET("", a.menuHandler.Query)
+			gMenu.GET(":id", a.menuHandler.Get)
+			gMenu.POST("", a.menuHandler.Create)
+			gMenu.PUT(":id", a.menuHandler.Update)
+			gMenu.DELETE(":id", a.menuHandler.Delete)
+			gMenu.PATCH(":id/enable", a.menuHandler.Enable)
+			gMenu.PATCH(":id/disable", a.menuHandler.Disable)
 		}
-		v1.GET("/menus.tree", a.MenuAPI.QueryTree)
+		v1.GET("/menus.tree", a.menuHandler.QueryTree)
 
 		gRole := v1.Group("roles")
 		{
-			gRole.GET("", a.RoleAPI.Query)
-			gRole.GET(":id", a.RoleAPI.Get)
-			gRole.POST("", a.RoleAPI.Create)
-			gRole.PUT(":id", a.RoleAPI.Update)
-			gRole.DELETE(":id", a.RoleAPI.Delete)
-			gRole.PATCH(":id/enable", a.RoleAPI.Enable)
-			gRole.PATCH(":id/disable", a.RoleAPI.Disable)
+			gRole.GET("", a.roleHandler.Query)
+			gRole.GET(":id", a.roleHandler.Get)
+			gRole.POST("", a.roleHandler.Create)
+			gRole.PUT(":id", a.roleHandler.Update)
+			gRole.DELETE(":id", a.roleHandler.Delete)
+			gRole.PATCH(":id/enable", a.roleHandler.Enable)
+			gRole.PATCH(":id/disable", a.roleHandler.Disable)
 		}
-		v1.GET("/roles.select", a.RoleAPI.QuerySelect)
+		v1.GET("/roles.select", a.roleHandler.QuerySelect)
 
 		gUser := v1.Group("users")
 		{
-			gUser.GET("", a.UserAPI.Query)
-			gUser.GET(":id", a.UserAPI.Get)
-			gUser.POST("", a.UserAPI.Create)
-			gUser.PUT(":id", a.UserAPI.Update)
-			gUser.DELETE(":id", a.UserAPI.Delete)
-			gUser.PATCH(":id/enable", a.UserAPI.Enable)
-			gUser.PATCH(":id/disable", a.UserAPI.Disable)
+			gUser.GET("", a.userHandler.Query)
+			gUser.GET(":id", a.userHandler.Get)
+			gUser.POST("", a.userHandler.Create)
+			gUser.PUT(":id", a.userHandler.Update)
+			gUser.DELETE(":id", a.userHandler.Delete)
+			gUser.PATCH(":id/enable", a.userHandler.Enable)
+			gUser.PATCH(":id/disable", a.userHandler.Disable)
 		}
 	}
 }

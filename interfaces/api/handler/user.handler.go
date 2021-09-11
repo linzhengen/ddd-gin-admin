@@ -4,20 +4,31 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"github.com/linzhengen/ddd-gin-admin/application"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/ginx"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
-var UserSet = wire.NewSet(wire.Struct(new(User), "*"))
-
-type User struct {
-	UserSrv *application.User
+type User interface {
+	Query(c *gin.Context)
+	Get(c *gin.Context)
+	Create(c *gin.Context)
+	Update(c *gin.Context)
+	Delete(c *gin.Context)
+	Enable(c *gin.Context)
+	Disable(c *gin.Context)
 }
 
-func (a *User) Query(c *gin.Context) {
+func NewUser(userApp application.User) User {
+	return &user{userApp: userApp}
+}
+
+type user struct {
+	userApp application.User
+}
+
+func (a *user) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.UserQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -29,7 +40,7 @@ func (a *User) Query(c *gin.Context) {
 	}
 
 	params.Pagination = true
-	result, err := a.UserSrv.QueryShow(ctx, params)
+	result, err := a.userApp.QueryShow(ctx, params)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -37,9 +48,9 @@ func (a *User) Query(c *gin.Context) {
 	ginx.ResPage(c, result.Data, result.PageResult)
 }
 
-func (a *User) Get(c *gin.Context) {
+func (a *user) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.UserSrv.Get(ctx, c.Param("id"))
+	item, err := a.userApp.Get(ctx, c.Param("id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -47,7 +58,7 @@ func (a *User) Get(c *gin.Context) {
 	ginx.ResSuccess(c, item.CleanSecure())
 }
 
-func (a *User) Create(c *gin.Context) {
+func (a *user) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.User
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -59,7 +70,7 @@ func (a *User) Create(c *gin.Context) {
 	}
 
 	item.Creator = ginx.GetUserID(c)
-	result, err := a.UserSrv.Create(ctx, item)
+	result, err := a.userApp.Create(ctx, item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -67,7 +78,7 @@ func (a *User) Create(c *gin.Context) {
 	ginx.ResSuccess(c, result)
 }
 
-func (a *User) Update(c *gin.Context) {
+func (a *user) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.User
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -75,7 +86,7 @@ func (a *User) Update(c *gin.Context) {
 		return
 	}
 
-	err := a.UserSrv.Update(ctx, c.Param("id"), item)
+	err := a.userApp.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -83,9 +94,9 @@ func (a *User) Update(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *User) Delete(c *gin.Context) {
+func (a *user) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.UserSrv.Delete(ctx, c.Param("id"))
+	err := a.userApp.Delete(ctx, c.Param("id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -93,9 +104,9 @@ func (a *User) Delete(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *User) Enable(c *gin.Context) {
+func (a *user) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.UserSrv.UpdateStatus(ctx, c.Param("id"), 1)
+	err := a.userApp.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -103,9 +114,9 @@ func (a *User) Enable(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *User) Disable(c *gin.Context) {
+func (a *user) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.UserSrv.UpdateStatus(ctx, c.Param("id"), 2)
+	err := a.userApp.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {
 		ginx.ResError(c, err)
 		return

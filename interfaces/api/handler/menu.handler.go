@@ -2,19 +2,33 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"github.com/linzhengen/ddd-gin-admin/application"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/ginx"
 )
 
-var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
-
-type Menu struct {
-	MenuSrv *application.Menu
+type Menu interface {
+	Query(c *gin.Context)
+	QueryTree(c *gin.Context)
+	Get(c *gin.Context)
+	Create(c *gin.Context)
+	Update(c *gin.Context)
+	Delete(c *gin.Context)
+	Enable(c *gin.Context)
+	Disable(c *gin.Context)
 }
 
-func (a *Menu) Query(c *gin.Context) {
+func NewMenu(menuApp application.Menu) Menu {
+	return &menu{
+		menuApp: menuApp,
+	}
+}
+
+type menu struct {
+	menuApp application.Menu
+}
+
+func (a *menu) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -23,7 +37,7 @@ func (a *Menu) Query(c *gin.Context) {
 	}
 
 	params.Pagination = true
-	result, err := a.MenuSrv.Query(ctx, params, schema.MenuQueryOptions{
+	result, err := a.menuApp.Query(ctx, params, schema.MenuQueryOptions{
 		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
 	})
 	if err != nil {
@@ -33,7 +47,7 @@ func (a *Menu) Query(c *gin.Context) {
 	ginx.ResPage(c, result.Data, result.PageResult)
 }
 
-func (a *Menu) QueryTree(c *gin.Context) {
+func (a *menu) QueryTree(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
 	if err := ginx.ParseQuery(c, &params); err != nil {
@@ -41,7 +55,7 @@ func (a *Menu) QueryTree(c *gin.Context) {
 		return
 	}
 
-	result, err := a.MenuSrv.Query(ctx, params, schema.MenuQueryOptions{
+	result, err := a.menuApp.Query(ctx, params, schema.MenuQueryOptions{
 		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
 	})
 	if err != nil {
@@ -51,9 +65,9 @@ func (a *Menu) QueryTree(c *gin.Context) {
 	ginx.ResList(c, result.Data.ToTree())
 }
 
-func (a *Menu) Get(c *gin.Context) {
+func (a *menu) Get(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.MenuSrv.Get(ctx, c.Param("id"))
+	item, err := a.menuApp.Get(ctx, c.Param("id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -61,7 +75,7 @@ func (a *Menu) Get(c *gin.Context) {
 	ginx.ResSuccess(c, item)
 }
 
-func (a *Menu) Create(c *gin.Context) {
+func (a *menu) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -70,7 +84,7 @@ func (a *Menu) Create(c *gin.Context) {
 	}
 
 	item.Creator = ginx.GetUserID(c)
-	result, err := a.MenuSrv.Create(ctx, item)
+	result, err := a.menuApp.Create(ctx, item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -78,7 +92,7 @@ func (a *Menu) Create(c *gin.Context) {
 	ginx.ResSuccess(c, result)
 }
 
-func (a *Menu) Update(c *gin.Context) {
+func (a *menu) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -86,7 +100,7 @@ func (a *Menu) Update(c *gin.Context) {
 		return
 	}
 
-	err := a.MenuSrv.Update(ctx, c.Param("id"), item)
+	err := a.menuApp.Update(ctx, c.Param("id"), item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -94,9 +108,9 @@ func (a *Menu) Update(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *Menu) Delete(c *gin.Context) {
+func (a *menu) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSrv.Delete(ctx, c.Param("id"))
+	err := a.menuApp.Delete(ctx, c.Param("id"))
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -104,9 +118,9 @@ func (a *Menu) Delete(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *Menu) Enable(c *gin.Context) {
+func (a *menu) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSrv.UpdateStatus(ctx, c.Param("id"), 1)
+	err := a.menuApp.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -114,9 +128,9 @@ func (a *Menu) Enable(c *gin.Context) {
 	ginx.ResOK(c)
 }
 
-func (a *Menu) Disable(c *gin.Context) {
+func (a *menu) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
-	err := a.MenuSrv.UpdateStatus(ctx, c.Param("id"), 2)
+	err := a.menuApp.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {
 		ginx.ResError(c, err)
 		return

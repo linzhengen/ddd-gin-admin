@@ -3,24 +3,27 @@ package persistence
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/gormx"
+
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 
-	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
-var MenuSet = wire.NewSet(wire.Struct(new(Menu), "*"))
-
-type Menu struct {
-	DB *gorm.DB
+func NewMenu(db *gorm.DB) repository.MenuRepository {
+	return &menu{
+		db: db,
+	}
 }
 
-var _ repository.MenuRepository = &Menu{}
+type menu struct {
+	db *gorm.DB
+}
 
-func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
+func (a *menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
 	var opt schema.MenuQueryOptions
 	if len(opts) > 0 {
 		opt = opts[0]
@@ -28,10 +31,10 @@ func (a *Menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryO
 	return opt
 }
 
-func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
+func (a *menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetMenuDB(ctx, a.DB)
+	db := entity.GetMenuDB(ctx, a.db)
 	if v := params.IDs; len(v) > 0 {
 		db = db.Where("id IN (?)", v)
 	}
@@ -56,10 +59,10 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(opt.OrderFields))
 
 	var list entity.Menus
-	pr, err := WrapPageQuery(ctx, db, params.PaginationParam, &list)
+	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -72,9 +75,9 @@ func (a *Menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...
 	return qr, nil
 }
 
-func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
+func (a *menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
 	var item entity.Menu
-	ok, err := FindOne(ctx, entity.GetMenuDB(ctx, a.DB).Where("id=?", id), &item)
+	ok, err := gormx.FindOne(ctx, entity.GetMenuDB(ctx, a.db).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -85,29 +88,29 @@ func (a *Menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 	return item.ToSchemaMenu(), nil
 }
 
-func (a *Menu) Create(ctx context.Context, item schema.Menu) error {
+func (a *menu) Create(ctx context.Context, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
-	result := entity.GetMenuDB(ctx, a.DB).Create(eitem)
+	result := entity.GetMenuDB(ctx, a.db).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *Menu) Update(ctx context.Context, id string, item schema.Menu) error {
+func (a *menu) Update(ctx context.Context, id string, item schema.Menu) error {
 	eitem := entity.SchemaMenu(item).ToMenu()
-	result := entity.GetMenuDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
+	result := entity.GetMenuDB(ctx, a.db).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *Menu) UpdateParentPath(ctx context.Context, id, parentPath string) error {
-	result := entity.GetMenuDB(ctx, a.DB).Where("id=?", id).Update("parent_path", parentPath)
+func (a *menu) UpdateParentPath(ctx context.Context, id, parentPath string) error {
+	result := entity.GetMenuDB(ctx, a.db).Where("id=?", id).Update("parent_path", parentPath)
 	return errors.WithStack(result.Error)
 }
 
-func (a *Menu) Delete(ctx context.Context, id string) error {
-	result := entity.GetMenuDB(ctx, a.DB).Where("id=?", id).Delete(entity.Menu{})
+func (a *menu) Delete(ctx context.Context, id string) error {
+	result := entity.GetMenuDB(ctx, a.db).Where("id=?", id).Delete(entity.Menu{})
 	return errors.WithStack(result.Error)
 }
 
-func (a *Menu) UpdateStatus(ctx context.Context, id string, status int) error {
-	result := entity.GetMenuDB(ctx, a.DB).Where("id=?", id).Update("status", status)
+func (a *menu) UpdateStatus(ctx context.Context, id string, status int) error {
+	result := entity.GetMenuDB(ctx, a.db).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)
 }

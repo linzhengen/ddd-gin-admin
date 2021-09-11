@@ -4,17 +4,22 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/ginx"
 )
 
-var HealthCheckSet = wire.NewSet(wire.Struct(new(HealthCheck), "*"))
-
-type HealthCheck struct {
+type HealthCheck interface {
+	Get(c *gin.Context)
 }
 
-func (a *HealthCheck) Get(c *gin.Context) {
+func NewHealthCheck() HealthCheck {
+	return &healthCheck{}
+}
+
+type healthCheck struct {
+}
+
+func (a *healthCheck) Get(c *gin.Context) {
 	ginx.ResSuccess(c, &schema.HealthCheck{
 		Status:    "OK",
 		CheckedAt: time.Now(),

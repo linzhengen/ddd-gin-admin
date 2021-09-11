@@ -3,24 +3,27 @@ package persistence
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/infrastructure/gormx"
+
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 
-	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
-var UserRoleSet = wire.NewSet(wire.Struct(new(UserRole), "*"))
-
-type UserRole struct {
-	DB *gorm.DB
+func NewUserRole(db *gorm.DB) repository.UserRoleRepository {
+	return &userRole{
+		db: db,
+	}
 }
 
-var _ repository.UserRoleRepository = &UserRole{}
+type userRole struct {
+	db *gorm.DB
+}
 
-func (a *UserRole) getQueryOption(opts ...schema.UserRoleQueryOptions) schema.UserRoleQueryOptions {
+func (a *userRole) getQueryOption(opts ...schema.UserRoleQueryOptions) schema.UserRoleQueryOptions {
 	var opt schema.UserRoleQueryOptions
 	if len(opts) > 0 {
 		opt = opts[0]
@@ -28,10 +31,10 @@ func (a *UserRole) getQueryOption(opts ...schema.UserRoleQueryOptions) schema.Us
 	return opt
 }
 
-func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, opts ...schema.UserRoleQueryOptions) (*schema.UserRoleQueryResult, error) {
+func (a *userRole) Query(ctx context.Context, params schema.UserRoleQueryParam, opts ...schema.UserRoleQueryOptions) (*schema.UserRoleQueryResult, error) {
 	opt := a.getQueryOption(opts...)
 
-	db := entity.GetUserRoleDB(ctx, a.DB)
+	db := entity.GetUserRoleDB(ctx, a.db)
 	if v := params.UserID; v != "" {
 		db = db.Where("user_id=?", v)
 	}
@@ -40,10 +43,10 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 	}
 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(opt.OrderFields))
 
 	var list entity.UserRoles
-	pr, err := WrapPageQuery(ctx, db, params.PaginationParam, &list)
+	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -55,10 +58,10 @@ func (a *UserRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 	return qr, nil
 }
 
-func (a *UserRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
-	db := entity.GetUserRoleDB(ctx, a.DB).Where("id=?", id)
+func (a *userRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
+	db := entity.GetUserRoleDB(ctx, a.db).Where("id=?", id)
 	var item entity.UserRole
-	ok, err := FindOne(ctx, db, &item)
+	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -69,24 +72,24 @@ func (a *UserRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQu
 	return item.ToSchemaUserRole(), nil
 }
 
-func (a *UserRole) Create(ctx context.Context, item schema.UserRole) error {
+func (a *userRole) Create(ctx context.Context, item schema.UserRole) error {
 	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := entity.GetUserRoleDB(ctx, a.DB).Create(eitem)
+	result := entity.GetUserRoleDB(ctx, a.db).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *UserRole) Update(ctx context.Context, id string, item schema.UserRole) error {
+func (a *userRole) Update(ctx context.Context, id string, item schema.UserRole) error {
 	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := entity.GetUserRoleDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
+	result := entity.GetUserRoleDB(ctx, a.db).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *UserRole) Delete(ctx context.Context, id string) error {
-	result := entity.GetUserRoleDB(ctx, a.DB).Where("id=?", id).Delete(entity.UserRole{})
+func (a *userRole) Delete(ctx context.Context, id string) error {
+	result := entity.GetUserRoleDB(ctx, a.db).Where("id=?", id).Delete(entity.UserRole{})
 	return errors.WithStack(result.Error)
 }
 
-func (a *UserRole) DeleteByUserID(ctx context.Context, userID string) error {
-	result := entity.GetUserRoleDB(ctx, a.DB).Where("user_id=?", userID).Delete(entity.UserRole{})
+func (a *userRole) DeleteByUserID(ctx context.Context, userID string) error {
+	result := entity.GetUserRoleDB(ctx, a.db).Where("user_id=?", userID).Delete(entity.UserRole{})
 	return errors.WithStack(result.Error)
 }

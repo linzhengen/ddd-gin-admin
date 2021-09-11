@@ -8,26 +8,54 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/domain/repository"
 
 	"github.com/LyricTian/captcha"
-	"github.com/google/wire"
 	"github.com/linzhengen/ddd-gin-admin/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 )
 
-var LoginSet = wire.NewSet(wire.Struct(new(Login), "*"))
-
-type Login struct {
-	Auth            auth.Author
-	UserModel       repository.UserRepository
-	UserRoleModel   repository.UserRoleRepository
-	RoleModel       repository.RoleRepository
-	RoleMenuModel   repository.RoleMenuRepository
-	MenuModel       repository.MenuRepository
-	MenuActionModel repository.MenuActionRepository
+type Login interface {
+	GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptcha, error)
+	ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID string, width, height int) error
+	Verify(ctx context.Context, userName, password string) (*schema.User, error)
+	GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error)
+	DestroyToken(ctx context.Context, tokenString string) error
+	GetLoginInfo(ctx context.Context, userID string) (*schema.UserLoginInfo, error)
+	QueryUserMenuTree(ctx context.Context, userID string) (schema.MenuTrees, error)
+	UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error
 }
 
-func (a *Login) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptcha, error) {
+func NewLogin(
+	auth auth.Author,
+	userRepo repository.UserRepository,
+	userRoleRepo repository.UserRoleRepository,
+	roleRepo repository.RoleRepository,
+	roleMenuRepo repository.RoleMenuRepository,
+	menuRepo repository.MenuRepository,
+	menuActionRepo repository.MenuActionRepository,
+) Login {
+	return &login{
+		auth:           auth,
+		userRepo:       userRepo,
+		userRoleRepo:   userRoleRepo,
+		roleRepo:       roleRepo,
+		roleMenuRepo:   roleMenuRepo,
+		menuRepo:       menuRepo,
+		menuActionRepo: menuActionRepo,
+	}
+}
+
+type login struct {
+	auth           auth.Author
+	userRepo       repository.UserRepository
+	userRoleRepo   repository.UserRoleRepository
+	roleRepo       repository.RoleRepository
+	roleMenuRepo   repository.RoleMenuRepository
+	menuRepo       repository.MenuRepository
+	menuActionRepo repository.MenuActionRepository
+}
+
+func (a *login) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptcha, error) {
 	captchaID := captcha.NewLen(length)
 	item := &schema.LoginCaptcha{
 		CaptchaID: captchaID,
@@ -35,7 +63,7 @@ func (a *Login) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptch
 	return item, nil
 }
 
-func (a *Login) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID string, width, height int) error {
+func (a *login) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID string, width, height int) error {
 	err := captcha.WriteImage(w, captchaID, width, height)
 	if err != nil {
 		if err == captcha.ErrNotFound {
@@ -51,14 +79,14 @@ func (a *Login) ResCaptcha(ctx context.Context, w http.ResponseWriter, captchaID
 	return nil
 }
 
-func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
+func (a *login) Verify(ctx context.Context, userName, password string) (*schema.User, error) {
 	// is root user
 	root := schema.GetRootUser()
 	if userName == root.UserName && root.Password == password {
 		return root, nil
 	}
 
-	result, err := a.UserModel.Query(ctx, schema.UserQueryParam{
+	result, err := a.userRepo.Query(ctx, schema.UserQueryParam{
 		UserName: userName,
 	})
 	if err != nil {
@@ -79,8 +107,8 @@ func (a *Login) Verify(ctx context.Context, userName, password string) (*schema.
 	return item, nil
 }
 
-func (a *Login) GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error) {
-	tokenInfo, err := a.Auth.GenerateToken(ctx, userID)
+func (a *login) GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error) {
+	tokenInfo, err := a.auth.GenerateToken(ctx, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -93,16 +121,16 @@ func (a *Login) GenerateToken(ctx context.Context, userID string) (*schema.Login
 	return item, nil
 }
 
-func (a *Login) DestroyToken(ctx context.Context, tokenString string) error {
-	err := a.Auth.DestroyToken(ctx, tokenString)
+func (a *login) DestroyToken(ctx context.Context, tokenString string) error {
+	err := a.auth.DestroyToken(ctx, tokenString)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
 }
 
-func (a *Login) checkAndGetUser(ctx context.Context, userID string) (*schema.User, error) {
-	user, err := a.UserModel.Get(ctx, userID)
+func (a *login) checkAndGetUser(ctx context.Context, userID string) (*schema.User, error) {
+	user, err := a.userRepo.Get(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +143,7 @@ func (a *Login) checkAndGetUser(ctx context.Context, userID string) (*schema.Use
 	return user, nil
 }
 
-func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLoginInfo, error) {
+func (a *login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLoginInfo, error) {
 	if isRoot := schema.CheckIsRootUser(ctx, userID); isRoot {
 		root := schema.GetRootUser()
 		loginInfo := &schema.UserLoginInfo{
@@ -136,7 +164,7 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 		RealName: user.RealName,
 	}
 
-	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserID: userID,
 	})
 	if err != nil {
@@ -144,7 +172,7 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 	}
 
 	if roleIDs := userRoleResult.Data.ToRoleIDs(); len(roleIDs) > 0 {
-		roleResult, err := a.RoleModel.Query(ctx, schema.RoleQueryParam{
+		roleResult, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
 			IDs:    roleIDs,
 			Status: 1,
 		})
@@ -157,11 +185,11 @@ func (a *Login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 	return info, nil
 }
 
-func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.MenuTrees, error) {
+func (a *login) QueryUserMenuTree(ctx context.Context, userID string) (schema.MenuTrees, error) {
 	isRoot := schema.CheckIsRootUser(ctx, userID)
 	// show all menu when root user
 	if isRoot {
-		result, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		result, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
 			Status: 1,
 		}, schema.MenuQueryOptions{
 			OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
@@ -170,14 +198,14 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 			return nil, err
 		}
 
-		menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{})
+		menuActionResult, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{})
 		if err != nil {
 			return nil, err
 		}
 		return result.Data.FillMenuAction(menuActionResult.Data.ToMenuIDMap()).ToTree(), nil
 	}
 
-	userRoleResult, err := a.UserRoleModel.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserID: userID,
 	})
 	if err != nil {
@@ -187,7 +215,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 		return nil, errors.ErrNoPerm
 	}
 
-	roleMenuResult, err := a.RoleMenuModel.Query(ctx, schema.RoleMenuQueryParam{
+	roleMenuResult, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
 		RoleIDs: userRoleResult.Data.ToRoleIDs(),
 	})
 	if err != nil {
@@ -197,7 +225,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 		return nil, errors.ErrNoPerm
 	}
 
-	menuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+	menuResult, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
 		IDs:    roleMenuResult.Data.ToMenuIDs(),
 		Status: 1,
 	})
@@ -216,7 +244,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 		}
 	}
 	if len(qIDs) > 0 {
-		pmenuResult, err := a.MenuModel.Query(ctx, schema.MenuQueryParam{
+		pmenuResult, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
 			IDs: qIDs,
 		})
 		if err != nil {
@@ -226,7 +254,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	}
 
 	sort.Sort(menuResult.Data)
-	menuActionResult, err := a.MenuActionModel.Query(ctx, schema.MenuActionQueryParam{
+	menuActionResult, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{
 		IDs: roleMenuResult.Data.ToActionIDs(),
 	})
 	if err != nil {
@@ -235,7 +263,7 @@ func (a *Login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	return menuResult.Data.FillMenuAction(menuActionResult.Data.ToMenuIDMap()).ToTree(), nil
 }
 
-func (a *Login) UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error {
+func (a *login) UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error {
 	if schema.CheckIsRootUser(ctx, userID) {
 		return errors.New400Response("The root user is not allowed to update the password")
 	}
@@ -248,5 +276,5 @@ func (a *Login) UpdatePassword(ctx context.Context, userID string, params schema
 	}
 
 	params.NewPassword = hash.SHA1String(params.NewPassword)
-	return a.UserModel.UpdatePassword(ctx, userID, params.NewPassword)
+	return a.userRepo.UpdatePassword(ctx, userID, params.NewPassword)
 }
