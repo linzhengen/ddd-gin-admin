@@ -21,7 +21,7 @@ import (
 
 // Injectors from wire.go:
 
-func BuildApiInjector() (*api.Injector, func(), error) {
+func BuildApiInjector() (*ApiInjector, func(), error) {
 	author, cleanup, err := api.InitAuth()
 	if err != nil {
 		return nil, nil, err
@@ -57,8 +57,8 @@ func BuildApiInjector() (*api.Injector, func(), error) {
 	healthCheck := handler.NewHealthCheck()
 	routerRouter := router.NewRouter(author, syncedEnforcer, handlerLogin, handlerMenu, handlerRole, handlerUser, healthCheck)
 	engine := api.InitGinEngine(routerRouter)
-	injector := api.NewInjector(engine, author, syncedEnforcer, menu)
-	return injector, func() {
+	apiInjector := NewApiInjector(engine, author, syncedEnforcer, menu)
+	return apiInjector, func() {
 		cleanup3()
 		cleanup2()
 		cleanup()

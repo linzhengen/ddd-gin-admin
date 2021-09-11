@@ -17,7 +17,7 @@ import (
 	"github.com/google/wire"
 )
 
-func BuildApiInjector() (*api.Injector, func(), error) {
+func BuildApiInjector() (*ApiInjector, func(), error) {
 	wire.Build(
 		// init,
 		api.InitGormDB,
@@ -55,7 +55,7 @@ func BuildApiInjector() (*api.Injector, func(), error) {
 		casbin.NewCasbinAdapter,
 
 		// injector
-		api.NewInjector,
+		NewApiInjector,
 	)
 	return nil, nil, nil
 }

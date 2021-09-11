@@ -7,6 +7,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/casbin/casbin/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/linzhengen/ddd-gin-admin/application"
+	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
+
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
 	"github.com/linzhengen/ddd-gin-admin/infrastructure/config"
@@ -14,6 +19,27 @@ import (
 
 	_ "github.com/linzhengen/ddd-gin-admin/interfaces/api/swagger"
 )
+
+func NewApiInjector(
+	engine *gin.Engine,
+	auth auth.Author,
+	casbinEnforcer *casbin.SyncedEnforcer,
+	menuBll application.Menu,
+) *ApiInjector {
+	return &ApiInjector{
+		engine:         engine,
+		auth:           auth,
+		casbinEnforcer: casbinEnforcer,
+		menuBll:        menuBll,
+	}
+}
+
+type ApiInjector struct {
+	engine         *gin.Engine
+	auth           auth.Author
+	casbinEnforcer *casbin.SyncedEnforcer
+	menuBll        application.Menu
+}
 
 func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
 	var o api.Options
@@ -50,13 +76,13 @@ func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
 	}
 
 	if config.C.Menu.Enable && config.C.Menu.Data != "" {
-		err = injector.MenuBll.InitData(ctx, config.C.Menu.Data)
+		err = injector.menuBll.InitData(ctx, config.C.Menu.Data)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	httpServerCleanFunc := api.InitHTTPServer(ctx, injector.Engine)
+	httpServerCleanFunc := api.InitHTTPServer(ctx, injector.engine)
 
 	return func() {
 		httpServerCleanFunc()
