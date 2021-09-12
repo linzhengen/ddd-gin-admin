@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 )
 
 type Role interface {
@@ -29,8 +29,8 @@ type role struct {
 func (a *role) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.RoleQueryParam
-	if err := ginx.ParseQuery(c, &params); err != nil {
-		ginx.ResError(c, err)
+	if err := api.ParseQuery(c, &params); err != nil {
+		api.ResError(c, err)
 		return
 	}
 
@@ -39,17 +39,17 @@ func (a *role) Query(c *gin.Context) {
 		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
 	})
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResPage(c, result.Data, result.PageResult)
+	api.ResPage(c, result.Data, result.PageResult)
 }
 
 func (a *role) QuerySelect(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.RoleQueryParam
-	if err := ginx.ParseQuery(c, &params); err != nil {
-		ginx.ResError(c, err)
+	if err := api.ParseQuery(c, &params); err != nil {
+		api.ResError(c, err)
 		return
 	}
 
@@ -57,81 +57,81 @@ func (a *role) QuerySelect(c *gin.Context) {
 		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
 	})
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResList(c, result.Data)
+	api.ResList(c, result.Data)
 }
 
 func (a *role) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.roleApp.Get(ctx, c.Param("id"))
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResSuccess(c, item)
+	api.ResSuccess(c, item)
 }
 
 func (a *role) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Role
-	if err := ginx.ParseJSON(c, &item); err != nil {
-		ginx.ResError(c, err)
+	if err := api.ParseJSON(c, &item); err != nil {
+		api.ResError(c, err)
 		return
 	}
 
-	item.Creator = ginx.GetUserID(c)
+	item.Creator = api.GetUserID(c)
 	result, err := a.roleApp.Create(ctx, item)
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResSuccess(c, result)
+	api.ResSuccess(c, result)
 }
 
 func (a *role) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Role
-	if err := ginx.ParseJSON(c, &item); err != nil {
-		ginx.ResError(c, err)
+	if err := api.ParseJSON(c, &item); err != nil {
+		api.ResError(c, err)
 		return
 	}
 
 	err := a.roleApp.Update(ctx, c.Param("id"), item)
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResOK(c)
+	api.ResOK(c)
 }
 
 func (a *role) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.roleApp.Delete(ctx, c.Param("id"))
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResOK(c)
+	api.ResOK(c)
 }
 
 func (a *role) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.roleApp.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResOK(c)
+	api.ResOK(c)
 }
 
 func (a *role) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.roleApp.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResOK(c)
+	api.ResOK(c)
 }
