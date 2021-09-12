@@ -3,9 +3,9 @@ package middleware
 import (
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
 	"github.com/linzhengen/ddd-gin-admin/configs"
-	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
 func CasbinMiddleware(enforcer *casbin.SyncedEnforcer, skippers ...SkipperFunc) gin.HandlerFunc {

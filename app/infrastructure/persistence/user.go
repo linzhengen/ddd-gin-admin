@@ -3,13 +3,14 @@ package persistence
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 
 	"github.com/jinzhu/gorm"
-	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 )
 
 func getUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
