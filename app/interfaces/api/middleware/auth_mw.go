@@ -4,14 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/contextx"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 	"github.com/linzhengen/ddd-gin-admin/configs"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 
 func wrapUserAuthContext(c *gin.Context, userID string) {
-	ginx.SetUserID(c, userID)
+	api.SetUserID(c, userID)
 	ctx := contextx.NewUserID(c.Request.Context(), userID)
 	ctx = logger.NewUserIDContext(ctx, userID)
 	c.Request = c.Request.WithContext(ctx)
@@ -31,7 +31,7 @@ func UserAuthMiddleware(a auth.Author, skippers ...SkipperFunc) gin.HandlerFunc 
 			return
 		}
 
-		userID, err := a.ParseUserID(c.Request.Context(), ginx.GetToken(c))
+		userID, err := a.ParseUserID(c.Request.Context(), api.GetToken(c))
 		if err != nil {
 			if err == auth.ErrInvalidToken {
 				if configs.C.IsDebugMode() {
@@ -39,10 +39,10 @@ func UserAuthMiddleware(a auth.Author, skippers ...SkipperFunc) gin.HandlerFunc 
 					c.Next()
 					return
 				}
-				ginx.ResError(c, errors.ErrInvalidToken)
+				api.ResError(c, errors.ErrInvalidToken)
 				return
 			}
-			ginx.ResError(c, errors.WithStack(err))
+			api.ResError(c, errors.WithStack(err))
 			return
 		}
 

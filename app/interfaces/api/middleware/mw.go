@@ -4,22 +4,22 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
 	"github.com/gin-gonic/gin"
 )
 
 func NoMethodHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ginx.ResError(c, errors.ErrMethodNotAllow)
+		api.ResError(c, errors.ErrMethodNotAllow)
 	}
 }
 
 func NoRouteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ginx.ResError(c, errors.ErrNotFound)
+		api.ResError(c, errors.ErrNotFound)
 	}
 }
 

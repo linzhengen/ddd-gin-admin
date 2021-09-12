@@ -3,10 +3,10 @@ package handler
 import (
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 
 	"github.com/gin-gonic/gin"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 )
 
 type HealthCheck interface {
@@ -21,7 +21,7 @@ type healthCheck struct {
 }
 
 func (a *healthCheck) Get(c *gin.Context) {
-	ginx.ResSuccess(c, &schema.HealthCheck{
+	api.ResSuccess(c, &schema.HealthCheck{
 		Status:    "OK",
 		CheckedAt: time.Now(),
 	})

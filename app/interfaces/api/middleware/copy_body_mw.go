@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/linzhengen/ddd-gin-admin/configs"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/gin-gonic/gin"
 )
@@ -45,7 +45,7 @@ func CopyBodyMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 		c.Request.Body.Close()
 		bf := bytes.NewBuffer(requestBody)
 		c.Request.Body = http.MaxBytesReader(c.Writer, ioutil.NopCloser(bf), maxMemory)
-		c.Set(ginx.ReqBodyKey, requestBody)
+		c.Set(api.ReqBodyKey, requestBody)
 
 		c.Next()
 	}

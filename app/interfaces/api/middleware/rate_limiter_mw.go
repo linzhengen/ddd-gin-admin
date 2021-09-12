@@ -4,11 +4,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
@@ -40,7 +40,7 @@ func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 			return
 		}
 
-		userID := ginx.GetUserID(c)
+		userID := api.GetUserID(c)
 		if userID != "" {
 			limit := cfg.Count
 			rate, delay, allowed := limiter.AllowMinute(userID, limit)
@@ -50,7 +50,7 @@ func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 				h.Set("X-RateLimit-Remaining", strconv.FormatInt(limit-rate, 10))
 				delaySec := int64(delay / time.Second)
 				h.Set("X-RateLimit-Delay", strconv.FormatInt(delaySec, 10))
-				ginx.ResError(c, errors.ErrTooManyRequests)
+				api.ResError(c, errors.ErrTooManyRequests)
 				return
 			}
 		}

@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"runtime"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
@@ -27,7 +27,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 			if err := recover(); err != nil {
 				stack := stack(3)
 				logger.WithContext(c.Request.Context()).WithField(logger.StackKey, string(stack)).Errorf("[panic]: %v", err)
-				ginx.ResError(c, errors.ErrInternalServer)
+				api.ResError(c, errors.ErrInternalServer)
 			}
 		}()
 		c.Next()

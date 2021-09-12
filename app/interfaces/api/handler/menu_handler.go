@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 )
 
 type Menu interface {
@@ -31,8 +31,8 @@ type menu struct {
 func (a *menu) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
-	if err := ginx.ParseQuery(c, &params); err != nil {
-		ginx.ResError(c, err)
+	if err := api.ParseQuery(c, &params); err != nil {
+		api.ResError(c, err)
 		return
 	}
 
@@ -41,17 +41,17 @@ func (a *menu) Query(c *gin.Context) {
 		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
 	})
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResPage(c, result.Data, result.PageResult)
+	api.ResPage(c, result.Data, result.PageResult)
 }
 
 func (a *menu) QueryTree(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
-	if err := ginx.ParseQuery(c, &params); err != nil {
-		ginx.ResError(c, err)
+	if err := api.ParseQuery(c, &params); err != nil {
+		api.ResError(c, err)
 		return
 	}
 
@@ -59,81 +59,81 @@ func (a *menu) QueryTree(c *gin.Context) {
 		OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
 	})
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResList(c, result.Data.ToTree())
+	api.ResList(c, result.Data.ToTree())
 }
 
 func (a *menu) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.menuApp.Get(ctx, c.Param("id"))
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResSuccess(c, item)
+	api.ResSuccess(c, item)
 }
 
 func (a *menu) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
-	if err := ginx.ParseJSON(c, &item); err != nil {
-		ginx.ResError(c, err)
+	if err := api.ParseJSON(c, &item); err != nil {
+		api.ResError(c, err)
 		return
 	}
 
-	item.Creator = ginx.GetUserID(c)
+	item.Creator = api.GetUserID(c)
 	result, err := a.menuApp.Create(ctx, item)
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResSuccess(c, result)
+	api.ResSuccess(c, result)
 }
 
 func (a *menu) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
-	if err := ginx.ParseJSON(c, &item); err != nil {
-		ginx.ResError(c, err)
+	if err := api.ParseJSON(c, &item); err != nil {
+		api.ResError(c, err)
 		return
 	}
 
 	err := a.menuApp.Update(ctx, c.Param("id"), item)
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResOK(c)
+	api.ResOK(c)
 }
 
 func (a *menu) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.menuApp.Delete(ctx, c.Param("id"))
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResOK(c)
+	api.ResOK(c)
 }
 
 func (a *menu) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.menuApp.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResOK(c)
+	api.ResOK(c)
 }
 
 func (a *menu) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.menuApp.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {
-		ginx.ResError(c, err)
+		api.ResError(c, err)
 		return
 	}
-	ginx.ResOK(c)
+	api.ResOK(c)
 }

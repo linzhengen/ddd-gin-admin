@@ -4,7 +4,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 	"github.com/linzhengen/ddd-gin-admin/configs"
 )
 
@@ -22,11 +22,11 @@ func CasbinMiddleware(enforcer *casbin.SyncedEnforcer, skippers ...SkipperFunc) 
 
 		p := c.Request.URL.Path
 		m := c.Request.Method
-		if b, err := enforcer.Enforce(ginx.GetUserID(c), p, m); err != nil {
-			ginx.ResError(c, errors.WithStack(err))
+		if b, err := enforcer.Enforce(api.GetUserID(c), p, m); err != nil {
+			api.ResError(c, errors.WithStack(err))
 			return
 		} else if !b {
-			ginx.ResError(c, errors.ErrNoPerm)
+			api.ResError(c, errors.ErrNoPerm)
 			return
 		}
 		c.Next()
