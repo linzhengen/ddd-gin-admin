@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
@@ -12,7 +12,7 @@ import (
 )
 
 func GetRootUser() *User {
-	user := config.C.Root
+	user := configs.C.Root
 	return &User{
 		ID:       user.UserName,
 		UserName: user.UserName,

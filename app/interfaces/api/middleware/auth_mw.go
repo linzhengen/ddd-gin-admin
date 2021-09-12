@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/contextx"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
@@ -18,9 +18,9 @@ func wrapUserAuthContext(c *gin.Context, userID string) {
 }
 
 func UserAuthMiddleware(a auth.Author, skippers ...SkipperFunc) gin.HandlerFunc {
-	if !config.C.JWTAuth.Enable {
+	if !configs.C.JWTAuth.Enable {
 		return func(c *gin.Context) {
-			wrapUserAuthContext(c, config.C.Root.UserName)
+			wrapUserAuthContext(c, configs.C.Root.UserName)
 			c.Next()
 		}
 	}
@@ -34,8 +34,8 @@ func UserAuthMiddleware(a auth.Author, skippers ...SkipperFunc) gin.HandlerFunc 
 		userID, err := a.ParseUserID(c.Request.Context(), ginx.GetToken(c))
 		if err != nil {
 			if err == auth.ErrInvalidToken {
-				if config.C.IsDebugMode() {
-					wrapUserAuthContext(c, config.C.Root.UserName)
+				if configs.C.IsDebugMode() {
+					wrapUserAuthContext(c, configs.C.Root.UserName)
 					c.Next()
 					return
 				}

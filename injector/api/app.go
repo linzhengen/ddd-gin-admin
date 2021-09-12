@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/LyricTian/captcha"
 	"github.com/LyricTian/captcha/store"
@@ -62,9 +62,9 @@ func SetVersion(s string) Option {
 }
 
 func InitCaptcha() {
-	cfg := config.C.Captcha
+	cfg := configs.C.Captcha
 	if cfg.Store == "redis" {
-		rc := config.C.Redis
+		rc := configs.C.Redis
 		captcha.SetCustomStore(store.NewRedisStore(&redis.Options{
 			Addr:     rc.Addr,
 			Password: rc.Password,
@@ -74,7 +74,7 @@ func InitCaptcha() {
 }
 
 func InitMonitor(ctx context.Context) func() {
-	if c := config.C.Monitor; c.Enable {
+	if c := configs.C.Monitor; c.Enable {
 		// ShutdownCleanup set false to prevent automatically closes on os.Interrupt
 		// and close agent manually before service shutting down
 		err := agent.Listen(agent.Options{Addr: c.Addr, ConfigDir: c.ConfigDir, ShutdownCleanup: false})
@@ -89,7 +89,7 @@ func InitMonitor(ctx context.Context) func() {
 }
 
 func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
-	cfg := config.C.HTTP
+	cfg := configs.C.HTTP
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	srv := &http.Server{
 		Addr:         addr,

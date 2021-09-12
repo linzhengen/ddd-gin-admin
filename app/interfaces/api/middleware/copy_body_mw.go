@@ -7,7 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
+
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +16,7 @@ import (
 
 func CopyBodyMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 	var maxMemory int64 = 64 << 20 // 64 MB
-	if v := config.C.HTTP.MaxContentLength; v > 0 {
+	if v := configs.C.HTTP.MaxContentLength; v > 0 {
 		maxMemory = v
 	}
 

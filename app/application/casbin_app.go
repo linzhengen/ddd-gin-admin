@@ -3,7 +3,7 @@ package application
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
@@ -30,7 +30,7 @@ func init() {
 }
 
 func LoadCasbinPolicy(ctx context.Context, e *casbin.SyncedEnforcer) {
-	if !config.C.Casbin.Enable {
+	if !configs.C.Casbin.Enable {
 		return
 	}
 

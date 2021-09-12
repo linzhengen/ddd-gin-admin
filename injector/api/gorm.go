@@ -6,15 +6,16 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/linzhengen/ddd-gin-admin/configs"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 
 	"github.com/jinzhu/gorm"
 )
 
 func InitGormDB() (*gorm.DB, func(), error) {
-	cfg := config.C.Gorm
+	cfg := configs.C.Gorm
 	db, cleanFunc, err := NewGormDB()
 	if err != nil {
 		return nil, cleanFunc, err
@@ -31,7 +32,7 @@ func InitGormDB() (*gorm.DB, func(), error) {
 }
 
 func NewGormDB() (*gorm.DB, func(), error) {
-	cfg := config.C
+	cfg := configs.C
 	var dsn string
 	switch cfg.Gorm.DBType {
 	case "mysql":
@@ -57,7 +58,7 @@ func NewGormDB() (*gorm.DB, func(), error) {
 }
 
 func autoMigrate(db *gorm.DB) error {
-	if dbType := config.C.Gorm.DBType; strings.ToLower(dbType) == "mysql" {
+	if dbType := configs.C.Gorm.DBType; strings.ToLower(dbType) == "mysql" {
 		db = db.Set("gorm:table_options", "ENGINE=InnoDB")
 	}
 

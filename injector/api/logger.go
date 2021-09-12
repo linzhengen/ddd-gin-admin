@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 	loggerhook "github.com/linzhengen/ddd-gin-admin/pkg/logger/hook"
@@ -14,7 +14,7 @@ import (
 )
 
 func InitLogger() (func(), error) {
-	c := config.C.Log
+	c := configs.C.Log
 	logger.SetLevel(c.Level)
 	logger.SetFormatter(c.Format)
 
@@ -52,16 +52,16 @@ func InitLogger() (func(), error) {
 		}
 
 		if c.Hook.IsGorm() {
-			hc := config.C.LogGormHook
+			hc := configs.C.LogGormHook
 
 			var dsn string
 			switch hc.DBType {
 			case "mysql":
-				dsn = config.C.MySQL.DSN()
+				dsn = configs.C.MySQL.DSN()
 			case "sqlite3":
-				dsn = config.C.Sqlite3.DSN()
+				dsn = configs.C.Sqlite3.DSN()
 			case "postgres":
-				dsn = config.C.Postgres.DSN()
+				dsn = configs.C.Postgres.DSN()
 			default:
 				return nil, errors.New("unknown db")
 			}
