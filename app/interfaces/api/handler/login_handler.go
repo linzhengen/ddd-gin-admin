@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
@@ -34,7 +34,7 @@ type login struct {
 
 func (a *login) GetCaptcha(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.loginApp.GetCaptcha(ctx, config.C.Captcha.Length)
+	item, err := a.loginApp.GetCaptcha(ctx, configs.C.Captcha.Length)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -57,7 +57,7 @@ func (a *login) ResCaptcha(c *gin.Context) {
 		}
 	}
 
-	cfg := config.C.Captcha
+	cfg := configs.C.Captcha
 	err := a.loginApp.ResCaptcha(ctx, c.Writer, captchaID, cfg.Width, cfg.Height)
 	if err != nil {
 		ginx.ResError(c, err)

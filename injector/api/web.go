@@ -3,15 +3,15 @@ package api
 import (
 	"github.com/LyricTian/gzip"
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/middleware"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 func InitGinEngine(r router.Router) *gin.Engine {
-	gin.SetMode(config.C.RunMode)
+	gin.SetMode(configs.C.RunMode)
 
 	app := gin.New()
 	app.NoMethod(middleware.NoMethodHandler())
@@ -32,15 +32,15 @@ func InitGinEngine(r router.Router) *gin.Engine {
 	app.Use(middleware.RecoveryMiddleware())
 
 	// CORS
-	if config.C.CORS.Enable {
+	if configs.C.CORS.Enable {
 		app.Use(middleware.CORSMiddleware())
 	}
 
 	// GZIP
-	if config.C.GZIP.Enable {
+	if configs.C.GZIP.Enable {
 		app.Use(gzip.Gzip(gzip.BestCompression,
-			gzip.WithExcludedExtensions(config.C.GZIP.ExcludedExtentions),
-			gzip.WithExcludedPaths(config.C.GZIP.ExcludedPaths),
+			gzip.WithExcludedExtensions(configs.C.GZIP.ExcludedExtentions),
+			gzip.WithExcludedPaths(configs.C.GZIP.ExcludedPaths),
 		))
 	}
 
@@ -49,12 +49,12 @@ func InitGinEngine(r router.Router) *gin.Engine {
 	r.Register(app)
 
 	// Swagger
-	if config.C.Swagger {
+	if configs.C.Swagger {
 		app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	// Website
-	if dir := config.C.WWW; dir != "" {
+	if dir := configs.C.WWW; dir != "" {
 		app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(prefixes...)))
 	}
 

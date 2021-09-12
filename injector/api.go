@@ -7,11 +7,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/application"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
@@ -48,19 +48,19 @@ func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
 		opt(&o)
 	}
 
-	config.MustLoad(o.ConfigFile)
+	configs.MustLoad(o.ConfigFile)
 	if v := o.ModelFile; v != "" {
-		config.C.Casbin.Model = v
+		configs.C.Casbin.Model = v
 	}
 	if v := o.WWWDir; v != "" {
-		config.C.WWW = v
+		configs.C.WWW = v
 	}
 	if v := o.MenuFile; v != "" {
-		config.C.Menu.Data = v
+		configs.C.Menu.Data = v
 	}
-	config.PrintWithJSON()
+	configs.PrintWithJSON()
 
-	logger.WithContext(ctx).Printf("starting server，run mode：%s，ver：%s，pid：%d", config.C.RunMode, o.Version, os.Getpid())
+	logger.WithContext(ctx).Printf("starting server，run mode：%s，ver：%s，pid：%d", configs.C.RunMode, o.Version, os.Getpid())
 
 	loggerCleanFunc, err := api.InitLogger()
 	if err != nil {
@@ -76,8 +76,8 @@ func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
 		return nil, err
 	}
 
-	if config.C.Menu.Enable && config.C.Menu.Data != "" {
-		err = injector.menuBll.InitData(ctx, config.C.Menu.Data)
+	if configs.C.Menu.Enable && configs.C.Menu.Data != "" {
+		err = injector.menuBll.InitData(ctx, configs.C.Menu.Data)
 		if err != nil {
 			return nil, err
 		}

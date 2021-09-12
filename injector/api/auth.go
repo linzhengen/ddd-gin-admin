@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/golang-jwt/jwt"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth/jwtauth"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth/jwtauth/store/buntdb"
@@ -10,7 +10,7 @@ import (
 )
 
 func InitAuth() (auth.Author, func(), error) {
-	cfg := config.C.JWTAuth
+	cfg := configs.C.JWTAuth
 
 	var opts []jwtauth.Option
 	opts = append(opts, jwtauth.SetExpired(cfg.Expired))
@@ -36,7 +36,7 @@ func InitAuth() (auth.Author, func(), error) {
 	var store jwtauth.Store
 	switch cfg.Store {
 	case "redis":
-		rcfg := config.C.Redis
+		rcfg := configs.C.Redis
 		store = redis.NewStore(&redis.Config{
 			Addr:      rcfg.Addr,
 			Password:  rcfg.Password,

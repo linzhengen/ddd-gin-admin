@@ -4,7 +4,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
+
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
 
 	"github.com/gin-gonic/gin"
@@ -15,12 +16,12 @@ import (
 )
 
 func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
-	cfg := config.C.RateLimiter
+	cfg := configs.C.RateLimiter
 	if !cfg.Enable {
 		return EmptyMiddleware()
 	}
 
-	rc := config.C.Redis
+	rc := configs.C.Redis
 	ring := redis.NewRing(&redis.RingOptions{
 		Addrs: map[string]string{
 			"server1": rc.Addr,

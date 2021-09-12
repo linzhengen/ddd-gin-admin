@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/linzhengen/ddd-gin-admin/configs"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/contextx"
 
 	"github.com/jinzhu/gorm"
@@ -37,7 +38,7 @@ func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 		db, ok := trans.(*gorm.DB)
 		if ok {
 			if contextx.FromTransLock(ctx) {
-				if dbType := config.C.Gorm.DBType; dbType == "mysql" ||
+				if dbType := configs.C.Gorm.DBType; dbType == "mysql" ||
 					dbType == "postgres" {
 					db = db.Set("gorm:query_option", "FOR UPDATE")
 				}

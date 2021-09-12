@@ -3,14 +3,14 @@ package api
 import (
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/config"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/persist"
 )
 
 func InitCasbin(adapter persist.Adapter) (*casbin.SyncedEnforcer, func(), error) {
-	cfg := config.C.Casbin
+	cfg := configs.C.Casbin
 	if cfg.Model == "" {
 		return new(casbin.SyncedEnforcer), nil, nil
 	}
