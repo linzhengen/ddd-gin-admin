@@ -23,6 +23,7 @@ type User interface {
 }
 
 func NewUser(
+	casbinAdapter repository.CasbinAdapter,
 	enforcer *casbin.SyncedEnforcer,
 	transRepo repository.TransRepository,
 	userRepo repository.UserRepository,
@@ -30,20 +31,22 @@ func NewUser(
 	roleRepo repository.RoleRepository,
 ) User {
 	return &user{
-		enforcer:     enforcer,
-		transRepo:    transRepo,
-		userRepo:     userRepo,
-		userRoleRepo: userRoleRepo,
-		roleRepo:     roleRepo,
+		casbinAdapter: casbinAdapter,
+		enforcer:      enforcer,
+		transRepo:     transRepo,
+		userRepo:      userRepo,
+		userRoleRepo:  userRoleRepo,
+		roleRepo:      roleRepo,
 	}
 }
 
 type user struct {
-	enforcer     *casbin.SyncedEnforcer
-	transRepo    repository.TransRepository
-	userRepo     repository.UserRepository
-	userRoleRepo repository.UserRoleRepository
-	roleRepo     repository.RoleRepository
+	casbinAdapter repository.CasbinAdapter
+	enforcer      *casbin.SyncedEnforcer
+	transRepo     repository.TransRepository
+	userRepo      repository.UserRepository
+	userRoleRepo  repository.UserRoleRepository
+	roleRepo      repository.RoleRepository
 }
 
 func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
@@ -120,7 +123,7 @@ func (a *user) Create(ctx context.Context, item schema.User) (*schema.IDResult, 
 		return nil, err
 	}
 
-	loadCasbinPolicy(ctx, a.enforcer)
+	a.casbinAdapter.AddCasbinPolicyItemToChan(ctx, a.enforcer)
 	return schema.NewIDResult(item.ID), nil
 }
 
@@ -190,7 +193,7 @@ func (a *user) Update(ctx context.Context, id string, item schema.User) error {
 		return err
 	}
 
-	loadCasbinPolicy(ctx, a.enforcer)
+	a.casbinAdapter.AddCasbinPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -233,7 +236,7 @@ func (a *user) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	loadCasbinPolicy(ctx, a.enforcer)
+	a.casbinAdapter.AddCasbinPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -252,6 +255,6 @@ func (a *user) UpdateStatus(ctx context.Context, id string, status int) error {
 		return err
 	}
 
-	loadCasbinPolicy(ctx, a.enforcer)
+	a.casbinAdapter.AddCasbinPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
