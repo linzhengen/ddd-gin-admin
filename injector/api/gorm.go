@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
-
 	"github.com/jinzhu/gorm"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 )
 
 func InitGormDB() (*gorm.DB, func(), error) {
