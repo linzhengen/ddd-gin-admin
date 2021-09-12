@@ -3,7 +3,7 @@ package application
 import (
 	"context"
 
-	errors2 "github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 
@@ -58,7 +58,7 @@ func (a *role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 		return nil, err
 	}
 	if item == nil {
-		return nil, errors2.ErrNotFound
+		return nil, errors.ErrNotFound
 	}
 
 	roleMenus, err := a.QueryRoleMenus(ctx, id)
@@ -114,7 +114,7 @@ func (a *role) checkName(ctx context.Context, item schema.Role) error {
 		return err
 	}
 	if result.PageResult.Total > 0 {
-		return errors2.New400Response("The role name already exists")
+		return errors.New400Response("The role name already exists")
 	}
 	return nil
 }
@@ -125,7 +125,7 @@ func (a *role) Update(ctx context.Context, id string, item schema.Role) error {
 		return err
 	}
 	if oldItem == nil {
-		return errors2.ErrNotFound
+		return errors.ErrNotFound
 	}
 	if oldItem.Name != item.Name {
 		err := a.checkName(ctx, item)
@@ -188,7 +188,7 @@ func (a *role) Delete(ctx context.Context, id string) error {
 		return err
 	}
 	if oldItem == nil {
-		return errors2.ErrNotFound
+		return errors.ErrNotFound
 	}
 
 	userResult, err := a.userRepo.Query(ctx, schema.UserQueryParam{
@@ -199,7 +199,7 @@ func (a *role) Delete(ctx context.Context, id string) error {
 		return err
 	}
 	if userResult.PageResult.Total > 0 {
-		return errors2.New400Response("The role has been assigned to the user and cannot be deleted")
+		return errors.New400Response("The role has been assigned to the user and cannot be deleted")
 	}
 
 	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
@@ -224,7 +224,7 @@ func (a *role) UpdateStatus(ctx context.Context, id string, status int) error {
 		return err
 	}
 	if oldItem == nil {
-		return errors2.ErrNotFound
+		return errors.ErrNotFound
 	}
 
 	err = a.roleRepo.UpdateStatus(ctx, id, status)
