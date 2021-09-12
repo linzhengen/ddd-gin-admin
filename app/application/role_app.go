@@ -98,7 +98,7 @@ func (a *role) Create(ctx context.Context, item schema.Role) (*schema.IDResult, 
 	if err != nil {
 		return nil, err
 	}
-	LoadCasbinPolicy(ctx, a.enforcer)
+	loadCasbinPolicy(ctx, a.enforcer)
 	return schema.NewIDResult(item.ID), nil
 }
 
@@ -157,7 +157,7 @@ func (a *role) Update(ctx context.Context, id string, item schema.Role) error {
 	if err != nil {
 		return err
 	}
-	LoadCasbinPolicy(ctx, a.enforcer)
+	loadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
 
@@ -211,7 +211,7 @@ func (a *role) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.enforcer)
+	loadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
 
@@ -228,6 +228,6 @@ func (a *role) UpdateStatus(ctx context.Context, id string, status int) error {
 	if err != nil {
 		return err
 	}
-	LoadCasbinPolicy(ctx, a.enforcer)
+	loadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
