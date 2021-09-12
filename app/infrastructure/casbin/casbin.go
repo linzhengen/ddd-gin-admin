@@ -4,6 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/casbin/casbin/v2"
+
+	"github.com/linzhengen/ddd-gin-admin/configs"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 
@@ -12,13 +18,15 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 
+var autoLoadPolicyChan entity.AutoLoadPolicyChan
+
 func NewCasbinAdapter(
 	roleRepo repository.RoleRepository,
 	roleMenuRepo repository.RoleMenuRepository,
 	menuResourceRepo repository.MenuActionResourceRepository,
 	userRepo repository.UserRepository,
 	userRoleRepo repository.UserRoleRepository,
-) persist.Adapter {
+) repository.CasbinAdapter {
 	return &casbinAdapter{
 		roleRepo:         roleRepo,
 		roleMenuRepo:     roleMenuRepo,
@@ -34,6 +42,39 @@ type casbinAdapter struct {
 	menuResourceRepo repository.MenuActionResourceRepository
 	userRepo         repository.UserRepository
 	userRoleRepo     repository.UserRoleRepository
+}
+
+func (a *casbinAdapter) AddCasbinPolicyItemToChan(ctx context.Context, e *casbin.SyncedEnforcer) {
+	if !configs.C.Casbin.Enable {
+		return
+	}
+
+	if len(autoLoadPolicyChan) > 0 {
+		logger.WithContext(ctx).Infof("The load casbin policy is already in the wait queue")
+		return
+	}
+
+	autoLoadPolicyChan <- &entity.CasbinPolicyItem{
+		Ctx:      ctx,
+		Enforcer: e,
+	}
+}
+
+func (a *casbinAdapter) GetAutoLoadPolicyChan() entity.AutoLoadPolicyChan {
+	return autoLoadPolicyChan
+}
+
+func (a *casbinAdapter) CreateAutoLoadPolicyChan() entity.AutoLoadPolicyChan {
+	autoLoadPolicyChan = make(chan *entity.CasbinPolicyItem, 1)
+	go func() {
+		for item := range autoLoadPolicyChan {
+			err := item.Enforcer.LoadPolicy()
+			if err != nil {
+				logger.WithContext(item.Ctx).Errorf("The load casbin policy error: %s", err.Error())
+			}
+		}
+	}()
+	return autoLoadPolicyChan
 }
 
 func (a *casbinAdapter) LoadPolicy(model casbinModel.Model) error {

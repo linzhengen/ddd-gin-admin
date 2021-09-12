@@ -3,13 +3,15 @@ package api
 import (
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
+
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/casbin/casbin/v2"
-	"github.com/casbin/casbin/v2/persist"
 )
 
-func InitCasbin(adapter persist.Adapter) (*casbin.SyncedEnforcer, func(), error) {
+func InitCasbin(adapter repository.CasbinAdapter) (*casbin.SyncedEnforcer, func(), error) {
+	adapter.CreateAutoLoadPolicyChan()
 	cfg := configs.C.Casbin
 	if cfg.Model == "" {
 		return new(casbin.SyncedEnforcer), nil, nil
