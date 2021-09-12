@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
@@ -11,7 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"github.com/go-redis/redis_rate"
-	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"golang.org/x/time/rate"
 )
 

@@ -6,10 +6,11 @@ import (
 	"io/ioutil"
 	"runtime"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
 
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 

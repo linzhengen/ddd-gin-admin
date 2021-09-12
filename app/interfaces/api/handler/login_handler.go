@@ -4,10 +4,10 @@ import (
 	"github.com/LyricTian/captcha"
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/application"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/ginx"
 	"github.com/linzhengen/ddd-gin-admin/configs"
-	"github.com/linzhengen/ddd-gin-admin/pkg/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 
