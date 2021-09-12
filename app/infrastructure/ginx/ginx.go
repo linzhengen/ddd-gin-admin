@@ -51,14 +51,14 @@ func GetBody(c *gin.Context) []byte {
 
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
-		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
+		return errors.Wrap400Response(err, fmt.Sprintf("400 Bad Request - %s", err.Error()))
 	}
 	return nil
 }
 
 func ParseQuery(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindQuery(obj); err != nil {
-		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
+		return errors.Wrap400Response(err, fmt.Sprintf("400 Bad Request - %s", err.Error()))
 	}
 	return nil
 }

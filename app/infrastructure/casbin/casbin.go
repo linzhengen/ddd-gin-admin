@@ -64,7 +64,7 @@ func (a *casbinAdapter) GetAutoLoadPolicyChan() entity.AutoLoadPolicyChan {
 	return autoLoadPolicyChan
 }
 
-func (a *casbinAdapter) AutoLoadPolicy() entity.AutoLoadPolicyChan {
+func (a *casbinAdapter) CreateAutoLoadPolicyChan() entity.AutoLoadPolicyChan {
 	autoLoadPolicyChan = make(chan *entity.CasbinPolicyItem, 1)
 	go func() {
 		for item := range autoLoadPolicyChan {

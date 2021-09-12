@@ -11,7 +11,7 @@ import (
 )
 
 func InitCasbin(adapter repository.CasbinAdapter) (*casbin.SyncedEnforcer, func(), error) {
-	adapter.AutoLoadPolicy()
+	adapter.CreateAutoLoadPolicyChan()
 	cfg := configs.C.Casbin
 	if cfg.Model == "" {
 		return new(casbin.SyncedEnforcer), nil, nil

@@ -10,7 +10,7 @@ import (
 
 type CasbinAdapter interface {
 	persist.Adapter
-	AutoLoadPolicy() entity.AutoLoadPolicyChan
+	CreateAutoLoadPolicyChan() entity.AutoLoadPolicyChan
 	GetAutoLoadPolicyChan() entity.AutoLoadPolicyChan
 	AddCasbinPolicyItemToChan(ctx context.Context, e *casbin.SyncedEnforcer)
 }
