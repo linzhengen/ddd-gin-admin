@@ -120,7 +120,7 @@ func (a *user) Create(ctx context.Context, item schema.User) (*schema.IDResult, 
 		return nil, err
 	}
 
-	LoadCasbinPolicy(ctx, a.enforcer)
+	loadCasbinPolicy(ctx, a.enforcer)
 	return schema.NewIDResult(item.ID), nil
 }
 
@@ -190,7 +190,7 @@ func (a *user) Update(ctx context.Context, id string, item schema.User) error {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.enforcer)
+	loadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
 
@@ -233,7 +233,7 @@ func (a *user) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.enforcer)
+	loadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }
 
@@ -252,6 +252,6 @@ func (a *user) UpdateStatus(ctx context.Context, id string, status int) error {
 		return err
 	}
 
-	LoadCasbinPolicy(ctx, a.enforcer)
+	loadCasbinPolicy(ctx, a.enforcer)
 	return nil
 }

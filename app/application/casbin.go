@@ -29,7 +29,7 @@ func init() {
 	}()
 }
 
-func LoadCasbinPolicy(ctx context.Context, e *casbin.SyncedEnforcer) {
+func loadCasbinPolicy(ctx context.Context, e *casbin.SyncedEnforcer) {
 	if !configs.C.Casbin.Enable {
 		return
 	}
