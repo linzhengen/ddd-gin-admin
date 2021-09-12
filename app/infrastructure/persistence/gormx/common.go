@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
+
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/contextx"
-
 	"github.com/jinzhu/gorm"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 )
 
 type TransFunc func(context.Context) error
