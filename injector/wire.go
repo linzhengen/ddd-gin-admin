@@ -13,7 +13,9 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
+	consoleHandler "github.com/linzhengen/ddd-gin-admin/app/interfaces/console/handler"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
+	"github.com/linzhengen/ddd-gin-admin/injector/console"
 
 	// "github.com/linzhengen/ddd-gin-admin/infrastructure/api/mock"
 	"github.com/google/wire"
@@ -75,4 +77,15 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		NewApiInjector,
 	)
 	return nil, nil, nil
+}
+
+func BuildConsoleInjector() (*consoleHandler.ConsoleHandler, error) {
+	wire.Build(
+		console.InitGormDB,
+		persistence.NewUser,
+		application.NewHelloConsole,
+		consoleHandler.NewHelloHandler,
+		consoleHandler.NewConsoleHandler,
+	)
+	return nil, nil
 }

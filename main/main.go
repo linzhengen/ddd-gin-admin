@@ -26,7 +26,7 @@ var VERSION = "0.4.0"
 
 // @title ddd-gin-admin
 // @version 0.2.0
-// @description RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
+// @description RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE.
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @securityDefinitions.apikey ApiKeyAuth
@@ -74,6 +74,29 @@ func newWebCmd(ctx context.Context) *cli.Command {
 			&cli.StringFlag{
 				Name:  "www",
 				Usage: "static file dir",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			return injector.RunServer(ctx,
+				api.SetConfigFile(c.String("conf")),
+				api.SetModelFile(c.String("model")),
+				api.SetWWWDir(c.String("www")),
+				api.SetMenuFile(c.String("menu")),
+				api.SetVersion(VERSION))
+		},
+	}
+}
+
+func newConsoleCmd(ctx context.Context) *cli.Command {
+	return &cli.Command{
+		Name:  "hello",
+		Usage: "run cli",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "name",
+				Aliases:  []string{"n"},
+				Usage:    "input your name",
+				Required: true,
 			},
 		},
 		Action: func(c *cli.Context) error {
