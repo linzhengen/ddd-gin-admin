@@ -1,4 +1,4 @@
-package schema
+package response
 
 import "time"
 
@@ -14,22 +14,9 @@ type Role struct {
 	RoleMenus RoleMenus `json:"role_menus" binding:"required,gt=0"`    // RoleMenus
 }
 
-type RoleQueryParam struct {
-	PaginationParam
-	IDs        []string `form:"-"`          // IDs
-	Name       string   `form:"-"`          // Name
-	QueryValue string   `form:"queryValue"` // Query Search Values
-	UserID     string   `form:"-"`          // User ID
-	Status     int      `form:"status"`     // Status(1:enable 2:disable)
-}
-
-type RoleQueryOptions struct {
-	OrderFields []*OrderField // Order Fields
-}
-
-type RoleQueryResult struct {
+type RoleQuery struct {
 	Data       Roles
-	PageResult *PaginationResult
+	PageResult *Pagination
 }
 
 type Roles []*Role
@@ -59,19 +46,9 @@ type RoleMenu struct {
 	ActionID string `json:"action_id" binding:"required"` // Action ID
 }
 
-type RoleMenuQueryParam struct {
-	PaginationParam
-	RoleID  string
-	RoleIDs []string
-}
-
-type RoleMenuQueryOptions struct {
-	OrderFields []*OrderField
-}
-
-type RoleMenuQueryResult struct {
+type RoleMenuQuery struct {
 	Data       RoleMenus
-	PageResult *PaginationResult
+	PageResult *Pagination
 }
 
 type RoleMenus []*RoleMenu

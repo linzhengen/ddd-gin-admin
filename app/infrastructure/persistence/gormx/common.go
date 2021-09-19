@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/contextx"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/request"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/jinzhu/gorm"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 )
 
 type TransFunc func(context.Context) error
@@ -53,14 +56,14 @@ func GetDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB
 	return GetDB(ctx, defDB).Model(m)
 }
 
-func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (*schema.PaginationResult, error) {
+func WrapPageQuery(ctx context.Context, db *gorm.DB, pp request.PaginationParam, out interface{}) (*response.Pagination, error) {
 	if pp.OnlyCount {
 		var count int
 		err := db.Count(&count).Error
 		if err != nil {
 			return nil, err
 		}
-		return &schema.PaginationResult{Total: count}, nil
+		return &response.Pagination{Total: count}, nil
 	}
 	if !pp.Pagination {
 		err := db.Find(out).Error
@@ -72,14 +75,14 @@ func WrapPageQuery(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, 
 		return nil, err
 	}
 
-	return &schema.PaginationResult{
+	return &response.Pagination{
 		Total:    total,
 		Current:  pp.GetCurrent(),
 		PageSize: pp.GetPageSize(),
 	}, nil
 }
 
-func FindPage(ctx context.Context, db *gorm.DB, pp schema.PaginationParam, out interface{}) (int, error) {
+func FindPage(ctx context.Context, db *gorm.DB, pp request.PaginationParam, out interface{}) (int, error) {
 	var count int
 	err := db.Count(&count).Error
 	if err != nil {
@@ -123,7 +126,7 @@ func Check(ctx context.Context, db *gorm.DB) (bool, error) {
 
 type OrderFieldFunc func(string) string
 
-func ParseOrder(items []*schema.OrderField, handle ...OrderFieldFunc) string {
+func ParseOrder(items []*request.OrderField, handle ...OrderFieldFunc) string {
 	orders := make([]string, len(items))
 
 	for i, item := range items {
@@ -133,7 +136,7 @@ func ParseOrder(items []*schema.OrderField, handle ...OrderFieldFunc) string {
 		}
 
 		direction := "ASC"
-		if item.Direction == schema.OrderByDESC {
+		if item.Direction == request.OrderByDESC {
 			direction = "DESC"
 		}
 		orders[i] = fmt.Sprintf("%s %s", key, direction)

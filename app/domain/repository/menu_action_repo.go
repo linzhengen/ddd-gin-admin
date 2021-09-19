@@ -3,14 +3,18 @@ package repository
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/request"
 )
 
 type MenuActionRepository interface {
-	Query(ctx context.Context, params schema.MenuActionQueryParam, opts ...schema.MenuActionQueryOptions) (*schema.MenuActionQueryResult, error)
-	Get(ctx context.Context, id string, opts ...schema.MenuActionQueryOptions) (*schema.MenuAction, error)
-	Create(ctx context.Context, item schema.MenuAction) error
-	Update(ctx context.Context, id string, item schema.MenuAction) error
+	Query(ctx context.Context, req request.MenuActionQuery) (entity.MenuActions, *response.Pagination, error)
+	Get(ctx context.Context, id string) (*entity.MenuAction, error)
+	Create(ctx context.Context, item entity.MenuAction) error
+	Update(ctx context.Context, id string, item entity.MenuAction) error
 	Delete(ctx context.Context, id string) error
 	DeleteByMenuID(ctx context.Context, menuID string) error
 }

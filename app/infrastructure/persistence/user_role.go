@@ -3,14 +3,17 @@ package persistence
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/request"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 )
 
 func getUserRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
@@ -27,44 +30,28 @@ type userRole struct {
 	db *gorm.DB
 }
 
-func (a *userRole) getQueryOption(opts ...schema.UserRoleQueryOptions) schema.UserRoleQueryOptions {
-	var opt schema.UserRoleQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *userRole) Query(ctx context.Context, params schema.UserRoleQueryParam, opts ...schema.UserRoleQueryOptions) (*schema.UserRoleQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *userRole) Query(ctx context.Context, req request.UserRoleQueryRequest) (entity.UserRoles, *response.Pagination, error) {
 	db := getUserRoleDB(ctx, a.db)
-	if v := params.UserID; v != "" {
+	if v := req.UserID; v != "" {
 		db = db.Where("user_id=?", v)
 	}
-	if v := params.UserIDs; len(v) > 0 {
+	if v := req.UserIDs; len(v) > 0 {
 		db = db.Where("user_id IN (?)", v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(req.OrderFields.AddIdSortKey()))
 
 	var list entity.UserRoles
-	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
+	p, err := gormx.WrapPageQuery(ctx, db, req.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
-	qr := &schema.UserRoleQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaUserRoles(),
-	}
-
-	return qr, nil
+	return list, p, nil
 }
 
-func (a *userRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
+func (a *userRole) Get(ctx context.Context, id string) (*entity.UserRole, error) {
 	db := getUserRoleDB(ctx, a.db).Where("id=?", id)
-	var item entity.UserRole
+	var item *entity.UserRole
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -73,18 +60,16 @@ func (a *userRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQu
 		return nil, nil
 	}
 
-	return item.ToSchemaUserRole(), nil
+	return item, nil
 }
 
-func (a *userRole) Create(ctx context.Context, item schema.UserRole) error {
-	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := getUserRoleDB(ctx, a.db).Create(eitem)
+func (a *userRole) Create(ctx context.Context, item entity.UserRole) error {
+	result := getUserRoleDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *userRole) Update(ctx context.Context, id string, item schema.UserRole) error {
-	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := getUserRoleDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *userRole) Update(ctx context.Context, id string, item entity.UserRole) error {
+	result := getUserRoleDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 

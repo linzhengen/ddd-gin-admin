@@ -3,14 +3,18 @@ package repository
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/request"
 )
 
 type MenuRepository interface {
-	Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error)
-	Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error)
-	Create(ctx context.Context, item schema.Menu) error
-	Update(ctx context.Context, id string, item schema.Menu) error
+	Query(ctx context.Context, req request.MenuQuery) (entity.Menus, *response.Pagination, error)
+	Get(ctx context.Context, id string) (*entity.Menu, error)
+	Create(ctx context.Context, item entity.Menu) error
+	Update(ctx context.Context, id string, item entity.Menu) error
 	UpdateParentPath(ctx context.Context, id, parentPath string) error
 	Delete(ctx context.Context, id string) error
 	UpdateStatus(ctx context.Context, id string, status int) error

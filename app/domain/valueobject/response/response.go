@@ -1,4 +1,4 @@
-package schema
+package response
 
 type StatusText string
 
@@ -26,33 +26,14 @@ type ErrorItem struct {
 }
 
 type ListResult struct {
-	List       interface{}       `json:"list"`                 // List
-	Pagination *PaginationResult `json:"pagination,omitempty"` // Pagination
+	List       interface{} `json:"list"`                 // List
+	Pagination *Pagination `json:"pagination,omitempty"` // Pagination
 }
 
-type PaginationResult struct {
+type Pagination struct {
 	Total    int  `json:"total"`    // Total count
 	Current  uint `json:"current"`  // Current Page
 	PageSize uint `json:"pageSize"` // Page Size
-}
-
-type PaginationParam struct {
-	Pagination bool `form:"-"`                                     // Pagination
-	OnlyCount  bool `form:"-"`                                     // Only count
-	Current    uint `form:"current,default=1"`                     // Current page
-	PageSize   uint `form:"pageSize,default=10" binding:"max=100"` // Page size
-}
-
-func (a PaginationParam) GetCurrent() uint {
-	return a.Current
-}
-
-func (a PaginationParam) GetPageSize() uint {
-	pageSize := a.PageSize
-	if a.PageSize == 0 {
-		pageSize = 100
-	}
-	return pageSize
 }
 
 type OrderDirection int

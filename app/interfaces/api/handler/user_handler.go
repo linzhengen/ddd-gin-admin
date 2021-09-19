@@ -3,9 +3,9 @@ package handler
 import (
 	"strings"
 
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/application"

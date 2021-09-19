@@ -3,14 +3,17 @@ package persistence
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/request"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 )
 
 func getMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
@@ -27,60 +30,44 @@ type menu struct {
 	db *gorm.DB
 }
 
-func (a *menu) getQueryOption(opts ...schema.MenuQueryOptions) schema.MenuQueryOptions {
-	var opt schema.MenuQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *menu) Query(ctx context.Context, req request.MenuQueryRequest) (entity.Menus, *response.Pagination, error) {
 	db := getMenuDB(ctx, a.db)
-	if v := params.IDs; len(v) > 0 {
+	if v := req.IDs; len(v) > 0 {
 		db = db.Where("id IN (?)", v)
 	}
-	if v := params.Name; v != "" {
+	if v := req.Name; v != "" {
 		db = db.Where("name=?", v)
 	}
-	if v := params.ParentID; v != nil {
+	if v := req.ParentID; v != nil {
 		db = db.Where("parent_id=?", *v)
 	}
-	if v := params.PrefixParentPath; v != "" {
+	if v := req.PrefixParentPath; v != "" {
 		db = db.Where("parent_path LIKE ?", v+"%")
 	}
-	if v := params.ShowStatus; v != 0 {
+	if v := req.ShowStatus; v != 0 {
 		db = db.Where("show_status=?", v)
 	}
-	if v := params.Status; v != 0 {
+	if v := req.Status; v != 0 {
 		db = db.Where("status=?", v)
 	}
-	if v := params.QueryValue; v != "" {
+	if v := req.QueryValue; v != "" {
 		v = "%" + v + "%"
 		db = db.Where("name LIKE ? OR memo LIKE ?", v, v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(req.OrderFields.AddIdSortKey()))
 
 	var list entity.Menus
-	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
+	p, err := gormx.WrapPageQuery(ctx, db, req.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
-	qr := &schema.MenuQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaMenus(),
-	}
-
-	return qr, nil
+	return list, p, nil
 }
 
-func (a *menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
-	var item entity.Menu
+func (a *menu) Get(ctx context.Context, id string) (*entity.Menu, error) {
+	var item *entity.Menu
 	ok, err := gormx.FindOne(ctx, getMenuDB(ctx, a.db).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -89,18 +76,16 @@ func (a *menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 		return nil, nil
 	}
 
-	return item.ToSchemaMenu(), nil
+	return item, nil
 }
 
-func (a *menu) Create(ctx context.Context, item schema.Menu) error {
-	eitem := entity.SchemaMenu(item).ToMenu()
-	result := getMenuDB(ctx, a.db).Create(eitem)
+func (a *menu) Create(ctx context.Context, item entity.Menu) error {
+	result := getMenuDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *menu) Update(ctx context.Context, id string, item schema.Menu) error {
-	eitem := entity.SchemaMenu(item).ToMenu()
-	result := getMenuDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *menu) Update(ctx context.Context, id string, item entity.Menu) error {
+	result := getMenuDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 

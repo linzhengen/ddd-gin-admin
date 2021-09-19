@@ -2,19 +2,7 @@ package entity
 
 import (
 	"time"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
-
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
-
-type SchemaMenu schema.Menu
-
-func (a SchemaMenu) ToMenu() *Menu {
-	item := new(Menu)
-	structure.Copy(a, item)
-	return item
-}
 
 type Menu struct {
 	ID         string     `gorm:"column:id;primary_key;size:36;"`
@@ -33,18 +21,4 @@ type Menu struct {
 	DeletedAt  *time.Time `gorm:"column:deleted_at;index;"`
 }
 
-func (a Menu) ToSchemaMenu() *schema.Menu {
-	item := new(schema.Menu)
-	structure.Copy(a, item)
-	return item
-}
-
 type Menus []*Menu
-
-func (a Menus) ToSchemaMenus() []*schema.Menu {
-	list := make([]*schema.Menu, len(a))
-	for i, item := range a {
-		list[i] = item.ToSchemaMenu()
-	}
-	return list
-}

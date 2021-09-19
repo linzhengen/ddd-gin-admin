@@ -1,29 +1,11 @@
-package schema
+package response
 
 import (
-	"context"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/configs"
-
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
-
-func GetRootUser() *User {
-	user := configs.C.Root
-	return &User{
-		ID:       user.UserName,
-		UserName: user.UserName,
-		RealName: user.RealName,
-		Password: hash.MD5String(user.Password),
-	}
-}
-
-func CheckIsRootUser(ctx context.Context, userID string) bool {
-	return GetRootUser().ID == userID
-}
 
 type User struct {
 	ID        string    `json:"id"`                                    // ID
@@ -47,25 +29,13 @@ func (a *User) CleanSecure() *User {
 	return a
 }
 
-type UserQueryParam struct {
-	PaginationParam
-	UserName   string   `form:"userName"`   // User Name
-	QueryValue string   `form:"queryValue"` // Query search values
-	Status     int      `form:"status"`     // Status(1:enable 2:disable)
-	RoleIDs    []string `form:"-"`          // Role IDs
-}
-
-type UserQueryOptions struct {
-	OrderFields []*OrderField
-}
-
-type UserQueryResult struct {
+type UserQuery struct {
 	Data       Users
-	PageResult *PaginationResult
+	PageResult *Pagination
 }
 
-func (a UserQueryResult) ToShowResult(mUserRoles map[string]UserRoles, mRoles map[string]*Role) *UserShowQueryResult {
-	return &UserShowQueryResult{
+func (a UserQuery) ToShowResult(mUserRoles map[string]UserRoles, mRoles map[string]*Role) *UserShowQuery {
+	return &UserShowQuery{
 		PageResult: a.PageResult,
 		Data:       a.Data.ToUserShows(mUserRoles, mRoles),
 	}
@@ -105,19 +75,9 @@ type UserRole struct {
 	RoleID string `json:"role_id"` // Role ID
 }
 
-type UserRoleQueryParam struct {
-	PaginationParam
-	UserID  string
-	UserIDs []string
-}
-
-type UserRoleQueryOptions struct {
-	OrderFields []*OrderField
-}
-
 type UserRoleQueryResult struct {
 	Data       UserRoles
-	PageResult *PaginationResult
+	PageResult *Pagination
 }
 
 type UserRoles []*UserRole
@@ -161,7 +121,7 @@ type UserShow struct {
 
 type UserShows []*UserShow
 
-type UserShowQueryResult struct {
+type UserShowQuery struct {
 	Data       UserShows
-	PageResult *PaginationResult
+	PageResult *Pagination
 }

@@ -3,14 +3,16 @@ package persistence
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/request"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 )
 
 func getUserDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
@@ -27,54 +29,38 @@ type user struct {
 	db *gorm.DB
 }
 
-func (a *user) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryOptions {
-	var opt schema.UserQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *user) Query(ctx context.Context, req request.UserQueryRequest) (entity.Users, *response.Pagination, error) {
 	db := getUserDB(ctx, a.db)
-	if v := params.UserName; v != "" {
+	if v := req.UserName; v != "" {
 		db = db.Where("user_name=?", v)
 	}
-	if v := params.Status; v > 0 {
+	if v := req.Status; v > 0 {
 		db = db.Where("status=?", v)
 	}
-	if v := params.RoleIDs; len(v) > 0 {
+	if v := req.RoleIDs; len(v) > 0 {
 		subQuery := getUserRoleDB(ctx, a.db).
 			Select("user_id").
 			Where("role_id IN (?)", v).
 			SubQuery()
 		db = db.Where("id IN ?", subQuery)
 	}
-	if v := params.QueryValue; v != "" {
+	if v := req.QueryValue; v != "" {
 		v = "%" + v + "%"
 		db = db.Where("user_name LIKE ? OR real_name LIKE ? OR phone LIKE ? OR email LIKE ?", v, v, v, v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(req.OrderFields.AddIdSortKey()))
 
 	var list entity.Users
-	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
+	p, err := gormx.WrapPageQuery(ctx, db, req.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
-
-	qr := &schema.UserQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaUsers(),
-	}
-	return qr, nil
+	return list, p, nil
 }
 
-func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
-	var item entity.User
+func (a *user) Get(ctx context.Context, id string) (*entity.User, error) {
+	var item *entity.User
 	ok, err := gormx.FindOne(ctx, getUserDB(ctx, a.db).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -83,18 +69,16 @@ func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 		return nil, nil
 	}
 
-	return item.ToSchemaUser(), nil
+	return item, nil
 }
 
-func (a *user) Create(ctx context.Context, item schema.User) error {
-	sitem := entity.SchemaUser(item)
-	result := getUserDB(ctx, a.db).Create(sitem.ToUser())
+func (a *user) Create(ctx context.Context, item entity.User) error {
+	result := getUserDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *user) Update(ctx context.Context, id string, item schema.User) error {
-	eitem := entity.SchemaUser(item).ToUser()
-	result := getUserDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *user) Update(ctx context.Context, id string, item entity.User) error {
+	result := getUserDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 

@@ -3,14 +3,17 @@ package persistence
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/request"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 )
 
 func getMenuActionResourceDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
@@ -27,48 +30,33 @@ type menuActionResource struct {
 	db *gorm.DB
 }
 
-func (a *menuActionResource) getQueryOption(opts ...schema.MenuActionResourceQueryOptions) schema.MenuActionResourceQueryOptions {
-	var opt schema.MenuActionResourceQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *menuActionResource) Query(ctx context.Context, params schema.MenuActionResourceQueryParam, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResourceQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *menuActionResource) Query(ctx context.Context, req request.MenuActionResourceQueryRequest) (entity.MenuActionResources, *response.Pagination, error) {
 	db := getMenuActionResourceDB(ctx, a.db)
-	if v := params.MenuID; v != "" {
+	if v := req.MenuID; v != "" {
 		subQuery := getMenuActionDB(ctx, a.db).
 			Where("menu_id=?", v).
 			Select("id").SubQuery()
 		db = db.Where("action_id IN ?", subQuery)
 	}
-	if v := params.MenuIDs; len(v) > 0 {
+	if v := req.MenuIDs; len(v) > 0 {
 		subQuery := getMenuActionDB(ctx, a.db).Where("menu_id IN (?)", v).Select("id").SubQuery()
 		db = db.Where("action_id IN ?", subQuery)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByASC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(req.OrderFields.AddIdSortKey()))
 
 	var list entity.MenuActionResources
-	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
+	p, err := gormx.WrapPageQuery(ctx, db, req.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	qr := &schema.MenuActionResourceQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaMenuActionResources(),
+		return nil, nil, errors.WithStack(err)
 	}
 
-	return qr, nil
+	return list, p, nil
 }
 
-func (a *menuActionResource) Get(ctx context.Context, id string, opts ...schema.MenuActionResourceQueryOptions) (*schema.MenuActionResource, error) {
+func (a *menuActionResource) Get(ctx context.Context, id string) (*entity.MenuActionResource, error) {
 	db := getMenuActionResourceDB(ctx, a.db).Where("id=?", id)
-	var item entity.MenuActionResource
+	var item *entity.MenuActionResource
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -77,18 +65,16 @@ func (a *menuActionResource) Get(ctx context.Context, id string, opts ...schema.
 		return nil, nil
 	}
 
-	return item.ToSchemaMenuActionResource(), nil
+	return item, nil
 }
 
-func (a *menuActionResource) Create(ctx context.Context, item schema.MenuActionResource) error {
-	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
-	result := getMenuActionResourceDB(ctx, a.db).Create(eitem)
+func (a *menuActionResource) Create(ctx context.Context, item entity.MenuActionResource) error {
+	result := getMenuActionResourceDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *menuActionResource) Update(ctx context.Context, id string, item schema.MenuActionResource) error {
-	eitem := entity.SchemaMenuActionResource(item).ToMenuActionResource()
-	result := getMenuActionResourceDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *menuActionResource) Update(ctx context.Context, id string, item entity.MenuActionResource) error {
+	result := getMenuActionResourceDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 

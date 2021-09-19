@@ -4,8 +4,9 @@ import (
 	"github.com/LyricTian/captcha"
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/application"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 	"github.com/linzhengen/ddd-gin-admin/configs"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
@@ -145,7 +146,7 @@ func (a *login) QueryUserMenuTree(c *gin.Context) {
 
 func (a *login) UpdatePassword(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.UpdatePasswordParam
+	var item response.UpdatePasswordParam
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return

@@ -1,4 +1,4 @@
-package schema
+package response
 
 import (
 	"strings"
@@ -28,24 +28,9 @@ func (a *Menu) String() string {
 	return json.MarshalToString(a)
 }
 
-type MenuQueryParam struct {
-	PaginationParam
-	IDs              []string `form:"-"`
-	Name             string   `form:"-"`
-	PrefixParentPath string   `form:"-"`
-	QueryValue       string   `form:"queryValue"`
-	ParentID         *string  `form:"parentID"`
-	ShowStatus       int      `form:"showStatus"` // 1:show 2:hide
-	Status           int      `form:"status"`     // 1:enable 2:disable
-}
-
-type MenuQueryOptions struct {
-	OrderFields []*OrderField
-}
-
-type MenuQueryResult struct {
+type MenuQuery struct {
 	Data       Menus
-	PageResult *PaginationResult
+	PageResult *Pagination
 }
 
 type Menus []*Menu
@@ -171,19 +156,9 @@ type MenuAction struct {
 	Resources MenuActionResources `yaml:"resources,omitempty" json:"resources"`
 }
 
-type MenuActionQueryParam struct {
-	PaginationParam
-	MenuID string
-	IDs    []string
-}
-
-type MenuActionQueryOptions struct {
-	OrderFields []*OrderField
-}
-
-type MenuActionQueryResult struct {
+type MenuActionQuery struct {
 	Data       MenuActions
-	PageResult *PaginationResult
+	PageResult *Pagination
 }
 
 type MenuActions []*MenuAction
@@ -219,19 +194,9 @@ type MenuActionResource struct {
 	Path     string `yaml:"path" binding:"required" json:"path"`
 }
 
-type MenuActionResourceQueryParam struct {
-	PaginationParam
-	MenuID  string   // 菜单ID
-	MenuIDs []string // 菜单ID列表
-}
-
-type MenuActionResourceQueryOptions struct {
-	OrderFields []*OrderField // 排序字段
-}
-
-type MenuActionResourceQueryResult struct {
+type MenuActionResourceQuery struct {
 	Data       MenuActionResources
-	PageResult *PaginationResult
+	PageResult *Pagination
 }
 
 type MenuActionResources []*MenuActionResource

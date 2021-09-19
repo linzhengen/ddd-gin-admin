@@ -3,14 +3,17 @@ package persistence
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/request"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
 )
 
 func getMenuActionDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
@@ -27,44 +30,28 @@ type menuAction struct {
 	db *gorm.DB
 }
 
-func (a *menuAction) getQueryOption(opts ...schema.MenuActionQueryOptions) schema.MenuActionQueryOptions {
-	var opt schema.MenuActionQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *menuAction) Query(ctx context.Context, params schema.MenuActionQueryParam, opts ...schema.MenuActionQueryOptions) (*schema.MenuActionQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *menuAction) Query(ctx context.Context, req request.MenuActionQueryRequest) (entity.MenuActions, *response.Pagination, error) {
 	db := getMenuActionDB(ctx, a.db)
-	if v := params.MenuID; v != "" {
+	if v := req.MenuID; v != "" {
 		db = db.Where("menu_id=?", v)
 	}
-	if v := params.IDs; len(v) > 0 {
+	if v := req.IDs; len(v) > 0 {
 		db = db.Where("id IN (?)", v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByASC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(req.OrderFields.AddIdSortKey()))
 
 	var list entity.MenuActions
-	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
+	p, err := gormx.WrapPageQuery(ctx, db, req.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
-	qr := &schema.MenuActionQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaMenuActions(),
-	}
-
-	return qr, nil
+	return list, p, nil
 }
 
-func (a *menuAction) Get(ctx context.Context, id string, opts ...schema.MenuActionQueryOptions) (*schema.MenuAction, error) {
+func (a *menuAction) Get(ctx context.Context, id string) (*entity.MenuAction, error) {
 	db := getMenuActionDB(ctx, a.db).Where("id=?", id)
-	var item entity.MenuAction
+	var item *entity.MenuAction
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -73,18 +60,16 @@ func (a *menuAction) Get(ctx context.Context, id string, opts ...schema.MenuActi
 		return nil, nil
 	}
 
-	return item.ToSchemaMenuAction(), nil
+	return item, nil
 }
 
-func (a *menuAction) Create(ctx context.Context, item schema.MenuAction) error {
-	eitem := entity.SchemaMenuAction(item).ToMenuAction()
-	result := getMenuActionDB(ctx, a.db).Create(eitem)
+func (a *menuAction) Create(ctx context.Context, item entity.MenuAction) error {
+	result := getMenuActionDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *menuAction) Update(ctx context.Context, id string, item schema.MenuAction) error {
-	eitem := entity.SchemaMenuAction(item).ToMenuAction()
-	result := getMenuActionDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *menuAction) Update(ctx context.Context, id string, item entity.MenuAction) error {
+	result := getMenuActionDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 
