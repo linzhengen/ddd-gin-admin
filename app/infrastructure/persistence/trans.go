@@ -3,7 +3,7 @@ package persistence
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/contextx"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"

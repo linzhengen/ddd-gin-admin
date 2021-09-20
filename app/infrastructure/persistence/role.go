@@ -5,12 +5,12 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 )
 
 func getRoleDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
@@ -27,17 +27,7 @@ type role struct {
 	db *gorm.DB
 }
 
-func (a *role) getQueryOption(opts ...schema.RoleQueryOptions) schema.RoleQueryOptions {
-	var opt schema.RoleQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *role) Query(ctx context.Context, params schema.RoleQueryParam) (entity.Roles, *schema.PaginationResult, error) {
 	db := getRoleDB(ctx, a.db)
 	if v := params.IDs; len(v) > 0 {
 		db = db.Where("id IN (?)", v)
@@ -57,24 +47,19 @@ func (a *role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...
 		db = db.Where("name LIKE ? OR memo LIKE ?", v, v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(params.OrderFields.AddIdSortField()))
 
 	var list entity.Roles
 	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	qr := &schema.RoleQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaRoles(),
+		return nil, nil, errors.WithStack(err)
 	}
 
-	return qr, nil
+	return list, pr, nil
 }
 
-func (a *role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
-	var role entity.Role
+func (a *role) Get(ctx context.Context, id string) (*entity.Role, error) {
+	var role *entity.Role
 	ok, err := gormx.FindOne(ctx, getRoleDB(ctx, a.db).Where("id=?", id), &role)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -83,18 +68,16 @@ func (a *role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 		return nil, nil
 	}
 
-	return role.ToSchemaRole(), nil
+	return role, nil
 }
 
-func (a *role) Create(ctx context.Context, item schema.Role) error {
-	eitem := entity.SchemaRole(item).ToRole()
-	result := getRoleDB(ctx, a.db).Create(eitem)
+func (a *role) Create(ctx context.Context, item entity.Role) error {
+	result := getRoleDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *role) Update(ctx context.Context, id string, item schema.Role) error {
-	eitem := entity.SchemaRole(item).ToRole()
-	result := getRoleDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *role) Update(ctx context.Context, id string, item entity.Role) error {
+	result := getRoleDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
+
 	"github.com/casbin/casbin/v2"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
@@ -11,7 +13,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 
 	casbinModel "github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -26,22 +28,37 @@ func NewCasbinAdapter(
 	menuResourceRepo repository.MenuActionResourceRepository,
 	userRepo repository.UserRepository,
 	userRoleRepo repository.UserRoleRepository,
+	roleFactory factory.Role,
+	roleMenuFactory factory.RoleMenu,
+	menuActionResourceFactory factory.MenuActionResource,
+	userFactory factory.User,
+	userRoleFactory factory.UserRole,
 ) repository.CasbinAdapter {
 	return &casbinAdapter{
-		roleRepo:         roleRepo,
-		roleMenuRepo:     roleMenuRepo,
-		menuResourceRepo: menuResourceRepo,
-		userRepo:         userRepo,
-		userRoleRepo:     userRoleRepo,
+		roleRepo:                  roleRepo,
+		roleMenuRepo:              roleMenuRepo,
+		menuResourceRepo:          menuResourceRepo,
+		userRepo:                  userRepo,
+		userRoleRepo:              userRoleRepo,
+		roleFactory:               roleFactory,
+		roleMenuFactory:           roleMenuFactory,
+		menuActionResourceFactory: menuActionResourceFactory,
+		userFactory:               userFactory,
+		userRoleFactory:           userRoleFactory,
 	}
 }
 
 type casbinAdapter struct {
-	roleRepo         repository.RoleRepository
-	roleMenuRepo     repository.RoleMenuRepository
-	menuResourceRepo repository.MenuActionResourceRepository
-	userRepo         repository.UserRepository
-	userRoleRepo     repository.UserRoleRepository
+	roleRepo                  repository.RoleRepository
+	roleMenuRepo              repository.RoleMenuRepository
+	menuResourceRepo          repository.MenuActionResourceRepository
+	userRepo                  repository.UserRepository
+	userRoleRepo              repository.UserRoleRepository
+	roleFactory               factory.Role
+	roleMenuFactory           factory.RoleMenu
+	menuActionResourceFactory factory.MenuActionResource
+	userFactory               factory.User
+	userRoleFactory           factory.UserRole
 }
 
 func (a *casbinAdapter) AddCasbinPolicyItemToChan(ctx context.Context, e *casbin.SyncedEnforcer) {
@@ -95,29 +112,29 @@ func (a *casbinAdapter) LoadPolicy(model casbinModel.Model) error {
 }
 
 func (a *casbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model) error {
-	roleResult, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
+	roleResult, _, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
 		Status: 1,
 	})
 	if err != nil {
 		return err
 	}
-	if len(roleResult.Data) == 0 {
+	if len(roleResult) == 0 {
 		return nil
 	}
 
-	roleMenuResult, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{})
+	roleMenuResult, _, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{})
 	if err != nil {
 		return err
 	}
-	mRoleMenus := roleMenuResult.Data.ToRoleIDMap()
+	mRoleMenus := a.roleMenuFactory.ToSchemaList(roleMenuResult).ToRoleIDMap()
 
-	menuResourceResult, err := a.menuResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{})
+	menuResourceResult, _, err := a.menuResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{})
 	if err != nil {
 		return err
 	}
-	mMenuResources := menuResourceResult.Data.ToActionIDMap()
+	mMenuResources := a.menuActionResourceFactory.ToSchemaList(menuResourceResult).ToActionIDMap()
 
-	for _, item := range roleResult.Data {
+	for _, item := range a.roleFactory.ToSchemaList(roleResult) {
 		mcache := make(map[string]struct{})
 		if rms, ok := mRoleMenus[item.ID]; ok {
 			for _, actionID := range rms.ToActionIDs() {
@@ -141,20 +158,20 @@ func (a *casbinAdapter) loadRolePolicy(ctx context.Context, m casbinModel.Model)
 }
 
 func (a *casbinAdapter) loadUserPolicy(ctx context.Context, m casbinModel.Model) error {
-	userResult, err := a.userRepo.Query(ctx, schema.UserQueryParam{
+	userResult, _, err := a.userRepo.Query(ctx, schema.UserQueryParam{
 		Status: 1,
 	})
 	if err != nil {
 		return err
 	}
-	if len(userResult.Data) > 0 {
-		userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{})
+	if len(userResult) > 0 {
+		userRoleResult, _, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{})
 		if err != nil {
 			return err
 		}
 
-		mUserRoles := userRoleResult.Data.ToUserIDMap()
-		for _, uitem := range userResult.Data {
+		mUserRoles := a.userRoleFactory.ToSchemaList(userRoleResult).ToUserIDMap()
+		for _, uitem := range userResult {
 			if urs, ok := mUserRoles[uitem.ID]; ok {
 				for _, ur := range urs {
 					line := fmt.Sprintf("g,%s,%s", ur.UserID, ur.RoleID)

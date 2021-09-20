@@ -7,11 +7,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
+
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
@@ -25,7 +26,7 @@ func NewApiInjector(
 	engine *gin.Engine,
 	auth auth.Author,
 	casbinEnforcer *casbin.SyncedEnforcer,
-	menuBll application.Menu,
+	menuBll service.Menu,
 ) *ApiInjector {
 	return &ApiInjector{
 		engine:         engine,
@@ -39,7 +40,7 @@ type ApiInjector struct {
 	engine         *gin.Engine
 	auth           auth.Author
 	casbinEnforcer *casbin.SyncedEnforcer
-	menuBll        application.Menu
+	menuBll        service.Menu
 }
 
 func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {

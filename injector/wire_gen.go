@@ -8,6 +8,8 @@ package injector
 
 import (
 	"github.com/linzhengen/ddd-gin-admin/app/application"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/casbin"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
@@ -36,7 +38,12 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	menuActionResourceRepository := persistence.NewMenuActionResource(db)
 	userRepository := persistence.NewUser(db)
 	userRoleRepository := persistence.NewUserRole(db)
-	casbinAdapter := casbin.NewCasbinAdapter(roleRepository, roleMenuRepository, menuActionResourceRepository, userRepository, userRoleRepository)
+	role := factory.NewRole()
+	roleMenu := factory.NewRoleMenu()
+	menuActionResource := factory.NewMenuActionResource()
+	user := factory.NewUser()
+	userRole := factory.NewUserRole()
+	casbinAdapter := casbin.NewCasbinAdapter(roleRepository, roleMenuRepository, menuActionResourceRepository, userRepository, userRoleRepository, role, roleMenu, menuActionResource, user, userRole)
 	syncedEnforcer, cleanup3, err := api.InitCasbin(casbinAdapter)
 	if err != nil {
 		cleanup2()
@@ -45,19 +52,25 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	}
 	menuRepository := persistence.NewMenu(db)
 	menuActionRepository := persistence.NewMenuAction(db)
-	login := application.NewLogin(author, userRepository, userRoleRepository, roleRepository, roleMenuRepository, menuRepository, menuActionRepository)
-	handlerLogin := handler.NewLogin(login)
+	menuAction := factory.NewMenuAction()
+	login := service.NewLogin(author, userRepository, userRoleRepository, roleRepository, roleMenuRepository, menuRepository, menuActionRepository, user, userRole, role, roleMenu, menuAction)
+	applicationLogin := application.NewLogin(login)
+	handlerLogin := handler.NewLogin(applicationLogin)
 	transRepository := persistence.NewTrans(db)
-	menu := application.NewMenu(transRepository, menuRepository, menuActionRepository, menuActionResourceRepository)
-	handlerMenu := handler.NewMenu(menu)
-	role := application.NewRole(casbinAdapter, syncedEnforcer, transRepository, roleRepository, roleMenuRepository, userRepository)
-	handlerRole := handler.NewRole(role)
-	user := application.NewUser(casbinAdapter, syncedEnforcer, transRepository, userRepository, userRoleRepository, roleRepository)
-	handlerUser := handler.NewUser(user)
+	menu := factory.NewMenu()
+	serviceMenu := service.NewMenu(transRepository, menuRepository, menuActionRepository, menuActionResourceRepository, menu, menuAction, menuActionResource)
+	applicationMenu := application.NewMenu(serviceMenu)
+	handlerMenu := handler.NewMenu(applicationMenu)
+	serviceRole := service.NewRole(casbinAdapter, syncedEnforcer, transRepository, roleRepository, roleMenuRepository, userRepository, role, roleMenu, user)
+	applicationRole := application.NewRole(serviceRole)
+	handlerRole := handler.NewRole(applicationRole)
+	serviceUser := service.NewUser(casbinAdapter, syncedEnforcer, transRepository, userRepository, userRoleRepository, roleRepository, user, userRole, role)
+	applicationUser := application.NewUser(serviceUser)
+	handlerUser := handler.NewUser(applicationUser)
 	healthCheck := handler.NewHealthCheck()
 	routerRouter := router.NewRouter(author, syncedEnforcer, handlerLogin, handlerMenu, handlerRole, handlerUser, healthCheck)
 	engine := api.InitGinEngine(routerRouter)
-	apiInjector := NewApiInjector(engine, author, syncedEnforcer, menu)
+	apiInjector := NewApiInjector(engine, author, syncedEnforcer, serviceMenu)
 	return apiInjector, func() {
 		cleanup3()
 		cleanup2()

@@ -5,12 +5,12 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 )
 
 func getRoleMenuDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
@@ -27,17 +27,7 @@ type roleMenu struct {
 	db *gorm.DB
 }
 
-func (a *roleMenu) getQueryOption(opts ...schema.RoleMenuQueryOptions) schema.RoleMenuQueryOptions {
-	var opt schema.RoleMenuQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *roleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenuQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *roleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam) (entity.RoleMenus, *schema.PaginationResult, error) {
 	db := getRoleMenuDB(ctx, a.db)
 	if v := params.RoleID; v != "" {
 		db = db.Where("role_id=?", v)
@@ -46,25 +36,19 @@ func (a *roleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam, 
 		db = db.Where("role_id IN (?)", v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(params.OrderFields.AddIdSortField()))
 
 	var list entity.RoleMenus
 	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
-	qr := &schema.RoleMenuQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaRoleMenus(),
-	}
-
-	return qr, nil
+	return list, pr, nil
 }
 
-func (a *roleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQueryOptions) (*schema.RoleMenu, error) {
+func (a *roleMenu) Get(ctx context.Context, id string) (*entity.RoleMenu, error) {
 	db := getRoleMenuDB(ctx, a.db).Where("id=?", id)
-	var item entity.RoleMenu
+	var item *entity.RoleMenu
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -73,18 +57,16 @@ func (a *roleMenu) Get(ctx context.Context, id string, opts ...schema.RoleMenuQu
 		return nil, nil
 	}
 
-	return item.ToSchemaRoleMenu(), nil
+	return item, nil
 }
 
-func (a *roleMenu) Create(ctx context.Context, item schema.RoleMenu) error {
-	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
-	result := getRoleMenuDB(ctx, a.db).Create(eitem)
+func (a *roleMenu) Create(ctx context.Context, item entity.RoleMenu) error {
+	result := getRoleMenuDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *roleMenu) Update(ctx context.Context, id string, item schema.RoleMenu) error {
-	eitem := entity.SchemaRoleMenu(item).ToRoleMenu()
-	result := getRoleMenuDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *roleMenu) Update(ctx context.Context, id string, item entity.RoleMenu) error {
+	result := getRoleMenuDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 
