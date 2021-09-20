@@ -7,6 +7,7 @@ package injector
 
 import (
 	"github.com/linzhengen/ddd-gin-admin/app/application"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/casbin"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
@@ -34,6 +35,12 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		persistence.NewRoleMenu,
 		persistence.NewMenuAction,
 		persistence.NewMenuActionResource,
+
+		// service
+		service.NewLogin,
+		service.NewMenu,
+		service.NewRole,
+		service.NewUser,
 
 		// application
 		application.NewLogin,

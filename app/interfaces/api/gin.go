@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

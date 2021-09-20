@@ -8,6 +8,7 @@ package injector
 
 import (
 	"github.com/linzhengen/ddd-gin-admin/app/application"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/casbin"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
@@ -45,15 +46,19 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	}
 	menuRepository := persistence.NewMenu(db)
 	menuActionRepository := persistence.NewMenuAction(db)
-	login := application.NewLogin(author, userRepository, userRoleRepository, roleRepository, roleMenuRepository, menuRepository, menuActionRepository)
-	handlerLogin := handler.NewLogin(login)
+	login := service.NewLogin(author, userRepository, userRoleRepository, roleRepository, roleMenuRepository, menuRepository, menuActionRepository)
+	applicationLogin := application.NewLogin(login)
+	handlerLogin := handler.NewLogin(applicationLogin)
 	transRepository := persistence.NewTrans(db)
-	menu := application.NewMenu(transRepository, menuRepository, menuActionRepository, menuActionResourceRepository)
-	handlerMenu := handler.NewMenu(menu)
-	role := application.NewRole(casbinAdapter, syncedEnforcer, transRepository, roleRepository, roleMenuRepository, userRepository)
-	handlerRole := handler.NewRole(role)
-	user := application.NewUser(casbinAdapter, syncedEnforcer, transRepository, userRepository, userRoleRepository, roleRepository)
-	handlerUser := handler.NewUser(user)
+	menu := service.NewMenu(transRepository, menuRepository, menuActionRepository, menuActionResourceRepository)
+	applicationMenu := application.NewMenu(menu)
+	handlerMenu := handler.NewMenu(applicationMenu)
+	role := service.NewRole(casbinAdapter, syncedEnforcer, transRepository, roleRepository, roleMenuRepository, userRepository)
+	applicationRole := application.NewRole(role)
+	handlerRole := handler.NewRole(applicationRole)
+	user := service.NewUser(casbinAdapter, syncedEnforcer, transRepository, userRepository, userRoleRepository, roleRepository)
+	applicationUser := application.NewUser(user)
+	handlerUser := handler.NewUser(applicationUser)
 	healthCheck := handler.NewHealthCheck()
 	routerRouter := router.NewRouter(author, syncedEnforcer, handlerLogin, handlerMenu, handlerRole, handlerUser, healthCheck)
 	engine := api.InitGinEngine(routerRouter)
