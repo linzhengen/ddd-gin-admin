@@ -12,21 +12,21 @@ func NewRoleMenu() RoleMenu {
 
 type RoleMenu struct{}
 
-func (a RoleMenu) ToEntity(RoleMenu *schema.RoleMenu) *entity.RoleMenu {
+func (a RoleMenu) ToEntity(roleMenu *schema.RoleMenu) *entity.RoleMenu {
 	item := new(entity.RoleMenu)
-	structure.Copy(RoleMenu, item)
+	structure.Copy(roleMenu, item)
 	return item
 }
 
-func (a RoleMenu) ToSchema(RoleMenu *entity.RoleMenu) *schema.RoleMenu {
+func (a RoleMenu) ToSchema(roleMenu *entity.RoleMenu) *schema.RoleMenu {
 	item := new(schema.RoleMenu)
-	structure.Copy(RoleMenu, item)
+	structure.Copy(roleMenu, item)
 	return item
 }
 
-func (a RoleMenu) ToSchemaList(RoleMenus []*entity.RoleMenu) schema.RoleMenus {
-	list := make([]*schema.RoleMenu, len(RoleMenus))
-	for i, item := range RoleMenus {
+func (a RoleMenu) ToSchemaList(roleMenus []*entity.RoleMenu) schema.RoleMenus {
+	list := make([]*schema.RoleMenu, len(roleMenus))
+	for i, item := range roleMenus {
 		list[i] = a.ToSchema(item)
 	}
 	return list

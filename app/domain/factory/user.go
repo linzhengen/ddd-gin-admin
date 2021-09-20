@@ -12,21 +12,21 @@ func NewUser() User {
 
 type User struct{}
 
-func (a User) ToEntity(User *schema.User) *entity.User {
+func (a User) ToEntity(user *schema.User) *entity.User {
 	item := new(entity.User)
-	structure.Copy(User, item)
+	structure.Copy(user, item)
 	return item
 }
 
-func (a User) ToSchema(User *entity.User) *schema.User {
+func (a User) ToSchema(user *entity.User) *schema.User {
 	item := new(schema.User)
-	structure.Copy(User, item)
+	structure.Copy(user, item)
 	return item
 }
 
-func (a User) ToSchemaList(Users []*entity.User) schema.Users {
-	list := make([]*schema.User, len(Users))
-	for i, item := range Users {
+func (a User) ToSchemaList(users []*entity.User) schema.Users {
+	list := make([]*schema.User, len(users))
+	for i, item := range users {
 		list[i] = a.ToSchema(item)
 	}
 	return list

@@ -13,21 +13,21 @@ func NewRole() Role {
 
 type Role struct{}
 
-func (a Role) ToEntity(Role *schema.Role) *entity.Role {
+func (a Role) ToEntity(role *schema.Role) *entity.Role {
 	item := new(entity.Role)
-	structure.Copy(Role, item)
+	structure.Copy(role, item)
 	return item
 }
 
-func (a Role) ToSchema(Role *entity.Role) *schema.Role {
+func (a Role) ToSchema(role *entity.Role) *schema.Role {
 	item := new(schema.Role)
-	structure.Copy(Role, item)
+	structure.Copy(role, item)
 	return item
 }
 
-func (a Role) ToSchemaList(Roles []*entity.Role) schema.Roles {
-	list := make([]*schema.Role, len(Roles))
-	for i, item := range Roles {
+func (a Role) ToSchemaList(roles []*entity.Role) schema.Roles {
+	list := make([]*schema.Role, len(roles))
+	for i, item := range roles {
 		list[i] = a.ToSchema(item)
 	}
 	return list
