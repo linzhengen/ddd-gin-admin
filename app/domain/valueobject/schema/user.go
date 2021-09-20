@@ -49,14 +49,11 @@ func (a *User) CleanSecure() *User {
 
 type UserQueryParam struct {
 	PaginationParam
+	OrderFields
 	UserName   string   `form:"userName"`   // User Name
 	QueryValue string   `form:"queryValue"` // Query search values
 	Status     int      `form:"status"`     // Status(1:enable 2:disable)
 	RoleIDs    []string `form:"-"`          // Role IDs
-}
-
-type UserQueryOptions struct {
-	OrderFields []*OrderField
 }
 
 type UserQueryResult struct {
@@ -107,12 +104,9 @@ type UserRole struct {
 
 type UserRoleQueryParam struct {
 	PaginationParam
+	OrderFields
 	UserID  string
 	UserIDs []string
-}
-
-type UserRoleQueryOptions struct {
-	OrderFields []*OrderField
 }
 
 type UserRoleQueryResult struct {

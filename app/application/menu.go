@@ -9,8 +9,8 @@ import (
 
 type Menu interface {
 	InitData(ctx context.Context, dataFile string) error
-	Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error)
-	Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error)
+	Query(ctx context.Context, params schema.MenuQueryParam) (*schema.MenuQueryResult, error)
+	Get(ctx context.Context, id string) (*schema.Menu, error)
 	QueryActions(ctx context.Context, id string) (schema.MenuActions, error)
 	Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error)
 	Update(ctx context.Context, id string, item schema.Menu) error
@@ -34,12 +34,12 @@ func (m menu) InitData(ctx context.Context, dataFile string) error {
 	return m.menuSvc.InitData(ctx, dataFile)
 }
 
-func (m menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
-	return m.menuSvc.Query(ctx, params, opts...)
+func (m menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema.MenuQueryResult, error) {
+	return m.menuSvc.Query(ctx, params)
 }
 
-func (m menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
-	return m.menuSvc.Get(ctx, id, opts...)
+func (m menu) Get(ctx context.Context, id string) (*schema.Menu, error) {
+	return m.menuSvc.Get(ctx, id)
 }
 
 func (m menu) QueryActions(ctx context.Context, id string) (schema.MenuActions, error) {

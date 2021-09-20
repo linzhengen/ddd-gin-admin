@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
@@ -12,8 +14,8 @@ import (
 )
 
 type Role interface {
-	Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error)
-	Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error)
+	Query(ctx context.Context, params schema.RoleQueryParam) (*schema.RoleQueryResult, error)
+	Get(ctx context.Context, id string) (*schema.Role, error)
 	QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMenus, error)
 	Create(ctx context.Context, item schema.Role) (*schema.IDResult, error)
 	Update(ctx context.Context, id string, item schema.Role) error
@@ -28,32 +30,48 @@ func NewRole(
 	roleRepo repository.RoleRepository,
 	roleMenuRepo repository.RoleMenuRepository,
 	userRepo repository.UserRepository,
+	roleFactory factory.Role,
+	roleMenuFactory factory.RoleMenu,
+	userFactory factory.User,
 ) Role {
 	return &role{
-		casbinAdapter: casbinAdapter,
-		enforcer:      enforcer,
-		transRepo:     transRepo,
-		roleRepo:      roleRepo,
-		roleMenuRepo:  roleMenuRepo,
-		userRepo:      userRepo,
+		casbinAdapter:   casbinAdapter,
+		enforcer:        enforcer,
+		transRepo:       transRepo,
+		roleRepo:        roleRepo,
+		roleMenuRepo:    roleMenuRepo,
+		userRepo:        userRepo,
+		roleFactory:     roleFactory,
+		roleMenuFactory: roleMenuFactory,
+		userFactory:     userFactory,
 	}
 }
 
 type role struct {
-	casbinAdapter repository.CasbinAdapter
-	enforcer      *casbin.SyncedEnforcer
-	transRepo     repository.TransRepository
-	roleRepo      repository.RoleRepository
-	roleMenuRepo  repository.RoleMenuRepository
-	userRepo      repository.UserRepository
+	casbinAdapter   repository.CasbinAdapter
+	enforcer        *casbin.SyncedEnforcer
+	transRepo       repository.TransRepository
+	roleRepo        repository.RoleRepository
+	roleMenuRepo    repository.RoleMenuRepository
+	userRepo        repository.UserRepository
+	roleFactory     factory.Role
+	roleMenuFactory factory.RoleMenu
+	userFactory     factory.User
 }
 
-func (a *role) Query(ctx context.Context, params schema.RoleQueryParam, opts ...schema.RoleQueryOptions) (*schema.RoleQueryResult, error) {
-	return a.roleRepo.Query(ctx, params, opts...)
+func (a *role) Query(ctx context.Context, params schema.RoleQueryParam) (*schema.RoleQueryResult, error) {
+	result, pr, err := a.roleRepo.Query(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	return &schema.RoleQueryResult{
+		Data:       a.roleFactory.ToSchemaList(result),
+		PageResult: pr,
+	}, nil
 }
 
-func (a *role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptions) (*schema.Role, error) {
-	item, err := a.roleRepo.Get(ctx, id, opts...)
+func (a *role) Get(ctx context.Context, id string) (*schema.Role, error) {
+	item, err := a.roleRepo.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -65,19 +83,20 @@ func (a *role) Get(ctx context.Context, id string, opts ...schema.RoleQueryOptio
 	if err != nil {
 		return nil, err
 	}
-	item.RoleMenus = roleMenus
+	roleSchema := a.roleFactory.ToSchema(item)
+	roleSchema.RoleMenus = roleMenus
 
-	return item, nil
+	return roleSchema, nil
 }
 
 func (a *role) QueryRoleMenus(ctx context.Context, roleID string) (schema.RoleMenus, error) {
-	result, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
+	result, _, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
 		RoleID: roleID,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.Data, nil
+	return a.roleMenuFactory.ToSchemaList(result), nil
 }
 
 func (a *role) Create(ctx context.Context, item schema.Role) (*schema.IDResult, error) {
@@ -91,12 +110,12 @@ func (a *role) Create(ctx context.Context, item schema.Role) (*schema.IDResult, 
 		for _, rmItem := range item.RoleMenus {
 			rmItem.ID = uuid.MustString()
 			rmItem.RoleID = item.ID
-			err := a.roleMenuRepo.Create(ctx, *rmItem)
+			err := a.roleMenuRepo.Create(ctx, *a.roleMenuFactory.ToEntity(rmItem))
 			if err != nil {
 				return err
 			}
 		}
-		return a.roleRepo.Create(ctx, item)
+		return a.roleRepo.Create(ctx, *a.roleFactory.ToEntity(&item))
 	})
 	if err != nil {
 		return nil, err
@@ -106,14 +125,14 @@ func (a *role) Create(ctx context.Context, item schema.Role) (*schema.IDResult, 
 }
 
 func (a *role) checkName(ctx context.Context, item schema.Role) error {
-	result, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
+	_, pr, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 		Name:            item.Name,
 	})
 	if err != nil {
 		return err
 	}
-	if result.PageResult.Total > 0 {
+	if pr.Total > 0 {
 		return errors.New400Response("The role name already exists")
 	}
 	return nil
@@ -142,7 +161,7 @@ func (a *role) Update(ctx context.Context, id string, item schema.Role) error {
 		for _, rmitem := range addRoleMenus {
 			rmitem.ID = uuid.MustString()
 			rmitem.RoleID = id
-			err := a.roleMenuRepo.Create(ctx, *rmitem)
+			err := a.roleMenuRepo.Create(ctx, *a.roleMenuFactory.ToEntity(rmitem))
 			if err != nil {
 				return err
 			}
@@ -155,7 +174,7 @@ func (a *role) Update(ctx context.Context, id string, item schema.Role) error {
 			}
 		}
 
-		return a.roleRepo.Update(ctx, id, item)
+		return a.roleRepo.Update(ctx, id, *a.roleFactory.ToEntity(&item))
 	})
 	if err != nil {
 		return err
@@ -191,14 +210,14 @@ func (a *role) Delete(ctx context.Context, id string) error {
 		return errors.ErrNotFound
 	}
 
-	userResult, err := a.userRepo.Query(ctx, schema.UserQueryParam{
+	_, pr, err := a.userRepo.Query(ctx, schema.UserQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 		RoleIDs:         []string{id},
 	})
 	if err != nil {
 		return err
 	}
-	if userResult.PageResult.Total > 0 {
+	if pr.Total > 0 {
 		return errors.New400Response("The role has been assigned to the user and cannot be deleted")
 	}
 

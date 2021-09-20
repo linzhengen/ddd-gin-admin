@@ -27,17 +27,7 @@ type userRole struct {
 	db *gorm.DB
 }
 
-func (a *userRole) getQueryOption(opts ...schema.UserRoleQueryOptions) schema.UserRoleQueryOptions {
-	var opt schema.UserRoleQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *userRole) Query(ctx context.Context, params schema.UserRoleQueryParam, opts ...schema.UserRoleQueryOptions) (*schema.UserRoleQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *userRole) Query(ctx context.Context, params schema.UserRoleQueryParam) (entity.UserRoles, *schema.PaginationResult, error) {
 	db := getUserRoleDB(ctx, a.db)
 	if v := params.UserID; v != "" {
 		db = db.Where("user_id=?", v)
@@ -46,25 +36,19 @@ func (a *userRole) Query(ctx context.Context, params schema.UserRoleQueryParam, 
 		db = db.Where("user_id IN (?)", v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(params.OrderFields.AddIdSortField()))
 
 	var list entity.UserRoles
 	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
-	qr := &schema.UserRoleQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaUserRoles(),
-	}
-
-	return qr, nil
+	return list, pr, nil
 }
 
-func (a *userRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQueryOptions) (*schema.UserRole, error) {
+func (a *userRole) Get(ctx context.Context, id string) (*entity.UserRole, error) {
 	db := getUserRoleDB(ctx, a.db).Where("id=?", id)
-	var item entity.UserRole
+	var item *entity.UserRole
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -73,18 +57,16 @@ func (a *userRole) Get(ctx context.Context, id string, opts ...schema.UserRoleQu
 		return nil, nil
 	}
 
-	return item.ToSchemaUserRole(), nil
+	return item, nil
 }
 
-func (a *userRole) Create(ctx context.Context, item schema.UserRole) error {
-	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := getUserRoleDB(ctx, a.db).Create(eitem)
+func (a *userRole) Create(ctx context.Context, item entity.UserRole) error {
+	result := getUserRoleDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *userRole) Update(ctx context.Context, id string, item schema.UserRole) error {
-	eitem := entity.SchemaUserRole(item).ToUserRole()
-	result := getUserRoleDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *userRole) Update(ctx context.Context, id string, item entity.UserRole) error {
+	result := getUserRoleDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 

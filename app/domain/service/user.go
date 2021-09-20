@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
@@ -14,9 +16,9 @@ import (
 )
 
 type User interface {
-	Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error)
-	QueryShow(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserShowQueryResult, error)
-	Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error)
+	Query(ctx context.Context, params schema.UserQueryParam) (*schema.UserQueryResult, error)
+	QueryShow(ctx context.Context, params schema.UserQueryParam) (*schema.UserShowQueryResult, error)
+	Get(ctx context.Context, id string) (*schema.User, error)
 	Create(ctx context.Context, item schema.User) (*schema.IDResult, error)
 	Update(ctx context.Context, id string, item schema.User) error
 	Delete(ctx context.Context, id string) error
@@ -30,32 +32,48 @@ func NewUser(
 	userRepo repository.UserRepository,
 	userRoleRepo repository.UserRoleRepository,
 	roleRepo repository.RoleRepository,
+	userFactory factory.User,
+	userRoleFactory factory.UserRole,
+	roleFactory factory.Role,
 ) User {
 	return &user{
-		casbinAdapter: casbinAdapter,
-		enforcer:      enforcer,
-		transRepo:     transRepo,
-		userRepo:      userRepo,
-		userRoleRepo:  userRoleRepo,
-		roleRepo:      roleRepo,
+		casbinAdapter:   casbinAdapter,
+		enforcer:        enforcer,
+		transRepo:       transRepo,
+		userRepo:        userRepo,
+		userRoleRepo:    userRoleRepo,
+		roleRepo:        roleRepo,
+		userFactory:     userFactory,
+		userRoleFactory: userRoleFactory,
+		roleFactory:     roleFactory,
 	}
 }
 
 type user struct {
-	casbinAdapter repository.CasbinAdapter
-	enforcer      *casbin.SyncedEnforcer
-	transRepo     repository.TransRepository
-	userRepo      repository.UserRepository
-	userRoleRepo  repository.UserRoleRepository
-	roleRepo      repository.RoleRepository
+	casbinAdapter   repository.CasbinAdapter
+	enforcer        *casbin.SyncedEnforcer
+	transRepo       repository.TransRepository
+	userRepo        repository.UserRepository
+	userRoleRepo    repository.UserRoleRepository
+	roleRepo        repository.RoleRepository
+	userFactory     factory.User
+	userRoleFactory factory.UserRole
+	roleFactory     factory.Role
 }
 
-func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
-	return a.userRepo.Query(ctx, params, opts...)
+func (a *user) Query(ctx context.Context, params schema.UserQueryParam) (*schema.UserQueryResult, error) {
+	result, pr, err := a.userRepo.Query(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	return &schema.UserQueryResult{
+		Data:       a.userFactory.ToSchemaList(result),
+		PageResult: pr,
+	}, nil
 }
 
-func (a *user) QueryShow(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserShowQueryResult, error) {
-	result, err := a.userRepo.Query(ctx, params, opts...)
+func (a *user) QueryShow(ctx context.Context, params schema.UserQueryParam) (*schema.UserShowQueryResult, error) {
+	result, pr, err := a.userRepo.Query(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -63,25 +81,29 @@ func (a *user) QueryShow(ctx context.Context, params schema.UserQueryParam, opts
 		return nil, nil
 	}
 
-	userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
-		UserIDs: result.Data.ToIDs(),
+	users := a.userFactory.ToSchemaList(result)
+	userRoleResult, _, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
+		UserIDs: users.ToIDs(),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	roleResult, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
-		IDs: userRoleResult.Data.ToRoleIDs(),
+	roleResult, _, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
+		IDs: a.userRoleFactory.ToSchemaList(userRoleResult).ToRoleIDs(),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return result.ToShowResult(userRoleResult.Data.ToUserIDMap(), roleResult.Data.ToMap()), nil
+	return schema.UserQueryResult{
+		Data:       users,
+		PageResult: pr,
+	}.ToShowResult(a.userRoleFactory.ToSchemaList(userRoleResult).ToUserIDMap(), a.roleFactory.ToSchemaList(roleResult).ToMap()), nil
 }
 
-func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
-	item, err := a.userRepo.Get(ctx, id, opts...)
+func (a *user) Get(ctx context.Context, id string) (*schema.User, error) {
+	item, err := a.userRepo.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -89,15 +111,16 @@ func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 		return nil, errors.ErrNotFound
 	}
 
-	userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, _, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserID: id,
 	})
 	if err != nil {
 		return nil, err
 	}
-	item.UserRoles = userRoleResult.Data
+	user := a.userFactory.ToSchema(item)
+	user.UserRoles = a.userRoleFactory.ToSchemaList(userRoleResult)
 
-	return item, nil
+	return user, nil
 }
 
 func (a *user) Create(ctx context.Context, item schema.User) (*schema.IDResult, error) {
@@ -112,13 +135,13 @@ func (a *user) Create(ctx context.Context, item schema.User) (*schema.IDResult, 
 		for _, urItem := range item.UserRoles {
 			urItem.ID = uuid.MustString()
 			urItem.UserID = item.ID
-			err := a.userRoleRepo.Create(ctx, *urItem)
+			err := a.userRoleRepo.Create(ctx, *a.userRoleFactory.ToEntity(urItem))
 			if err != nil {
 				return err
 			}
 		}
 
-		return a.userRepo.Create(ctx, item)
+		return a.userRepo.Create(ctx, *a.userFactory.ToEntity(&item))
 	})
 	if err != nil {
 		return nil, err
@@ -133,14 +156,14 @@ func (a *user) checkUserName(ctx context.Context, item schema.User) error {
 		return errors.New400Response("The user name is invalid")
 	}
 
-	result, err := a.userRepo.Query(ctx, schema.UserQueryParam{
+	_, pr, err := a.userRepo.Query(ctx, schema.UserQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 		UserName:        item.UserName,
 	})
 	if err != nil {
 		return err
 	}
-	if result.PageResult.Total > 0 {
+	if pr.Total > 0 {
 		return errors.New400Response("The user name already exists")
 	}
 	return nil
@@ -175,7 +198,7 @@ func (a *user) Update(ctx context.Context, id string, item schema.User) error {
 		for _, rmitem := range addUserRoles {
 			rmitem.ID = uuid.MustString()
 			rmitem.UserID = id
-			err := a.userRoleRepo.Create(ctx, *rmitem)
+			err := a.userRoleRepo.Create(ctx, *a.userRoleFactory.ToEntity(rmitem))
 			if err != nil {
 				return err
 			}
@@ -188,7 +211,7 @@ func (a *user) Update(ctx context.Context, id string, item schema.User) error {
 			}
 		}
 
-		return a.userRepo.Update(ctx, id, item)
+		return a.userRepo.Update(ctx, id, *a.userFactory.ToEntity(&item))
 	})
 	if err != nil {
 		return err

@@ -8,9 +8,9 @@ import (
 )
 
 type User interface {
-	Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error)
-	QueryShow(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserShowQueryResult, error)
-	Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error)
+	Query(ctx context.Context, params schema.UserQueryParam) (*schema.UserQueryResult, error)
+	QueryShow(ctx context.Context, params schema.UserQueryParam) (*schema.UserShowQueryResult, error)
+	Get(ctx context.Context, id string) (*schema.User, error)
 	Create(ctx context.Context, item schema.User) (*schema.IDResult, error)
 	Update(ctx context.Context, id string, item schema.User) error
 	Delete(ctx context.Context, id string) error
@@ -29,16 +29,16 @@ type user struct {
 	userSvc service.User
 }
 
-func (u user) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
-	return u.userSvc.Query(ctx, params, opts...)
+func (u user) Query(ctx context.Context, params schema.UserQueryParam) (*schema.UserQueryResult, error) {
+	return u.userSvc.Query(ctx, params)
 }
 
-func (u user) QueryShow(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserShowQueryResult, error) {
-	return u.userSvc.QueryShow(ctx, params, opts...)
+func (u user) QueryShow(ctx context.Context, params schema.UserQueryParam) (*schema.UserShowQueryResult, error) {
+	return u.userSvc.QueryShow(ctx, params)
 }
 
-func (u user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
-	return u.userSvc.Get(ctx, id, opts...)
+func (u user) Get(ctx context.Context, id string) (*schema.User, error) {
+	return u.userSvc.Get(ctx, id)
 }
 
 func (u user) Create(ctx context.Context, item schema.User) (*schema.IDResult, error) {

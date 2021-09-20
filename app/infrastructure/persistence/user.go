@@ -27,17 +27,7 @@ type user struct {
 	db *gorm.DB
 }
 
-func (a *user) getQueryOption(opts ...schema.UserQueryOptions) schema.UserQueryOptions {
-	var opt schema.UserQueryOptions
-	if len(opts) > 0 {
-		opt = opts[0]
-	}
-	return opt
-}
-
-func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...schema.UserQueryOptions) (*schema.UserQueryResult, error) {
-	opt := a.getQueryOption(opts...)
-
+func (a *user) Query(ctx context.Context, params schema.UserQueryParam) (entity.Users, *schema.PaginationResult, error) {
 	db := getUserDB(ctx, a.db)
 	if v := params.UserName; v != "" {
 		db = db.Where("user_name=?", v)
@@ -57,24 +47,18 @@ func (a *user) Query(ctx context.Context, params schema.UserQueryParam, opts ...
 		db = db.Where("user_name LIKE ? OR real_name LIKE ? OR phone LIKE ? OR email LIKE ?", v, v, v, v)
 	}
 
-	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
-	db = db.Order(gormx.ParseOrder(opt.OrderFields))
+	db = db.Order(gormx.ParseOrder(params.OrderFields.AddIdSortField()))
 
 	var list entity.Users
 	pr, err := gormx.WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
-
-	qr := &schema.UserQueryResult{
-		PageResult: pr,
-		Data:       list.ToSchemaUsers(),
-	}
-	return qr, nil
+	return list, pr, nil
 }
 
-func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptions) (*schema.User, error) {
-	var item entity.User
+func (a *user) Get(ctx context.Context, id string) (*entity.User, error) {
+	var item *entity.User
 	ok, err := gormx.FindOne(ctx, getUserDB(ctx, a.db).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -83,18 +67,16 @@ func (a *user) Get(ctx context.Context, id string, opts ...schema.UserQueryOptio
 		return nil, nil
 	}
 
-	return item.ToSchemaUser(), nil
+	return item, nil
 }
 
-func (a *user) Create(ctx context.Context, item schema.User) error {
-	sitem := entity.SchemaUser(item)
-	result := getUserDB(ctx, a.db).Create(sitem.ToUser())
+func (a *user) Create(ctx context.Context, item entity.User) error {
+	result := getUserDB(ctx, a.db).Create(item)
 	return errors.WithStack(result.Error)
 }
 
-func (a *user) Update(ctx context.Context, id string, item schema.User) error {
-	eitem := entity.SchemaUser(item).ToUser()
-	result := getUserDB(ctx, a.db).Where("id=?", id).Updates(eitem)
+func (a *user) Update(ctx context.Context, id string, item entity.User) error {
+	result := getUserDB(ctx, a.db).Where("id=?", id).Updates(item)
 	return errors.WithStack(result.Error)
 }
 

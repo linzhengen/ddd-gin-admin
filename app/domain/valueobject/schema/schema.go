@@ -100,6 +100,12 @@ type OrderField struct {
 	Direction OrderDirection
 }
 
+type OrderFields []*OrderField
+
+func (a OrderFields) AddIdSortField() OrderFields {
+	return append(a, NewOrderField("id", OrderByDESC))
+}
+
 func NewIDResult(id string) *IDResult {
 	return &IDResult{
 		ID: id,

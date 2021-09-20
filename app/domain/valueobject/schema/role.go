@@ -16,15 +16,12 @@ type Role struct {
 
 type RoleQueryParam struct {
 	PaginationParam
+	OrderFields
 	IDs        []string `form:"-"`          // IDs
 	Name       string   `form:"-"`          // Name
 	QueryValue string   `form:"queryValue"` // Query Search Values
 	UserID     string   `form:"-"`          // User ID
 	Status     int      `form:"status"`     // Status(1:enable 2:disable)
-}
-
-type RoleQueryOptions struct {
-	OrderFields []*OrderField // Order Fields
 }
 
 type RoleQueryResult struct {
@@ -61,12 +58,9 @@ type RoleMenu struct {
 
 type RoleMenuQueryParam struct {
 	PaginationParam
+	OrderFields
 	RoleID  string
 	RoleIDs []string
-}
-
-type RoleMenuQueryOptions struct {
-	OrderFields []*OrderField
 }
 
 type RoleMenuQueryResult struct {

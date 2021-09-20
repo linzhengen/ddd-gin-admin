@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"os"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/contextx"
 
@@ -16,8 +19,8 @@ import (
 
 type Menu interface {
 	InitData(ctx context.Context, dataFile string) error
-	Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error)
-	Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error)
+	Query(ctx context.Context, params schema.MenuQueryParam) (*schema.MenuQueryResult, error)
+	Get(ctx context.Context, id string) (*schema.Menu, error)
 	QueryActions(ctx context.Context, id string) (schema.MenuActions, error)
 	Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error)
 	Update(ctx context.Context, id string, item schema.Menu) error
@@ -30,30 +33,39 @@ func NewMenu(
 	menuRepo repository.MenuRepository,
 	menuActionRepo repository.MenuActionRepository,
 	menuActionResourceRepo repository.MenuActionResourceRepository,
+	menuFactory factory.Menu,
+	menuActionFactory factory.MenuAction,
+	menuActionResourceFactory factory.MenuActionResource,
 ) Menu {
 	return &menu{
-		transRepo:              transRepo,
-		menuRepo:               menuRepo,
-		menuActionRepo:         menuActionRepo,
-		menuActionResourceRepo: menuActionResourceRepo,
+		transRepo:                 transRepo,
+		menuRepo:                  menuRepo,
+		menuActionRepo:            menuActionRepo,
+		menuActionResourceRepo:    menuActionResourceRepo,
+		menuFactory:               menuFactory,
+		menuActionFactory:         menuActionFactory,
+		menuActionResourceFactory: menuActionResourceFactory,
 	}
 }
 
 type menu struct {
-	transRepo              repository.TransRepository
-	menuRepo               repository.MenuRepository
-	menuActionRepo         repository.MenuActionRepository
-	menuActionResourceRepo repository.MenuActionResourceRepository
+	transRepo                 repository.TransRepository
+	menuRepo                  repository.MenuRepository
+	menuActionRepo            repository.MenuActionRepository
+	menuActionResourceRepo    repository.MenuActionResourceRepository
+	menuFactory               factory.Menu
+	menuActionFactory         factory.MenuAction
+	menuActionResourceFactory factory.MenuActionResource
 }
 
 func (a *menu) InitData(ctx context.Context, dataFile string) error {
-	result, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
+	_, pr, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 	})
 	if err != nil {
 		return err
 	}
-	if result.PageResult.Total > 0 {
+	if pr.Total > 0 {
 		return nil
 	}
 
@@ -113,22 +125,24 @@ func (a *menu) createMenus(ctx context.Context, parentID string, list schema.Men
 	})
 }
 
-func (a *menu) Query(ctx context.Context, params schema.MenuQueryParam, opts ...schema.MenuQueryOptions) (*schema.MenuQueryResult, error) {
-	menuActionResult, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{})
+func (a *menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema.MenuQueryResult, error) {
+	menuActionResult, pr, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{})
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := a.menuRepo.Query(ctx, params, opts...)
+	result, _, err := a.menuRepo.Query(ctx, params)
 	if err != nil {
 		return nil, err
 	}
-	result.Data.FillMenuAction(menuActionResult.Data.ToMenuIDMap())
-	return result, nil
+	return &schema.MenuQueryResult{
+		Data:       a.menuFactory.ToSchemaList(result).FillMenuAction(a.menuActionFactory.ToSchemaList(menuActionResult).ToMenuIDMap()),
+		PageResult: pr,
+	}, nil
 }
 
-func (a *menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptions) (*schema.Menu, error) {
-	item, err := a.menuRepo.Get(ctx, id, opts...)
+func (a *menu) Get(ctx context.Context, id string) (*schema.Menu, error) {
+	item, err := a.menuRepo.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -140,36 +154,38 @@ func (a *menu) Get(ctx context.Context, id string, opts ...schema.MenuQueryOptio
 	if err != nil {
 		return nil, err
 	}
-	item.Actions = actions
+	menuSchema := a.menuFactory.ToSchema(item)
+	menuSchema.Actions = actions
 
-	return item, nil
+	return menuSchema, nil
 }
 
 func (a *menu) QueryActions(ctx context.Context, id string) (schema.MenuActions, error) {
-	result, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{
+	result, _, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{
 		MenuID: id,
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(result.Data) == 0 {
+	if len(result) == 0 {
 		return nil, nil
 	}
 
-	resourceResult, err := a.menuActionResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{
+	resourceResult, _, err := a.menuActionResourceRepo.Query(ctx, schema.MenuActionResourceQueryParam{
 		MenuID: id,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	result.Data.FillResources(resourceResult.Data.ToActionIDMap())
+	menuActions := a.menuActionFactory.ToSchemaList(result)
+	menuActions.FillResources(a.menuActionResourceFactory.ToSchemaList(resourceResult).ToActionIDMap())
 
-	return result.Data, nil
+	return menuActions, nil
 }
 
 func (a *menu) checkName(ctx context.Context, item schema.Menu) error {
-	result, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
+	_, pr, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
 		PaginationParam: schema.PaginationParam{
 			OnlyCount: true,
 		},
@@ -179,7 +195,7 @@ func (a *menu) checkName(ctx context.Context, item schema.Menu) error {
 	if err != nil {
 		return err
 	}
-	if result.PageResult.Total > 0 {
+	if pr.Total > 0 {
 		return errors.New400Response("The menu name already exists")
 	}
 	return nil
@@ -203,7 +219,7 @@ func (a *menu) Create(ctx context.Context, item schema.Menu) (*schema.IDResult, 
 			return err
 		}
 
-		return a.menuRepo.Create(ctx, item)
+		return a.menuRepo.Create(ctx, *a.menuFactory.ToEntity(&item))
 	})
 	if err != nil {
 		return nil, err
@@ -216,7 +232,7 @@ func (a *menu) createActions(ctx context.Context, menuID string, items schema.Me
 	for _, item := range items {
 		item.ID = uuid.MustString()
 		item.MenuID = menuID
-		err := a.menuActionRepo.Create(ctx, *item)
+		err := a.menuActionRepo.Create(ctx, *a.menuActionFactory.ToEntity(item))
 		if err != nil {
 			return err
 		}
@@ -224,7 +240,7 @@ func (a *menu) createActions(ctx context.Context, menuID string, items schema.Me
 		for _, ritem := range item.Resources {
 			ritem.ID = uuid.MustString()
 			ritem.ActionID = item.ID
-			err := a.menuActionResourceRepo.Create(ctx, *ritem)
+			err := a.menuActionResourceRepo.Create(ctx, *a.menuActionResourceFactory.ToEntity(ritem))
 			if err != nil {
 				return err
 			}
@@ -246,7 +262,7 @@ func (a *menu) getParentPath(ctx context.Context, parentID string) (string, erro
 		return "", errors.ErrInvalidParent
 	}
 
-	return a.joinParentPath(pitem.ParentPath, pitem.ID), nil
+	return a.joinParentPath(a.menuFactory.ToSchema(pitem).ParentPath, pitem.ID), nil
 }
 
 func (a *menu) joinParentPath(parent, id string) string {
@@ -299,7 +315,7 @@ func (a *menu) Update(ctx context.Context, id string, item schema.Menu) error {
 			return err
 		}
 
-		return a.menuRepo.Update(ctx, id, item)
+		return a.menuRepo.Update(ctx, id, *a.menuFactory.ToEntity(&item))
 	})
 }
 
@@ -329,7 +345,7 @@ func (a *menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		// only update action name
 		if item.Name != oitem.Name {
 			oitem.Name = item.Name
-			err := a.menuActionRepo.Update(ctx, item.ID, *oitem)
+			err := a.menuActionRepo.Update(ctx, item.ID, *a.menuActionFactory.ToEntity(oitem))
 			if err != nil {
 				return err
 			}
@@ -340,7 +356,7 @@ func (a *menu) updateActions(ctx context.Context, menuID string, oldItems, newIt
 		for _, aritem := range addResources {
 			aritem.ID = uuid.MustString()
 			aritem.ActionID = oitem.ID
-			err := a.menuActionResourceRepo.Create(ctx, *aritem)
+			err := a.menuActionResourceRepo.Create(ctx, *a.menuActionResourceFactory.ToEntity(aritem))
 			if err != nil {
 				return err
 			}
@@ -400,7 +416,7 @@ func (a *menu) updateChildParentPath(ctx context.Context, oldItem, newItem schem
 	}
 
 	opath := a.joinParentPath(oldItem.ParentPath, oldItem.ID)
-	result, err := a.menuRepo.Query(contextx.NewNoTrans(ctx), schema.MenuQueryParam{
+	result, _, err := a.menuRepo.Query(contextx.NewNoTrans(ctx), schema.MenuQueryParam{
 		PrefixParentPath: opath,
 	})
 	if err != nil {
@@ -408,8 +424,9 @@ func (a *menu) updateChildParentPath(ctx context.Context, oldItem, newItem schem
 	}
 
 	npath := a.joinParentPath(newItem.ParentPath, newItem.ID)
-	for _, menu := range result.Data {
-		err = a.menuRepo.UpdateParentPath(ctx, menu.ID, npath+menu.ParentPath[len(opath):])
+	for _, menu := range result {
+		parentPath := *(menu.ParentPath)
+		err = a.menuRepo.UpdateParentPath(ctx, menu.ID, fmt.Sprintf("%s%s", npath, parentPath[len(opath):]))
 		if err != nil {
 			return err
 		}
@@ -426,14 +443,14 @@ func (a *menu) Delete(ctx context.Context, id string) error {
 		return errors.ErrNotFound
 	}
 
-	result, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
+	_, pr, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
 		PaginationParam: schema.PaginationParam{OnlyCount: true},
 		ParentID:        &id,
 	})
 	if err != nil {
 		return err
 	}
-	if result.PageResult.Total > 0 {
+	if pr.Total > 0 {
 		return errors.ErrNotAllowDeleteWithChild
 	}
 

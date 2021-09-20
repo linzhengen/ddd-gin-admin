@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
@@ -34,26 +36,42 @@ func NewLogin(
 	roleMenuRepo repository.RoleMenuRepository,
 	menuRepo repository.MenuRepository,
 	menuActionRepo repository.MenuActionRepository,
+	userFactory factory.User,
+	userRoleFactory factory.UserRole,
+	roleFactory factory.Role,
+	roleMenuFactory factory.RoleMenu,
+	menuActionFactory factory.MenuAction,
 ) Login {
 	return &login{
-		auth:           auth,
-		userRepo:       userRepo,
-		userRoleRepo:   userRoleRepo,
-		roleRepo:       roleRepo,
-		roleMenuRepo:   roleMenuRepo,
-		menuRepo:       menuRepo,
-		menuActionRepo: menuActionRepo,
+		auth:              auth,
+		userRepo:          userRepo,
+		userRoleRepo:      userRoleRepo,
+		roleRepo:          roleRepo,
+		roleMenuRepo:      roleMenuRepo,
+		menuRepo:          menuRepo,
+		menuActionRepo:    menuActionRepo,
+		userFactory:       userFactory,
+		userRoleFactory:   userRoleFactory,
+		roleFactory:       roleFactory,
+		roleMenuFactory:   roleMenuFactory,
+		menuActionFactory: menuActionFactory,
 	}
 }
 
 type login struct {
-	auth           auth.Author
-	userRepo       repository.UserRepository
-	userRoleRepo   repository.UserRoleRepository
-	roleRepo       repository.RoleRepository
-	roleMenuRepo   repository.RoleMenuRepository
-	menuRepo       repository.MenuRepository
-	menuActionRepo repository.MenuActionRepository
+	auth              auth.Author
+	userRepo          repository.UserRepository
+	userRoleRepo      repository.UserRoleRepository
+	roleRepo          repository.RoleRepository
+	roleMenuRepo      repository.RoleMenuRepository
+	menuRepo          repository.MenuRepository
+	menuActionRepo    repository.MenuActionRepository
+	userFactory       factory.User
+	userRoleFactory   factory.UserRole
+	roleFactory       factory.Role
+	roleMenuFactory   factory.RoleMenu
+	menuActionFactory factory.MenuAction
+	menuFactory       factory.Menu
 }
 
 func (a *login) GetCaptcha(ctx context.Context, length int) (*schema.LoginCaptcha, error) {
@@ -87,17 +105,16 @@ func (a *login) Verify(ctx context.Context, userName, password string) (*schema.
 		return root, nil
 	}
 
-	result, err := a.userRepo.Query(ctx, schema.UserQueryParam{
+	result, _, err := a.userRepo.Query(ctx, schema.UserQueryParam{
 		UserName: userName,
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(result.Data) == 0 {
+	if len(result) == 0 {
 		return nil, errors.ErrInvalidUserName
 	}
-
-	item := result.Data[0]
+	item := result[0]
 	if item.Password != hash.SHA1String(password) {
 		return nil, errors.ErrInvalidPassword
 	}
@@ -105,7 +122,7 @@ func (a *login) Verify(ctx context.Context, userName, password string) (*schema.
 		return nil, errors.ErrUserDisable
 	}
 
-	return item, nil
+	return a.userFactory.ToSchema(item), nil
 }
 
 func (a *login) GenerateToken(ctx context.Context, userID string) (*schema.LoginTokenInfo, error) {
@@ -141,7 +158,7 @@ func (a *login) checkAndGetUser(ctx context.Context, userID string) (*schema.Use
 	if user.Status != 1 {
 		return nil, errors.ErrUserDisable
 	}
-	return user, nil
+	return a.userFactory.ToSchema(user), nil
 }
 
 func (a *login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLoginInfo, error) {
@@ -165,22 +182,22 @@ func (a *login) GetLoginInfo(ctx context.Context, userID string) (*schema.UserLo
 		RealName: user.RealName,
 	}
 
-	userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, _, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserID: userID,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	if roleIDs := userRoleResult.Data.ToRoleIDs(); len(roleIDs) > 0 {
-		roleResult, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
+	if roleIDs := a.userRoleFactory.ToSchemaList(userRoleResult).ToRoleIDs(); len(roleIDs) > 0 {
+		roleResult, _, err := a.roleRepo.Query(ctx, schema.RoleQueryParam{
 			IDs:    roleIDs,
 			Status: 1,
 		})
 		if err != nil {
 			return nil, err
 		}
-		info.Roles = roleResult.Data
+		info.Roles = a.roleFactory.ToSchemaList(roleResult)
 	}
 
 	return info, nil
@@ -190,78 +207,80 @@ func (a *login) QueryUserMenuTree(ctx context.Context, userID string) (schema.Me
 	isRoot := schema.CheckIsRootUser(ctx, userID)
 	// show all menu when root user
 	if isRoot {
-		result, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
-			Status: 1,
-		}, schema.MenuQueryOptions{
+		result, _, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
 			OrderFields: schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC)),
+			Status:      1,
 		})
 		if err != nil {
 			return nil, err
 		}
 
-		menuActionResult, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{})
+		menuActionResult, _, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{})
 		if err != nil {
 			return nil, err
 		}
-		return result.Data.FillMenuAction(menuActionResult.Data.ToMenuIDMap()).ToTree(), nil
+		return a.menuFactory.ToSchemaList(result).FillMenuAction(
+			a.menuActionFactory.ToSchemaList(menuActionResult).ToMenuIDMap(),
+		).ToTree(), nil
 	}
 
-	userRoleResult, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
+	userRoleResult, _, err := a.userRoleRepo.Query(ctx, schema.UserRoleQueryParam{
 		UserID: userID,
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(userRoleResult.Data) == 0 {
+	if len(userRoleResult) == 0 {
 		return nil, errors.ErrNoPerm
 	}
 
-	roleMenuResult, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
-		RoleIDs: userRoleResult.Data.ToRoleIDs(),
+	roleMenuResult, _, err := a.roleMenuRepo.Query(ctx, schema.RoleMenuQueryParam{
+		RoleIDs: a.userRoleFactory.ToSchemaList(userRoleResult).ToRoleIDs(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(roleMenuResult.Data) == 0 {
+	if len(roleMenuResult) == 0 {
 		return nil, errors.ErrNoPerm
 	}
 
-	menuResult, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
-		IDs:    roleMenuResult.Data.ToMenuIDs(),
+	menuResult, _, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
+		IDs:    a.roleMenuFactory.ToSchemaList(roleMenuResult).ToMenuIDs(),
 		Status: 1,
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(menuResult.Data) == 0 {
+	if len(menuResult) == 0 {
 		return nil, errors.ErrNoPerm
 	}
 
-	mData := menuResult.Data.ToMap()
+	menusSchema := a.menuFactory.ToSchemaList(menuResult)
+	mData := menusSchema.ToMap()
 	var qIDs []string
-	for _, pid := range menuResult.Data.SplitParentIDs() {
+	for _, pid := range menusSchema.SplitParentIDs() {
 		if _, ok := mData[pid]; !ok {
 			qIDs = append(qIDs, pid)
 		}
 	}
 	if len(qIDs) > 0 {
-		pmenuResult, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
+		pmenuResult, _, err := a.menuRepo.Query(ctx, schema.MenuQueryParam{
 			IDs: qIDs,
 		})
 		if err != nil {
 			return nil, err
 		}
-		menuResult.Data = append(menuResult.Data, pmenuResult.Data...)
+		menusSchema = append(menusSchema, a.menuFactory.ToSchemaList(pmenuResult)...)
 	}
 
-	sort.Sort(menuResult.Data)
-	menuActionResult, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{
-		IDs: roleMenuResult.Data.ToActionIDs(),
+	sort.Sort(menusSchema)
+	menuActionResult, _, err := a.menuActionRepo.Query(ctx, schema.MenuActionQueryParam{
+		IDs: a.roleMenuFactory.ToSchemaList(roleMenuResult).ToActionIDs(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	return menuResult.Data.FillMenuAction(menuActionResult.Data.ToMenuIDMap()).ToTree(), nil
+	return menusSchema.FillMenuAction(a.menuActionFactory.ToSchemaList(menuActionResult).ToMenuIDMap()).ToTree(), nil
 }
 
 func (a *login) UpdatePassword(ctx context.Context, userID string, params schema.UpdatePasswordParam) error {

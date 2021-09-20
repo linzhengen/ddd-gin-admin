@@ -2,19 +2,7 @@ package entity
 
 import (
 	"time"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
-
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
-
-type SchemaUser schema.User
-
-func (a SchemaUser) ToUser() *User {
-	item := new(User)
-	structure.Copy(a, item)
-	return item
-}
 
 type User struct {
 	ID        string     `gorm:"column:id;primary_key;size:36;"`
@@ -30,18 +18,4 @@ type User struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at;index;"`
 }
 
-func (a User) ToSchemaUser() *schema.User {
-	item := new(schema.User)
-	structure.Copy(a, item)
-	return item
-}
-
 type Users []*User
-
-func (a Users) ToSchemaUsers() []*schema.User {
-	list := make([]*schema.User, len(a))
-	for i, item := range a {
-		list[i] = item.ToSchemaUser()
-	}
-	return list
-}
