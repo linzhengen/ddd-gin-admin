@@ -13,6 +13,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/linzhengen/ddd-gin-admin/injector/console"
+
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
 	"github.com/linzhengen/ddd-gin-admin/injector"
@@ -43,6 +45,7 @@ func main() {
 	app.Usage = "RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE."
 	app.Commands = []*cli.Command{
 		newWebCmd(ctx),
+		newConsoleCmd(ctx),
 	}
 	err := app.Run(os.Args)
 	if err != nil {
@@ -88,24 +91,30 @@ func newWebCmd(ctx context.Context) *cli.Command {
 }
 
 func newConsoleCmd(ctx context.Context) *cli.Command {
+	commands, cleanFunc, err := injector.InitConsole(ctx,
+		console.SetConfigFile("./configs/config.toml"),
+		console.SetVersion(VERSION))
 	return &cli.Command{
-		Name:  "hello",
-		Usage: "run cli",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "name",
-				Aliases:  []string{"n"},
-				Usage:    "input your name",
-				Required: true,
-			},
+		Name:  "console",
+		Usage: "Run console commands",
+		//Flags: []cli.Flag{
+		//	&cli.StringFlag{
+		//		Name:     "conf",
+		//		Aliases:  []string{"c"},
+		//		Usage:    "server config files(.json,.yaml,.toml)",
+		//		Required: true,
+		//	},
+		//},
+		Before: func(c *cli.Context) error {
+			return err
+		},
+		After: func(c *cli.Context) error {
+			cleanFunc()
+			return nil
 		},
 		Action: func(c *cli.Context) error {
-			return injector.RunServer(ctx,
-				api.SetConfigFile(c.String("conf")),
-				api.SetModelFile(c.String("model")),
-				api.SetWWWDir(c.String("www")),
-				api.SetMenuFile(c.String("menu")),
-				api.SetVersion(VERSION))
+			return nil
 		},
+		Subcommands: commands,
 	}
 }

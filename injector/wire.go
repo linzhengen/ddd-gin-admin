@@ -6,6 +6,8 @@
 package injector
 
 import (
+	"context"
+
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
@@ -13,7 +15,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
-	consoleHandler "github.com/linzhengen/ddd-gin-admin/app/interfaces/console/handler"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/console/command"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 	"github.com/linzhengen/ddd-gin-admin/injector/console"
 
@@ -60,7 +62,7 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		application.NewRole,
 		application.NewUser,
 
-		// handler
+		// command
 		handler.NewMenu,
 		handler.NewRole,
 		handler.NewLogin,
@@ -79,13 +81,13 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	return nil, nil, nil
 }
 
-func BuildConsoleInjector() (*consoleHandler.ConsoleHandler, error) {
+func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error) {
 	wire.Build(
 		console.InitGormDB,
 		persistence.NewUser,
 		application.NewHelloConsole,
-		consoleHandler.NewHelloHandler,
-		consoleHandler.NewConsoleHandler,
+		command.NewHelloCommand,
+		command.NewCliCommands,
 	)
-	return nil, nil
+	return nil, nil, nil
 }

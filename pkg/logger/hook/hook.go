@@ -28,7 +28,7 @@ type ExecCloser interface {
 	Close() error
 }
 
-// FilterHandle a filter handler
+// FilterHandle a filter command
 type FilterHandle func(*logrus.Entry) *logrus.Entry
 
 type options struct {

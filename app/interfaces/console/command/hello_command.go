@@ -1,4 +1,4 @@
-package handler
+package command
 
 import (
 	"context"
@@ -10,25 +10,25 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type HelloHandler interface {
-	Hello(ctx context.Context, c *cli.Context)
+type HelloCommand interface {
+	Hello(ctx context.Context, c *cli.Context) error
 }
 
-func NewHelloHandler(helloApp application.HelloConsole) HelloHandler {
-	return &helloHandler{
+func NewHelloCommand(helloApp application.HelloConsole) HelloCommand {
+	return &helloCommand{
 		helloApp: helloApp,
 	}
 }
 
-type helloHandler struct {
+type helloCommand struct {
 	helloApp application.HelloConsole
 }
 
-func (a *helloHandler) Hello(ctx context.Context, c *cli.Context) {
+func (a *helloCommand) Hello(ctx context.Context, c *cli.Context) error {
 	name, err := a.helloApp.GetUserName(ctx, c.String("id"))
 	if err != nil {
-		logger.Errorf("error %v", err)
-		return
+		return err
 	}
 	logger.Infof("hello %s", name)
+	return nil
 }
