@@ -53,7 +53,7 @@ func (a *menuActionResource) Query(ctx context.Context, params schema.MenuAction
 
 func (a *menuActionResource) Get(ctx context.Context, id string) (*entity.MenuActionResource, error) {
 	db := getMenuActionResourceDB(ctx, a.db).Where("id=?", id)
-	var item *entity.MenuActionResource
+	item := &entity.MenuActionResource{}
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)

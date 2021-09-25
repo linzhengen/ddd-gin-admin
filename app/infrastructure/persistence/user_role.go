@@ -48,7 +48,7 @@ func (a *userRole) Query(ctx context.Context, params schema.UserRoleQueryParam) 
 
 func (a *userRole) Get(ctx context.Context, id string) (*entity.UserRole, error) {
 	db := getUserRoleDB(ctx, a.db).Where("id=?", id)
-	var item *entity.UserRole
+	item := &entity.UserRole{}
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)

@@ -49,7 +49,7 @@ func (a *menuAction) Query(ctx context.Context, params schema.MenuActionQueryPar
 
 func (a *menuAction) Get(ctx context.Context, id string) (*entity.MenuAction, error) {
 	db := getMenuActionDB(ctx, a.db).Where("id=?", id)
-	var item *entity.MenuAction
+	item := &entity.MenuAction{}
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)

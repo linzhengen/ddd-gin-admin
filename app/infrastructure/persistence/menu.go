@@ -64,7 +64,7 @@ func (a *menu) Query(ctx context.Context, params schema.MenuQueryParam) (entity.
 }
 
 func (a *menu) Get(ctx context.Context, id string) (*entity.Menu, error) {
-	var item *entity.Menu
+	item := &entity.Menu{}
 	ok, err := gormx.FindOne(ctx, getMenuDB(ctx, a.db).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)

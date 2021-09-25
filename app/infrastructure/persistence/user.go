@@ -58,7 +58,7 @@ func (a *user) Query(ctx context.Context, params schema.UserQueryParam) (entity.
 }
 
 func (a *user) Get(ctx context.Context, id string) (*entity.User, error) {
-	var item *entity.User
+	item := &entity.User{}
 	ok, err := gormx.FindOne(ctx, getUserDB(ctx, a.db).Where("id=?", id), &item)
 	if err != nil {
 		return nil, errors.WithStack(err)

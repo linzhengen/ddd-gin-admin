@@ -48,7 +48,7 @@ func (a *roleMenu) Query(ctx context.Context, params schema.RoleMenuQueryParam) 
 
 func (a *roleMenu) Get(ctx context.Context, id string) (*entity.RoleMenu, error) {
 	db := getRoleMenuDB(ctx, a.db).Where("id=?", id)
-	var item *entity.RoleMenu
+	item := &entity.RoleMenu{}
 	ok, err := gormx.FindOne(ctx, db, &item)
 	if err != nil {
 		return nil, errors.WithStack(err)
