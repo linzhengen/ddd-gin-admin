@@ -7,9 +7,9 @@
 + Domain: This is where the domain and business logic of the application is defined.
 + Infrastructure: The infrastructure layer describes technical concerns such as DB access. This layer depends on the domain layer. Therefore, the infrastructure layer implements the interface defined in the repository of the domain layer.
 + Application: This layer serves as a passage between the domain and the interface layer. The sends the requests from the interface layer to the domain layer, which processes it and returns a response.
-+ Interface: This layer holds everything that interacts with other systems, such as web services, RMI interfaces or web applications, and batch processing frontend.
++ Interfaces: This layer holds everything that interacts with other systems, such as web services, RMI interfaces or web applications, and batch processing frontend.
 <div>
-    <img src="docs/img/ddd_architecture.png">
+    <img height="400" src="docs/img/ddd_architecture.png">
 </div>
 
 ## Swagger UI
