@@ -56,7 +56,7 @@ func main() {
 func newWebCmd(ctx context.Context) *cli.Command {
 	return &cli.Command{
 		Name:  "web",
-		Usage: "run web server",
+		Usage: "Run web server",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "conf",
@@ -97,14 +97,6 @@ func newConsoleCmd(ctx context.Context) *cli.Command {
 	return &cli.Command{
 		Name:  "console",
 		Usage: "Run console commands",
-		//Flags: []cli.Flag{
-		//	&cli.StringFlag{
-		//		Name:     "conf",
-		//		Aliases:  []string{"c"},
-		//		Usage:    "server config files(.json,.yaml,.toml)",
-		//		Required: true,
-		//	},
-		//},
 		Before: func(c *cli.Context) error {
 			return err
 		},
