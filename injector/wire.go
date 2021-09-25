@@ -86,14 +86,28 @@ func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error)
 		// init
 		console.InitGormDB,
 
+		// factory
+		factory.NewMenu,
+		factory.NewMenuAction,
+		factory.NewMenuActionResource,
+
 		// persistence
 		persistence.NewDbMigration,
+		persistence.NewTrans,
+		persistence.NewMenu,
+		persistence.NewMenuAction,
+		persistence.NewMenuActionResource,
+
+		// service
+		service.NewMenu,
 
 		// application
 		application.NewDbMigrationConsole,
+		application.NewDbSeedConsole,
 
 		// command
 		command.NewMigrateCommand,
+		command.NewSeedCommand,
 		command.NewCliCommands,
 	)
 	return nil, nil, nil

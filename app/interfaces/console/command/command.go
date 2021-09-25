@@ -10,14 +10,22 @@ type Commands []*cli.Command
 
 func NewCliCommands(
 	ctx context.Context,
-	migrate MigrateCommand,
+	migrateCmd MigrateCommand,
+	seedCmd SeedCommand,
 ) Commands {
 	return []*cli.Command{
 		{
 			Name:  "db:migrate",
 			Usage: "Migrate database",
 			Action: func(c *cli.Context) error {
-				return migrate.Migrate(ctx, c)
+				return migrateCmd.Migrate(ctx, c)
+			},
+		},
+		{
+			Name:  "db:seed",
+			Usage: "Running Seeders",
+			Action: func(c *cli.Context) error {
+				return seedCmd.Seed(ctx, c)
 			},
 		},
 	}
