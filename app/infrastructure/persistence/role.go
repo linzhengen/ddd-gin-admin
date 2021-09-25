@@ -59,7 +59,7 @@ func (a *role) Query(ctx context.Context, params schema.RoleQueryParam) (entity.
 }
 
 func (a *role) Get(ctx context.Context, id string) (*entity.Role, error) {
-	var role *entity.Role
+	role := &entity.Role{}
 	ok, err := gormx.FindOne(ctx, getRoleDB(ctx, a.db).Where("id=?", id), &role)
 	if err != nil {
 		return nil, errors.WithStack(err)
