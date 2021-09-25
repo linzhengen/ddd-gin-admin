@@ -26,35 +26,30 @@ type Options struct {
 
 type Option func(*Options)
 
-// SetConfigFile set config file
 func SetConfigFile(s string) Option {
 	return func(o *Options) {
 		o.ConfigFile = s
 	}
 }
 
-// SetModelFile set casbin mode file
 func SetModelFile(s string) Option {
 	return func(o *Options) {
 		o.ModelFile = s
 	}
 }
 
-// SetWWWDir set static file dir path
 func SetWWWDir(s string) Option {
 	return func(o *Options) {
 		o.WWWDir = s
 	}
 }
 
-// SetMenuFile set menu file
 func SetMenuFile(s string) Option {
 	return func(o *Options) {
 		o.MenuFile = s
 	}
 }
 
-// SetVersion set app version
 func SetVersion(s string) Option {
 	return func(o *Options) {
 		o.Version = s

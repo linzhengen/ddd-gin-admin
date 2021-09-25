@@ -7,6 +7,7 @@
 package injector
 
 import (
+	"context"
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
@@ -14,7 +15,9 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/console/command"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
+	"github.com/linzhengen/ddd-gin-admin/injector/console"
 )
 
 import (
@@ -74,6 +77,30 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	return apiInjector, func() {
 		cleanup3()
 		cleanup2()
+		cleanup()
+	}, nil
+}
+
+func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error) {
+	db, cleanup, err := console.InitGormDB()
+	if err != nil {
+		return nil, nil, err
+	}
+	dbMigrationRepository := persistence.NewDbMigration(db)
+	dbMigrationConsole := application.NewDbMigrationConsole(dbMigrationRepository)
+	migrateCommand := command.NewMigrateCommand(dbMigrationConsole)
+	transRepository := persistence.NewTrans(db)
+	menuRepository := persistence.NewMenu(db)
+	menuActionRepository := persistence.NewMenuAction(db)
+	menuActionResourceRepository := persistence.NewMenuActionResource(db)
+	menu := factory.NewMenu()
+	menuAction := factory.NewMenuAction()
+	menuActionResource := factory.NewMenuActionResource()
+	serviceMenu := service.NewMenu(transRepository, menuRepository, menuActionRepository, menuActionResourceRepository, menu, menuAction, menuActionResource)
+	dbSeedConsole := application.NewDbSeedConsole(serviceMenu)
+	seedCommand := command.NewSeedCommand(dbSeedConsole)
+	commands := command.NewCliCommands(ctx, migrateCommand, seedCommand)
+	return commands, func() {
 		cleanup()
 	}, nil
 }

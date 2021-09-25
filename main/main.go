@@ -13,6 +13,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/linzhengen/ddd-gin-admin/injector/console"
+
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
 	"github.com/linzhengen/ddd-gin-admin/injector"
@@ -26,7 +28,7 @@ var VERSION = "0.4.0"
 
 // @title ddd-gin-admin
 // @version 0.2.0
-// @description RBAC scaffolding based on GIN + GORM + CASBIN + WIRE.
+// @description RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE.
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @securityDefinitions.apikey ApiKeyAuth
@@ -43,6 +45,7 @@ func main() {
 	app.Usage = "RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE."
 	app.Commands = []*cli.Command{
 		newWebCmd(ctx),
+		newConsoleCmd(ctx),
 	}
 	err := app.Run(os.Args)
 	if err != nil {
@@ -53,7 +56,7 @@ func main() {
 func newWebCmd(ctx context.Context) *cli.Command {
 	return &cli.Command{
 		Name:  "web",
-		Usage: "run web server",
+		Usage: "Run web server",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "conf",
@@ -84,5 +87,26 @@ func newWebCmd(ctx context.Context) *cli.Command {
 				api.SetMenuFile(c.String("menu")),
 				api.SetVersion(VERSION))
 		},
+	}
+}
+
+func newConsoleCmd(ctx context.Context) *cli.Command {
+	commands, cleanFunc, err := injector.InitConsole(ctx,
+		console.SetConfigFile("./configs/config.toml"),
+		console.SetVersion(VERSION))
+	return &cli.Command{
+		Name:  "console",
+		Usage: "Run console commands",
+		Before: func(c *cli.Context) error {
+			return err
+		},
+		After: func(c *cli.Context) error {
+			cleanFunc()
+			return nil
+		},
+		Action: func(c *cli.Context) error {
+			return nil
+		},
+		Subcommands: commands,
 	}
 }

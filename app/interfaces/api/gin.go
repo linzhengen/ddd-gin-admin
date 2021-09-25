@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	prefix           = "gin-admin"
+	prefix           = "ddd-gin-admin"
 	UserIDKey        = prefix + "/user-id"
 	ReqBodyKey       = prefix + "/req-body"
 	ResBodyKey       = prefix + "/res-body"
