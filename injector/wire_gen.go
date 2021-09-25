@@ -86,10 +86,10 @@ func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error)
 	if err != nil {
 		return nil, nil, err
 	}
-	userRepository := persistence.NewUser(db)
-	helloConsole := application.NewHelloConsole(userRepository)
-	helloCommand := command.NewHelloCommand(helloConsole)
-	commands := command.NewCliCommands(ctx, helloCommand)
+	dbMigrationRepository := persistence.NewDbMigration(db)
+	dbMigrationConsole := application.NewDbMigrationConsole(dbMigrationRepository)
+	migrateCommand := command.NewMigrateCommand(dbMigrationConsole)
+	commands := command.NewCliCommands(ctx, migrateCommand)
 	return commands, func() {
 		cleanup()
 	}, nil

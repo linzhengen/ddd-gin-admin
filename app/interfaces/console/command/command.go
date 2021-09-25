@@ -10,14 +10,14 @@ type Commands []*cli.Command
 
 func NewCliCommands(
 	ctx context.Context,
-	hello HelloCommand,
+	migrate MigrateCommand,
 ) Commands {
 	return []*cli.Command{
 		{
-			Name:  "hello",
-			Usage: "echo hello",
+			Name:  "db:migrate",
+			Usage: "Migrate database",
 			Action: func(c *cli.Context) error {
-				return hello.Hello(ctx, c)
+				return migrate.Migrate(ctx, c)
 			},
 		},
 	}

@@ -83,10 +83,17 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 
 func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error) {
 	wire.Build(
+		// init
 		console.InitGormDB,
-		persistence.NewUser,
-		application.NewHelloConsole,
-		command.NewHelloCommand,
+
+		// persistence
+		persistence.NewDbMigration,
+
+		// application
+		application.NewDbMigrationConsole,
+
+		// command
+		command.NewMigrateCommand,
 		command.NewCliCommands,
 	)
 	return nil, nil, nil
