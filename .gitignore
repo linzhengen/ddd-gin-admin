@@ -23,3 +23,5 @@ main/app
 
 # data
 data
+.DS_Store
+

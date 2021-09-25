@@ -1,15 +1,15 @@
 # ddd-gin-admin
-English | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
+[English](./README.md) | 简体中文 | [日本語](./README.ja.md)
 
-`ddd-gin-admin` adopts the DDD architecture and provides the components needed to build a CMS. User permission management by RBAC.
+`ddd-gin-admin` 采用 DDD 架构并提供构建 CMS 所需的组件。通过 RBAC 进行用户权限管理。
 
 [![golangci-lint](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml)
 
 ## DDD Architecture
-+ Domain: This is where the domain and business logic of the application is defined.
-+ Infrastructure: The infrastructure layer describes technical concerns such as DB access. This layer depends on the domain layer. Therefore, the infrastructure layer implements the interface defined in the repository of the domain layer.
-+ Application: This layer serves as a passage between the domain and the interface layer. The sends the requests from the interface layer to the domain layer, which processes it and returns a response.
-+ Interfaces: This layer holds everything that interacts with other systems, such as web services, RMI interfaces or web applications, and batch processing frontend.
++ Domain: 这是定义应用程序的域和业务逻辑的地方。
++ Infrastructure: 这一层依赖于Domain层，例如数据库访问等, 对Domain层定义的接口的实现。
++ Application：这一层作为Domain层和Interfaces层之间的通道。将请求从Interfaces层发送到Domain层，Domain层对其进行处理并返回响应。
++ Interfaces：该层包含与其他系统交互的所有内容，例如Web应用程序以及批处理等。
 <div>
     <img height="400" src="docs/img/ddd_architecture.png">
 </div>
