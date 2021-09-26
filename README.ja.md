@@ -7,7 +7,7 @@
 
 ## DDD Architecture
 + Domain: Domain層は、アプリケーションのドメインとビジネスロジックが定義されます。
-+ Infrastructure: Infrastructure層は、DBアクセスなどの技術的関心を記述します。この層はdomain層に依存しています。 そのためinfrastructure層はdomain層のrepositoryで定義したインタフェースを実装します。
++ Infrastructure: Infrastructure層は、DBアクセスなどの技術的関心を記述します。この層はDomain層に依存しています。 そのためInfrastructure層はDomain層のrepositoryで定義したインタフェースを実装します。
 + Application: Application層は、ドメインとインターフェース層の間の通路として機能します。は、インターフェイス層からドメイン層に要求を送信し、ドメイン層はそれを処理して応答を返します。
 + Interfaces: Interfaces層は、Webアプリケーションやバッチ処理など、他のシステムと対話するすべてのものを保持します。
 <div>
