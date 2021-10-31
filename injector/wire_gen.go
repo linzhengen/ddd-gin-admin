@@ -8,19 +8,23 @@ package injector
 
 import (
 	"context"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/role"
+
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/casbin"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/console/command"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 	"github.com/linzhengen/ddd-gin-admin/injector/console"
-)
 
-import (
 	_ "github.com/linzhengen/ddd-gin-admin/app/interfaces/api/swagger"
 )
 
@@ -36,10 +40,10 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	roleRepository := persistence.NewRole(db)
+	roleRepository := role.NewRole(db)
 	roleMenuRepository := persistence.NewRoleMenu(db)
 	menuActionResourceRepository := persistence.NewMenuActionResource(db)
-	userRepository := persistence.NewUser(db)
+	userRepository := user.NewUser(db)
 	userRoleRepository := persistence.NewUserRole(db)
 	role := factory.NewRole()
 	roleMenu := factory.NewRoleMenu()
@@ -86,7 +90,7 @@ func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error)
 	if err != nil {
 		return nil, nil, err
 	}
-	dbMigrationRepository := persistence.NewDbMigration(db)
+	dbMigrationRepository := infrastructure.NewDbMigration(db)
 	dbMigrationConsole := application.NewDbMigrationConsole(dbMigrationRepository)
 	migrateCommand := command.NewMigrateCommand(dbMigrationConsole)
 	transRepository := persistence.NewTrans(db)

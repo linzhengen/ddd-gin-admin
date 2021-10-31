@@ -6,7 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
@@ -69,6 +70,6 @@ func autoMigrate(db *gorm.DB) error {
 		new(entity.RoleMenu),
 		new(entity.Role),
 		new(entity.UserRole),
-		new(entity.User),
+		new(user.User),
 	).Error
 }

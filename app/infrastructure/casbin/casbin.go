@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/userrole"
 
-	"github.com/casbin/casbin/v2"
+	entity2 "github.com/linzhengen/ddd-gin-admin/app/domain/role"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
@@ -15,6 +18,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/repository"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 
+	"github.com/casbin/casbin/v2"
 	casbinModel "github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
@@ -23,11 +27,11 @@ import (
 var autoLoadPolicyChan entity.AutoLoadPolicyChan
 
 func NewCasbinAdapter(
-	roleRepo repository.RoleRepository,
+	roleRepo entity2.RoleRepository,
 	roleMenuRepo repository.RoleMenuRepository,
 	menuResourceRepo repository.MenuActionResourceRepository,
-	userRepo repository.UserRepository,
-	userRoleRepo repository.UserRoleRepository,
+	userRepo user.UserRepository,
+	userRoleRepo userrole.UserRoleRepository,
 	roleFactory factory.Role,
 	roleMenuFactory factory.RoleMenu,
 	menuActionResourceFactory factory.MenuActionResource,
@@ -49,11 +53,11 @@ func NewCasbinAdapter(
 }
 
 type casbinAdapter struct {
-	roleRepo                  repository.RoleRepository
+	roleRepo                  entity2.RoleRepository
 	roleMenuRepo              repository.RoleMenuRepository
 	menuResourceRepo          repository.MenuActionResourceRepository
-	userRepo                  repository.UserRepository
-	userRoleRepo              repository.UserRoleRepository
+	userRepo                  user.UserRepository
+	userRoleRepo              userrole.UserRoleRepository
 	roleFactory               factory.Role
 	roleMenuFactory           factory.RoleMenu
 	menuActionResourceFactory factory.MenuActionResource

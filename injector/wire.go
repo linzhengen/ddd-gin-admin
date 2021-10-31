@@ -8,6 +8,12 @@ package injector
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/role"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
+
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
@@ -33,8 +39,8 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 
 		// persistence
 		persistence.NewTrans,
-		persistence.NewUser,
-		persistence.NewRole,
+		user.NewUser,
+		role.NewRole,
 		persistence.NewUserRole,
 		persistence.NewMenu,
 		persistence.NewRoleMenu,
@@ -92,7 +98,7 @@ func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error)
 		factory.NewMenuActionResource,
 
 		// persistence
-		persistence.NewDbMigration,
+		infrastructure.NewDbMigration,
 		persistence.NewTrans,
 		persistence.NewMenu,
 		persistence.NewMenuAction,

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 

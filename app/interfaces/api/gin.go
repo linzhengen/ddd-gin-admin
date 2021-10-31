@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
+	errors2 "github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 
@@ -52,21 +52,21 @@ func GetBody(c *gin.Context) []byte {
 
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
-		return errors.Wrap400Response(err, fmt.Sprintf("400 Bad Request - %s", err.Error()))
+		return errors2.Wrap400Response(err, fmt.Sprintf("400 Bad Request - %s", err.Error()))
 	}
 	return nil
 }
 
 func ParseQuery(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindQuery(obj); err != nil {
-		return errors.Wrap400Response(err, fmt.Sprintf("400 Bad Request - %s", err.Error()))
+		return errors2.Wrap400Response(err, fmt.Sprintf("400 Bad Request - %s", err.Error()))
 	}
 	return nil
 }
 
 func ParseForm(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindWith(obj, binding.Form); err != nil {
-		return errors.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
+		return errors2.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
 	}
 	return nil
 }
@@ -103,17 +103,17 @@ func ResJSON(c *gin.Context, status int, v interface{}) {
 
 func ResError(c *gin.Context, err error, status ...int) {
 	ctx := c.Request.Context()
-	var res *errors.ResponseError
+	var res *errors2.ResponseError
 
 	if err != nil {
-		if e, ok := err.(*errors.ResponseError); ok {
+		if e, ok := err.(*errors2.ResponseError); ok {
 			res = e
 		} else {
-			res = errors.UnWrapResponse(errors.ErrInternalServer)
+			res = errors2.UnWrapResponse(errors2.ErrInternalServer)
 			res.ERR = err
 		}
 	} else {
-		res = errors.UnWrapResponse(errors.ErrInternalServer)
+		res = errors2.UnWrapResponse(errors2.ErrInternalServer)
 	}
 
 	if len(status) > 0 {
