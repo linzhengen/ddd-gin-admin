@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 )
@@ -49,12 +51,22 @@ func SetExpired(expired int) Option {
 	}
 }
 
+func SetRootUser(id, password string) Option {
+	return func(o *options) {
+		o.rootUser = auth.RootUser{
+			UserName: id,
+			Password: hash.MD5String(password),
+		}
+	}
+}
+
 type options struct {
 	signingMethod jwt.SigningMethod
 	signingKey    interface{}
 	keyFunc       jwt.Keyfunc
 	expired       int
 	tokenType     string
+	rootUser      auth.RootUser
 }
 
 func NewRepository(store Store, opts ...Option) auth.Repository {
@@ -72,6 +84,16 @@ func NewRepository(store Store, opts ...Option) auth.Repository {
 type repositoryImpl struct {
 	opts  *options
 	store Store
+}
+
+func (a *repositoryImpl) FindRootUser(ctx context.Context, userName string) *auth.RootUser {
+	if userName == a.opts.rootUser.UserName {
+		return &auth.RootUser{
+			UserName: userName,
+			Password: a.opts.rootUser.Password,
+		}
+	}
+	return nil
 }
 
 func (a *repositoryImpl) GenerateToken(ctx context.Context, userID string) (*auth.Auth, error) {

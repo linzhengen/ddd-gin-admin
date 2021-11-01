@@ -1,8 +1,10 @@
 package user
 
 import (
-	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"time"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 )
 
 type User struct {
@@ -17,6 +19,7 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
+	Roles     []*role.Role
 }
 
 type QueryParams struct {

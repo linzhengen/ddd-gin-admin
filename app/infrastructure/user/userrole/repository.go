@@ -3,7 +3,7 @@ package userrole
 import (
 	"context"
 
-	userrole2 "github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
@@ -12,7 +12,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 )
 
-func NewRepository(db *gorm.DB) userrole2.Repository {
+func NewRepository(db *gorm.DB) userrole.Repository {
 	return &repository{
 		db: db,
 	}
@@ -26,7 +26,7 @@ func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return gormx.GetDBWithModel(ctx, defDB, new(Model))
 }
 
-func (a *repository) Query(ctx context.Context, params userrole2.QueryParam) ([]*userrole2.UserRole, *pagination.Pagination, error) {
+func (a *repository) Query(ctx context.Context, params userrole.QueryParam) (userrole.UserRoles, *pagination.Pagination, error) {
 	db := GetModelDB(ctx, a.db)
 	if v := params.UserID; v != "" {
 		db = db.Where("user_id=?", v)
@@ -45,7 +45,7 @@ func (a *repository) Query(ctx context.Context, params userrole2.QueryParam) ([]
 	return toDomainList(list), pr, nil
 }
 
-func (a *repository) Get(ctx context.Context, id string) (*userrole2.UserRole, error) {
+func (a *repository) Get(ctx context.Context, id string) (*userrole.UserRole, error) {
 	db := GetModelDB(ctx, a.db).Where("id=?", id)
 	item := &Model{}
 	ok, err := gormx.FindOne(ctx, db, &item)
@@ -59,12 +59,12 @@ func (a *repository) Get(ctx context.Context, id string) (*userrole2.UserRole, e
 	return item.ToDomain(), nil
 }
 
-func (a *repository) Create(ctx context.Context, item *userrole2.UserRole) error {
+func (a *repository) Create(ctx context.Context, item *userrole.UserRole) error {
 	result := GetModelDB(ctx, a.db).Create(domainToModel(item))
 	return errors.WithStack(result.Error)
 }
 
-func (a *repository) Update(ctx context.Context, id string, item *userrole2.UserRole) error {
+func (a *repository) Update(ctx context.Context, id string, item *userrole.UserRole) error {
 	result := GetModelDB(ctx, a.db).Where("id=?", id).Updates(domainToModel(item))
 	return errors.WithStack(result.Error)
 }

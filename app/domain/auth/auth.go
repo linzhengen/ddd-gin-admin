@@ -13,3 +13,8 @@ type Auth struct {
 	TokenType   string
 	ExpiresAt   int64
 }
+
+type RootUser struct {
+	UserName string
+	Password string
+}

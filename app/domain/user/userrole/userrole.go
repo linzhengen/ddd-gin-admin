@@ -14,3 +14,13 @@ type QueryParam struct {
 	UserID          string
 	UserIDs         []string
 }
+
+type UserRoles []*UserRole
+
+func (a UserRoles) ToRoleIDs() []string {
+	ids := make([]string, len(a))
+	for i, item := range a {
+		ids[i] = item.RoleID
+	}
+	return ids
+}
