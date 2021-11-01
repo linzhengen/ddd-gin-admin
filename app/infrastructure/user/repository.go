@@ -3,13 +3,14 @@ package user
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/userrole"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/userrole"
 )
 
 func NewRepository(db *gorm.DB) user.Repository {

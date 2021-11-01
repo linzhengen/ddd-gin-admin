@@ -3,13 +3,13 @@ package menuactionresource
 import (
 	"context"
 
+	menuactionresource2 "github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuactionresource"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menuaction"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/menuactionresource"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
@@ -19,7 +19,7 @@ func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return gormx.GetDBWithModel(ctx, defDB, new(Model))
 }
 
-func NewRepository(db *gorm.DB) menuactionresource.Repository {
+func NewRepository(db *gorm.DB) menuactionresource2.Repository {
 	return &repository{
 		db: db,
 	}
@@ -29,7 +29,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func (a *repository) Query(ctx context.Context, params menuactionresource.QueryParam) ([]*menuactionresource.MenuActionResource, *pagination.Pagination, error) {
+func (a *repository) Query(ctx context.Context, params menuactionresource2.QueryParam) ([]*menuactionresource2.MenuActionResource, *pagination.Pagination, error) {
 	db := GetModelDB(ctx, a.db)
 	if v := params.MenuID; v != "" {
 		subQuery := menuaction.GetModelDB(ctx, a.db).
@@ -53,7 +53,7 @@ func (a *repository) Query(ctx context.Context, params menuactionresource.QueryP
 	return toDomainList(list), pr, nil
 }
 
-func (a *repository) Get(ctx context.Context, id string) (*menuactionresource.MenuActionResource, error) {
+func (a *repository) Get(ctx context.Context, id string) (*menuactionresource2.MenuActionResource, error) {
 	db := GetModelDB(ctx, a.db).Where("id=?", id)
 	item := &Model{}
 	ok, err := gormx.FindOne(ctx, db, &item)
@@ -67,12 +67,12 @@ func (a *repository) Get(ctx context.Context, id string) (*menuactionresource.Me
 	return item.ToDomain(), nil
 }
 
-func (a *repository) Create(ctx context.Context, item *menuactionresource.MenuActionResource) error {
+func (a *repository) Create(ctx context.Context, item *menuactionresource2.MenuActionResource) error {
 	result := GetModelDB(ctx, a.db).Create(domainToModel(item))
 	return errors.WithStack(result.Error)
 }
 
-func (a *repository) Update(ctx context.Context, id string, item *menuactionresource.MenuActionResource) error {
+func (a *repository) Update(ctx context.Context, id string, item *menuactionresource2.MenuActionResource) error {
 	result := GetModelDB(ctx, a.db).Where("id=?", id).Updates(domainToModel(item))
 	return errors.WithStack(result.Error)
 }

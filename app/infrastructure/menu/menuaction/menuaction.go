@@ -1,7 +1,7 @@
 package menuaction
 
 import (
-	"github.com/linzhengen/ddd-gin-admin/app/domain/menuaction"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuaction"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
 

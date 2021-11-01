@@ -3,9 +3,9 @@ package userrole
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/userrole"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 
 	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"

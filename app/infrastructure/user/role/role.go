@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/role"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 

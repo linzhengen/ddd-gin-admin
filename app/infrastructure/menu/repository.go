@@ -10,12 +10,11 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
 
 	"github.com/jinzhu/gorm"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 )
 
 func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return gormx.GetDBWithModel(ctx, defDB, new(entity.Menu))
+	return gormx.GetDBWithModel(ctx, defDB, new(Model))
 }
 
 func NewMenu(db *gorm.DB) menu.Repository {
@@ -93,7 +92,7 @@ func (a *repository) UpdateParentPath(ctx context.Context, id, parentPath string
 }
 
 func (a *repository) Delete(ctx context.Context, id string) error {
-	result := GetModelDB(ctx, a.db).Where("id=?", id).Delete(entity.Menu{})
+	result := GetModelDB(ctx, a.db).Where("id=?", id).Delete(Model{})
 	return errors.WithStack(result.Error)
 }
 
