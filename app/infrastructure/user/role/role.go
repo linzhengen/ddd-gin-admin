@@ -1,16 +1,11 @@
 package role
 
 import (
-	"context"
 	"time"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
-
-	"github.com/jinzhu/gorm"
 )
 
 type Model struct {
@@ -31,9 +26,9 @@ func (a Model) ToDomain() *role.Role {
 	return item
 }
 
-func toDomainList(roles []*Model) []*role.Role {
-	list := make([]*role.Role, len(roles))
-	for i, item := range roles {
+func toDomainList(ms []*Model) []*role.Role {
+	list := make([]*role.Role, len(ms))
+	for i, item := range ms {
 		list[i] = item.ToDomain()
 	}
 	return list
@@ -43,8 +38,4 @@ func domainToModel(r *role.Role) *Model {
 	item := new(Model)
 	structure.Copy(r, item)
 	return item
-}
-
-func GetModelDB(ctx context.Context, db *gorm.DB) *gorm.DB {
-	return gormx.GetDBWithModel(ctx, db, new(Model))
 }

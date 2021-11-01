@@ -1,16 +1,11 @@
 package user
 
 import (
-	"context"
 	"time"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
-
-	"github.com/jinzhu/gorm"
 )
 
 type Model struct {
@@ -33,9 +28,9 @@ func (a Model) ToDomain() *user.User {
 	return item
 }
 
-func toDomainList(users []*Model) []*user.User {
-	list := make([]*user.User, len(users))
-	for i, item := range users {
+func toDomainList(ms []*Model) []*user.User {
+	list := make([]*user.User, len(ms))
+	for i, item := range ms {
 		list[i] = item.ToDomain()
 	}
 	return list
@@ -45,8 +40,4 @@ func domainToModel(u *user.User) *Model {
 	item := new(Model)
 	structure.Copy(u, item)
 	return item
-}
-
-func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
-	return gormx.GetDBWithModel(ctx, defDB, new(Model))
 }

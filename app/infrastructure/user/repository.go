@@ -23,6 +23,10 @@ type repository struct {
 	db *gorm.DB
 }
 
+func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
+	return gormx.GetDBWithModel(ctx, defDB, new(Model))
+}
+
 func (a *repository) Query(ctx context.Context, params user.QueryParams) ([]*user.User, *pagination.Pagination, error) {
 	db := GetModelDB(ctx, a.db)
 	if v := params.UserName; v != "" {
