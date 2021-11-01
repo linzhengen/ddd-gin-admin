@@ -1,11 +1,11 @@
-package jwtauth
+package auth
 
 import (
 	"context"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 )
 
 const defaultKey = "ddd-gin-admin"
@@ -23,14 +23,6 @@ var defaultOptions = options{
 	},
 }
 
-type options struct {
-	signingMethod jwt.SigningMethod
-	signingKey    interface{}
-	keyFunc       jwt.Keyfunc
-	expired       int
-	tokenType     string
-}
-
 type Option func(*options)
 
 func SetSigningMethod(method jwt.SigningMethod) Option {
@@ -45,8 +37,7 @@ func SetSigningKey(key interface{}) Option {
 	}
 }
 
-// SetKeyfunc 设定验证key的回调函数
-func SetKeyfunc(keyFunc jwt.Keyfunc) Option {
+func SetKeyFunc(keyFunc jwt.Keyfunc) Option {
 	return func(o *options) {
 		o.keyFunc = keyFunc
 	}
@@ -58,24 +49,32 @@ func SetExpired(expired int) Option {
 	}
 }
 
-func New(store Store, opts ...Option) *JWTAuth {
+type options struct {
+	signingMethod jwt.SigningMethod
+	signingKey    interface{}
+	keyFunc       jwt.Keyfunc
+	expired       int
+	tokenType     string
+}
+
+func NewRepository(store Store, opts ...Option) auth.Repository {
 	o := defaultOptions
 	for _, opt := range opts {
 		opt(&o)
 	}
 
-	return &JWTAuth{
+	return &repositoryImpl{
 		opts:  &o,
 		store: store,
 	}
 }
 
-type JWTAuth struct {
+type repositoryImpl struct {
 	opts  *options
 	store Store
 }
 
-func (a *JWTAuth) GenerateToken(ctx context.Context, userID string) (auth.TokenInfo, error) {
+func (a *repositoryImpl) GenerateToken(ctx context.Context, userID string) (*auth.Auth, error) {
 	now := time.Now()
 	expiresAt := now.Add(time.Duration(a.opts.expired) * time.Second).Unix()
 
@@ -91,7 +90,7 @@ func (a *JWTAuth) GenerateToken(ctx context.Context, userID string) (auth.TokenI
 		return nil, err
 	}
 
-	tokenInfo := &tokenInfo{
+	tokenInfo := &auth.Auth{
 		ExpiresAt:   expiresAt,
 		TokenType:   a.opts.tokenType,
 		AccessToken: tokenString,
@@ -99,7 +98,7 @@ func (a *JWTAuth) GenerateToken(ctx context.Context, userID string) (auth.TokenI
 	return tokenInfo, nil
 }
 
-func (a *JWTAuth) parseToken(tokenString string) (*jwt.StandardClaims, error) {
+func (a *repositoryImpl) parseToken(tokenString string) (*jwt.StandardClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, a.opts.keyFunc)
 	if err != nil {
 		return nil, err
@@ -110,14 +109,14 @@ func (a *JWTAuth) parseToken(tokenString string) (*jwt.StandardClaims, error) {
 	return token.Claims.(*jwt.StandardClaims), nil
 }
 
-func (a *JWTAuth) callStore(fn func(Store) error) error {
+func (a *repositoryImpl) callStore(fn func(Store) error) error {
 	if store := a.store; store != nil {
 		return fn(store)
 	}
 	return nil
 }
 
-func (a *JWTAuth) DestroyToken(ctx context.Context, tokenString string) error {
+func (a *repositoryImpl) DestroyToken(ctx context.Context, tokenString string) error {
 	claims, err := a.parseToken(tokenString)
 	if err != nil {
 		return err
@@ -131,7 +130,7 @@ func (a *JWTAuth) DestroyToken(ctx context.Context, tokenString string) error {
 	})
 }
 
-func (a *JWTAuth) ParseUserID(ctx context.Context, tokenString string) (string, error) {
+func (a *repositoryImpl) ParseUserID(ctx context.Context, tokenString string) (string, error) {
 	if tokenString == "" {
 		return "", auth.ErrInvalidToken
 	}
@@ -156,7 +155,7 @@ func (a *JWTAuth) ParseUserID(ctx context.Context, tokenString string) (string, 
 	return claims.Subject, nil
 }
 
-func (a *JWTAuth) Release() error {
+func (a *repositoryImpl) Release() error {
 	return a.callStore(func(store Store) error {
 		return store.Close()
 	})

@@ -3,8 +3,8 @@ package router
 import (
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 )
 
 type Router interface {

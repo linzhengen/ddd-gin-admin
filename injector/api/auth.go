@@ -2,14 +2,14 @@ package api
 
 import (
 	"github.com/golang-jwt/jwt"
+	auth2 "github.com/linzhengen/ddd-gin-admin/app/domain/auth"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth/store/buntdb"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth/store/redis"
 	"github.com/linzhengen/ddd-gin-admin/configs"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 	"github.com/linzhengen/ddd-gin-admin/pkg/auth/jwtauth"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth/jwtauth/store/buntdb"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth/jwtauth/store/redis"
 )
 
-func InitAuth() (auth.Author, func(), error) {
+func InitAuth() (auth2.Author, func(), error) {
 	cfg := configs.C.JWTAuth
 
 	var opts []jwtauth.Option
@@ -17,7 +17,7 @@ func InitAuth() (auth.Author, func(), error) {
 	opts = append(opts, jwtauth.SetSigningKey([]byte(cfg.SigningKey)))
 	opts = append(opts, jwtauth.SetKeyfunc(func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, auth.ErrInvalidToken
+			return nil, auth2.ErrInvalidToken
 		}
 		return []byte(cfg.SigningKey), nil
 	}))
@@ -33,7 +33,7 @@ func InitAuth() (auth.Author, func(), error) {
 	}
 	opts = append(opts, jwtauth.SetSigningMethod(method))
 
-	var store jwtauth.Store
+	var store auth2.Store
 	switch cfg.Store {
 	case "redis":
 		rcfg := configs.C.Redis
