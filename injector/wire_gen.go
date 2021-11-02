@@ -9,6 +9,8 @@ package injector
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain"
+
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure"
 
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/role"
@@ -61,7 +63,7 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	menuActionRepository := persistence.NewMenuAction(db)
 	menuAction := factory.NewMenuAction()
 	login := service.NewLogin(author, userRepository, userRoleRepository, roleRepository, roleMenuRepository, menuRepository, menuActionRepository, user, userRole, role, roleMenu, menuAction)
-	applicationLogin := application.NewLogin(login)
+	applicationLogin := domain.NewLogin(login)
 	handlerLogin := handler.NewLogin(applicationLogin)
 	transRepository := persistence.NewTrans(db)
 	menu := factory.NewMenu()

@@ -8,6 +8,8 @@ package injector
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain"
+
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure"
 
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/role"
@@ -63,7 +65,7 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		service.NewUser,
 
 		// application
-		application.NewLogin,
+		domain.NewLogin,
 		application.NewMenu,
 		application.NewRole,
 		application.NewUser,

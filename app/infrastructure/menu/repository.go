@@ -27,7 +27,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func (a *repository) Query(ctx context.Context, params menu.QueryParam) ([]*menu.Menu, *pagination.Pagination, error) {
+func (a *repository) Query(ctx context.Context, params menu.QueryParam) (menu.Menus, *pagination.Pagination, error) {
 	db := GetModelDB(ctx, a.db)
 	if v := params.IDs; len(v) > 0 {
 		db = db.Where("id IN (?)", v)

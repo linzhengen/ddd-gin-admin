@@ -37,6 +37,10 @@ type OrderField struct {
 	Direction OrderDirection
 }
 
+func NewOrderFields(orderFields ...*OrderField) []*OrderField {
+	return orderFields
+}
+
 func NewOrderField(key string, d OrderDirection) *OrderField {
 	return &OrderField{
 		Key:       key,
