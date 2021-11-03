@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/schema"
 
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 )
 
 type HealthCheck interface {

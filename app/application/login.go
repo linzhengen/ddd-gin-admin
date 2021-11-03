@@ -3,24 +3,16 @@ package application
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuaction"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/schema"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuaction"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 )
 
 type Login interface {
@@ -29,6 +21,7 @@ type Login interface {
 	DestroyToken(ctx context.Context, tokenString string) error
 	GetLoginInfo(ctx context.Context, userID string) (*user.User, error)
 	UpdatePassword(ctx context.Context, userID string, oldPassword, newPassword string) error
+	QueryUserMenuTree(ctx context.Context, userID string) (menu.Menus, error)
 }
 
 func NewLogin(
@@ -41,7 +34,7 @@ func NewLogin(
 	menuActionRepo menuaction.Repository,
 	roleMenuRepo rolemenu.Repository,
 ) Login {
-	return &login{
+	return &loginApp{
 		authRepo:       authRepo,
 		userRepo:       userRepo,
 		roleRepo:       roleRepo,
@@ -53,7 +46,7 @@ func NewLogin(
 	}
 }
 
-type login struct {
+type loginApp struct {
 	authRepo       auth.Repository
 	userRepo       user.Repository
 	roleRepo       role.Repository
@@ -64,7 +57,7 @@ type login struct {
 	roleMenuRepo   rolemenu.Repository
 }
 
-func (l login) Verify(ctx context.Context, userName, password string) (*user.User, error) {
+func (l loginApp) Verify(ctx context.Context, userName, password string) (*user.User, error) {
 	if rootUser := l.authRepo.FindRootUser(ctx, userName); rootUser != nil {
 		if password == rootUser.Password {
 			return &user.User{
@@ -92,7 +85,7 @@ func (l login) Verify(ctx context.Context, userName, password string) (*user.Use
 	return item, nil
 }
 
-func (l login) GenerateToken(ctx context.Context, userID string) (*auth.Auth, error) {
+func (l loginApp) GenerateToken(ctx context.Context, userID string) (*auth.Auth, error) {
 	auth, err := l.authRepo.GenerateToken(ctx, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -100,7 +93,7 @@ func (l login) GenerateToken(ctx context.Context, userID string) (*auth.Auth, er
 	return auth, nil
 }
 
-func (l login) DestroyToken(ctx context.Context, tokenString string) error {
+func (l loginApp) DestroyToken(ctx context.Context, tokenString string) error {
 	err := l.authRepo.DestroyToken(ctx, tokenString)
 	if err != nil {
 		return errors.WithStack(err)
@@ -108,11 +101,11 @@ func (l login) DestroyToken(ctx context.Context, tokenString string) error {
 	return nil
 }
 
-func (l login) GetLoginInfo(ctx context.Context, userID string) (*user.User, error) {
+func (l loginApp) GetLoginInfo(ctx context.Context, userID string) (*user.User, error) {
 	return l.userSvc.GetActiveUserWithRole(ctx, userID)
 }
 
-func (l login) UpdatePassword(ctx context.Context, userID string, oldPassword, newPassword string) error {
+func (l loginApp) UpdatePassword(ctx context.Context, userID string, oldPassword, newPassword string) error {
 	if rootUser := l.authRepo.FindRootUser(ctx, userID); rootUser != nil {
 		return errors.New400Response("The root user is not allowed to update the password")
 	}
@@ -127,8 +120,11 @@ func (l login) UpdatePassword(ctx context.Context, userID string, oldPassword, n
 	return l.userRepo.UpdatePassword(ctx, userID, hash.SHA1String(newPassword))
 }
 
-func (l login) QueryUserMenuTree(ctx context.Context, userID string) (menu.Menus, error) {
-	isRoot := schema.CheckIsRootUser(ctx, userID)
+func (l loginApp) QueryUserMenuTree(ctx context.Context, userID string) (menu.Menus, error) {
+	isRoot := false
+	if rootUser := l.authRepo.FindRootUser(ctx, userID); rootUser != nil {
+		isRoot = true
+	}
 	// show all menu when root user
 	if isRoot {
 		menuResult, _, err := l.menuRepo.Query(ctx, menu.QueryParam{

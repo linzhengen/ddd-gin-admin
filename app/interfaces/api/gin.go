@@ -7,7 +7,7 @@ import (
 
 	errors2 "github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/schema"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

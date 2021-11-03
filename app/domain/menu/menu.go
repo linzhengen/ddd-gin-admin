@@ -37,7 +37,7 @@ type QueryParam struct {
 	Name             string
 	PrefixParentPath string
 	QueryValue       string
-	ParentID         *string
+	ParentID         string
 	ShowStatus       int
 	Status           int
 }

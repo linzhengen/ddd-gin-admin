@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Query(ctx context.Context, params QueryParam) ([]*MenuActionResource, *pagination.Pagination, error)
+	Query(ctx context.Context, params QueryParam) (MenuActionResources, *pagination.Pagination, error)
 	Get(ctx context.Context, id string) (*MenuActionResource, error)
 	Create(ctx context.Context, item *MenuActionResource) error
 	Update(ctx context.Context, id string, item *MenuActionResource) error

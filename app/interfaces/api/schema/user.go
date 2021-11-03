@@ -1,29 +1,11 @@
 package schema
 
 import (
-	"context"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/configs"
-
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
-
-func GetRootUser() *User {
-	user := configs.C.Root
-	return &User{
-		ID:       user.UserName,
-		UserName: user.UserName,
-		RealName: user.RealName,
-		Password: hash.MD5String(user.Password),
-	}
-}
-
-func CheckIsRootUser(ctx context.Context, userID string) bool {
-	return GetRootUser().ID == userID
-}
 
 type User struct {
 	ID        string    `json:"id"`                                    // ID

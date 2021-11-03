@@ -3,12 +3,13 @@ package handler
 import (
 	"github.com/LyricTian/captcha"
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/app/domain"
+	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/schema"
 	"github.com/linzhengen/ddd-gin-admin/configs"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
 
 type Login interface {
@@ -22,28 +23,25 @@ type Login interface {
 	UpdatePassword(c *gin.Context)
 }
 
-func NewLogin(loginApp domain.Login) Login {
+func NewLogin(loginApp application.Login) Login {
 	return &login{
 		loginApp: loginApp,
 	}
 }
 
 type login struct {
-	loginApp domain.Login
+	loginApp application.Login
 }
 
 func (a *login) GetCaptcha(c *gin.Context) {
-	ctx := c.Request.Context()
-	item, err := a.loginApp.GetCaptcha(ctx, configs.C.Captcha.Length)
-	if err != nil {
-		api.ResError(c, err)
-		return
+	captchaID := captcha.NewLen(configs.C.Captcha.Length)
+	item := &schema.LoginCaptcha{
+		CaptchaID: captchaID,
 	}
 	api.ResSuccess(c, item)
 }
 
 func (a *login) ResCaptcha(c *gin.Context) {
-	ctx := c.Request.Context()
 	captchaID := c.Query("id")
 	if captchaID == "" {
 		api.ResError(c, errors.New400Response("Captcha is required"))
@@ -58,10 +56,19 @@ func (a *login) ResCaptcha(c *gin.Context) {
 	}
 
 	cfg := configs.C.Captcha
-	err := a.loginApp.ResCaptcha(ctx, c.Writer, captchaID, cfg.Width, cfg.Height)
+	err := captcha.WriteImage(c.Writer, captchaID, cfg.Width, cfg.Height)
 	if err != nil {
+		if err == captcha.ErrNotFound {
+			err = errors.ErrNotFound
+		}
 		api.ResError(c, err)
+		return
 	}
+	c.Writer.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	c.Writer.Header().Set("Pragma", "no-cache")
+	c.Writer.Header().Set("Expires", "0")
+	c.Writer.Header().Set("Content-Type", "image/png")
+
 }
 
 func (a *login) Login(c *gin.Context) {
@@ -91,11 +98,12 @@ func (a *login) Login(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-
+	schemaTokenInfo := new(schema.LoginTokenInfo)
+	structure.Copy(tokenInfo, schemaTokenInfo)
 	ctx = logger.NewUserIDContext(ctx, userID)
 	ctx = logger.NewTagContext(ctx, "__login__")
 	logger.WithContext(ctx).Infof("logged in")
-	api.ResSuccess(c, tokenInfo)
+	api.ResSuccess(c, schemaTokenInfo)
 }
 
 func (a *login) Logout(c *gin.Context) {
@@ -120,7 +128,9 @@ func (a *login) RefreshToken(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	api.ResSuccess(c, tokenInfo)
+	schemaTokenInfo := new(schema.LoginTokenInfo)
+	structure.Copy(tokenInfo, schemaTokenInfo)
+	api.ResSuccess(c, schemaTokenInfo)
 }
 
 func (a *login) GetUserInfo(c *gin.Context) {
@@ -130,7 +140,17 @@ func (a *login) GetUserInfo(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	api.ResSuccess(c, info)
+	schemaInfo := &schema.UserLoginInfo{
+		UserID:   info.ID,
+		UserName: info.UserName,
+		RealName: info.RealName,
+	}
+	roles := make([]*schema.Role, len(info.Roles))
+	for i, item := range info.Roles {
+		structure.Copy(item, roles[i])
+	}
+	schemaInfo.Roles = roles
+	api.ResSuccess(c, schemaInfo)
 }
 
 func (a *login) QueryUserMenuTree(c *gin.Context) {
@@ -140,7 +160,11 @@ func (a *login) QueryUserMenuTree(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	api.ResList(c, menus)
+	schemaMenus := make([]*schema.MenuTrees, len(menus))
+	for i, item := range menus {
+		structure.Copy(item, schemaMenus[i])
+	}
+	api.ResList(c, schemaMenus)
 }
 
 func (a *login) UpdatePassword(c *gin.Context) {
@@ -151,7 +175,7 @@ func (a *login) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	err := a.loginApp.UpdatePassword(ctx, api.GetUserID(c), item)
+	err := a.loginApp.UpdatePassword(ctx, api.GetUserID(c), item.OldPassword, item.NewPassword)
 	if err != nil {
 		api.ResError(c, err)
 		return

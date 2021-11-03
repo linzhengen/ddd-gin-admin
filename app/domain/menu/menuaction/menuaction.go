@@ -1,12 +1,16 @@
 package menuaction
 
-import "github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+import (
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuactionresource"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+)
 
 type MenuAction struct {
-	ID     string
-	MenuID string
-	Code   string
-	Name   string
+	ID        string
+	MenuID    string
+	Code      string
+	Name      string
+	Resources menuactionresource.MenuActionResources
 }
 
 type MenuActions []*MenuAction
@@ -24,4 +28,10 @@ func (a MenuActions) ToMenuIDMap() map[string]MenuActions {
 		m[item.MenuID] = append(m[item.MenuID], item)
 	}
 	return m
+}
+
+func (a MenuActions) FillResources(mResources map[string]menuactionresource.MenuActionResources) {
+	for i, item := range a {
+		a[i].Resources = mResources[item.ID]
+	}
 }
