@@ -1,5 +1,7 @@
 package schema
 
+import "github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+
 type StatusText string
 
 func (t StatusText) String() string {
@@ -34,6 +36,14 @@ type PaginationResult struct {
 	Total    int  `json:"total"`    // Total count
 	Current  uint `json:"current"`  // Current Page
 	PageSize uint `json:"pageSize"` // Page Size
+}
+
+func (pr PaginationResult) FromDomain(p *pagination.Pagination) *PaginationResult {
+	return &PaginationResult{
+		Total:    p.Total,
+		Current:  p.Current,
+		PageSize: p.PageSize,
+	}
 }
 
 type PaginationParam struct {

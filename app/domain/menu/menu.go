@@ -37,34 +37,34 @@ type QueryParam struct {
 	Name             string
 	PrefixParentPath string
 	QueryValue       string
-	ParentID         string
+	ParentID         *string
 	ShowStatus       int
 	Status           int
 }
 
-func (a Menus) ToTree() Menus {
-	mi := make(map[string]*Menu)
-	for _, item := range a {
-		mi[item.ID] = item
-	}
-
-	var list Menus
-	for _, item := range a {
-		if item.ParentID == "" {
-			list = append(list, item)
-			continue
-		}
-		if pitem, ok := mi[item.ParentID]; ok {
-			if pitem.Children == nil {
-				children := Menus{item}
-				pitem.Children = &children
-				continue
-			}
-			*pitem.Children = append(*pitem.Children, item)
-		}
-	}
-	return list
-}
+//func (a Menus) ToTree() Menus {
+//	mi := make(map[string]*Menu)
+//	for _, item := range a {
+//		mi[item.ID] = item
+//	}
+//
+//	var list Menus
+//	for _, item := range a {
+//		if item.ParentID == "" {
+//			list = append(list, item)
+//			continue
+//		}
+//		if pitem, ok := mi[item.ParentID]; ok {
+//			if pitem.Children == nil {
+//				children := Menus{item}
+//				pitem.Children = &children
+//				continue
+//			}
+//			*pitem.Children = append(*pitem.Children, item)
+//		}
+//	}
+//	return list
+//}
 
 func (a Menus) FillMenuAction(mActions map[string]menuaction.MenuActions) Menus {
 	for _, item := range a {

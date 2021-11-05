@@ -3,8 +3,10 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/application"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/schema"
 )
 
 type Menu interface {
@@ -19,16 +21,16 @@ type Menu interface {
 }
 
 func NewMenu(menuApp application.Menu) Menu {
-	return &menu{
+	return &menuHandler{
 		menuApp: menuApp,
 	}
 }
 
-type menu struct {
+type menuHandler struct {
 	menuApp application.Menu
 }
 
-func (a *menu) Query(c *gin.Context) {
+func (a *menuHandler) Query(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
 	if err := api.ParseQuery(c, &params); err != nil {
@@ -36,33 +38,61 @@ func (a *menu) Query(c *gin.Context) {
 		return
 	}
 
-	params.Pagination = true
-	params.OrderFields = schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC))
-	result, err := a.menuApp.Query(ctx, params)
+	domainParams := menu.QueryParam{
+		IDs:              params.IDs,
+		Name:             params.Name,
+		PrefixParentPath: params.PrefixParentPath,
+		QueryValue:       params.QueryValue,
+		ParentID:         params.ParentID,
+		ShowStatus:       params.ShowStatus,
+		Status:           params.Status,
+		PaginationParam: pagination.Param{
+			Pagination: true,
+		},
+		OrderFields: pagination.NewOrderFields(pagination.NewOrderField("sequence", pagination.OrderByDESC)),
+	}
+	result, p, err := a.menuApp.Query(ctx, domainParams)
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResPage(c, result.Data, result.PageResult)
+	api.ResPage(
+		c,
+		result,
+		schema.PaginationResult{}.FromDomain(p),
+	)
 }
 
-func (a *menu) QueryTree(c *gin.Context) {
+func (a *menuHandler) QueryTree(c *gin.Context) {
 	ctx := c.Request.Context()
 	var params schema.MenuQueryParam
 	if err := api.ParseQuery(c, &params); err != nil {
 		api.ResError(c, err)
 		return
 	}
-	params.OrderFields = schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC))
-	result, err := a.menuApp.Query(ctx, params)
+	domainParams := menu.QueryParam{
+		IDs:              params.IDs,
+		Name:             params.Name,
+		PrefixParentPath: params.PrefixParentPath,
+		QueryValue:       params.QueryValue,
+		ParentID:         params.ParentID,
+		ShowStatus:       params.ShowStatus,
+		Status:           params.Status,
+		PaginationParam: pagination.Param{
+			Pagination: true,
+		},
+		OrderFields: pagination.NewOrderFields(pagination.NewOrderField("sequence", pagination.OrderByDESC)),
+	}
+
+	result, _, err := a.menuApp.Query(ctx, domainParams)
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResList(c, result.Data.ToTree())
+	api.ResList(c, result.ToTree())
 }
 
-func (a *menu) Get(c *gin.Context) {
+func (a *menuHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.menuApp.Get(ctx, c.Param("id"))
 	if err != nil {
@@ -72,7 +102,7 @@ func (a *menu) Get(c *gin.Context) {
 	api.ResSuccess(c, item)
 }
 
-func (a *menu) Create(c *gin.Context) {
+func (a *menuHandler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
 	if err := api.ParseJSON(c, &item); err != nil {
@@ -89,7 +119,7 @@ func (a *menu) Create(c *gin.Context) {
 	api.ResSuccess(c, result)
 }
 
-func (a *menu) Update(c *gin.Context) {
+func (a *menuHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.Menu
 	if err := api.ParseJSON(c, &item); err != nil {
@@ -105,7 +135,7 @@ func (a *menu) Update(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *menu) Delete(c *gin.Context) {
+func (a *menuHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.menuApp.Delete(ctx, c.Param("id"))
 	if err != nil {
@@ -115,7 +145,7 @@ func (a *menu) Delete(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *menu) Enable(c *gin.Context) {
+func (a *menuHandler) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.menuApp.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
@@ -125,7 +155,7 @@ func (a *menu) Enable(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *menu) Disable(c *gin.Context) {
+func (a *menuHandler) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.menuApp.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {

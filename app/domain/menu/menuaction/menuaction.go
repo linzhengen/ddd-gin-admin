@@ -35,3 +35,11 @@ func (a MenuActions) FillResources(mResources map[string]menuactionresource.Menu
 		a[i].Resources = mResources[item.ID]
 	}
 }
+
+func (a MenuActions) ToMap() map[string]*MenuAction {
+	m := make(map[string]*MenuAction)
+	for _, item := range a {
+		m[item.Code] = item
+	}
+	return m
+}
