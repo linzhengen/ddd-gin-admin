@@ -19,8 +19,10 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
-	Roles     []*role.Role
+	Roles     role.Roles
 }
+
+type Users []*User
 
 type QueryParams struct {
 	PaginationParam pagination.Param
@@ -29,4 +31,12 @@ type QueryParams struct {
 	QueryValue      string
 	Status          int
 	RoleIDs         []string
+}
+
+func (a Users) ToIDs() []string {
+	idList := make([]string, len(a))
+	for i, item := range a {
+		idList[i] = item.ID
+	}
+	return idList
 }

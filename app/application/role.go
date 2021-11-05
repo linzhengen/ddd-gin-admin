@@ -3,20 +3,14 @@ package application
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/rbac"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
-
 	"github.com/casbin/casbin/v2"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/rbac"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/uuid"
 )
 

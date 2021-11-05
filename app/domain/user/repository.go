@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Query(ctx context.Context, params QueryParams) ([]*User, *pagination.Pagination, error)
+	Query(ctx context.Context, params QueryParams) (Users, *pagination.Pagination, error)
 	Get(ctx context.Context, id string) (*User, error)
 	Create(ctx context.Context, item *User) error
 	Update(ctx context.Context, id string, item *User) error

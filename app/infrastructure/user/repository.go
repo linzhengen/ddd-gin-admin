@@ -27,7 +27,7 @@ func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return gormx.GetDBWithModel(ctx, defDB, new(Model))
 }
 
-func (a *repository) Query(ctx context.Context, params user.QueryParams) ([]*user.User, *pagination.Pagination, error) {
+func (a *repository) Query(ctx context.Context, params user.QueryParams) (user.Users, *pagination.Pagination, error) {
 	db := GetModelDB(ctx, a.db)
 	if v := params.UserName; v != "" {
 		db = db.Where("user_name=?", v)
