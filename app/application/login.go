@@ -139,7 +139,7 @@ func (l loginApp) QueryUserMenuTree(ctx context.Context, userID string) (menu.Me
 		if err != nil {
 			return nil, err
 		}
-		return menuResult.ToTree().FillMenuAction(menuActionResult.ToMenuIDMap()), nil
+		return menuResult.FillMenuAction(menuActionResult.ToMenuIDMap()), nil
 	}
 
 	userRoleResult, _, err := l.userRoleRepo.Query(ctx, userrole.QueryParam{
@@ -190,5 +190,6 @@ func (l loginApp) QueryUserMenuTree(ctx context.Context, userID string) (menu.Me
 	if err != nil {
 		return nil, err
 	}
-	return menuResult.ToTree().FillMenuAction(menuActionResult.ToMenuIDMap()), nil
+
+	return menuResult.FillMenuAction(menuActionResult.ToMenuIDMap()), nil
 }

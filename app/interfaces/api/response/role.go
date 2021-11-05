@@ -1,6 +1,10 @@
-package schema
+package response
 
-import "time"
+import (
+	"time"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+)
 
 type Role struct {
 	ID        string    `json:"id"`                                    // ID
@@ -14,19 +18,9 @@ type Role struct {
 	RoleMenus RoleMenus `json:"role_menus" binding:"required,gt=0"`    // RoleMenus
 }
 
-type RoleQueryParam struct {
-	PaginationParam
-	OrderFields
-	IDs        []string `form:"-"`          // IDs
-	Name       string   `form:"-"`          // Name
-	QueryValue string   `form:"queryValue"` // Query Search Values
-	UserID     string   `form:"-"`          // User ID
-	Status     int      `form:"status"`     // Status(1:enable 2:disable)
-}
-
 type RoleQueryResult struct {
 	Data       Roles
-	PageResult *PaginationResult
+	PageResult *pagination.Pagination
 }
 
 type Roles []*Role
@@ -56,16 +50,9 @@ type RoleMenu struct {
 	ActionID string `json:"action_id" binding:"required"` // Action ID
 }
 
-type RoleMenuQueryParam struct {
-	PaginationParam
-	OrderFields
-	RoleID  string
-	RoleIDs []string
-}
-
 type RoleMenuQueryResult struct {
 	Data       RoleMenus
-	PageResult *PaginationResult
+	PageResult *pagination.Pagination
 }
 
 type RoleMenus []*RoleMenu

@@ -1,7 +1,9 @@
-package schema
+package response
 
 import (
 	"time"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
@@ -29,18 +31,9 @@ func (a *User) CleanSecure() *User {
 	return a
 }
 
-type UserQueryParam struct {
-	PaginationParam
-	OrderFields
-	UserName   string   `form:"userName"`   // User Name
-	QueryValue string   `form:"queryValue"` // Query search values
-	Status     int      `form:"status"`     // Status(1:enable 2:disable)
-	RoleIDs    []string `form:"-"`          // Role IDs
-}
-
 type UserQueryResult struct {
 	Data       Users
-	PageResult *PaginationResult
+	PageResult *pagination.Pagination
 }
 
 func (a UserQueryResult) ToShowResult(mUserRoles map[string]UserRoles, mRoles map[string]*Role) *UserShowQueryResult {
@@ -84,16 +77,9 @@ type UserRole struct {
 	RoleID string `json:"role_id"` // Role ID
 }
 
-type UserRoleQueryParam struct {
-	PaginationParam
-	OrderFields
-	UserID  string
-	UserIDs []string
-}
-
 type UserRoleQueryResult struct {
 	Data       UserRoles
-	PageResult *PaginationResult
+	PageResult *pagination.Pagination
 }
 
 type UserRoles []*UserRole
@@ -139,5 +125,5 @@ type UserShows []*UserShow
 
 type UserShowQueryResult struct {
 	Data       UserShows
-	PageResult *PaginationResult
+	PageResult *pagination.Pagination
 }

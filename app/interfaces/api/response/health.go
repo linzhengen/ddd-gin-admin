@@ -1,4 +1,4 @@
-package schema
+package response
 
 import "time"
 

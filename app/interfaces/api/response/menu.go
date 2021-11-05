@@ -1,8 +1,14 @@
-package schema
+package response
 
 import (
 	"strings"
 	"time"
+
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
 )
@@ -28,24 +34,32 @@ func (a *Menu) String() string {
 	return json.MarshalToString(a)
 }
 
-type MenuQueryParam struct {
-	PaginationParam
-	OrderFields
-	IDs              []string `form:"-"`
-	Name             string   `form:"-"`
-	PrefixParentPath string   `form:"-"`
-	QueryValue       string   `form:"queryValue"`
-	ParentID         *string  `form:"parentID"`
-	ShowStatus       int      `form:"showStatus"` // 1:show 2:hide
-	Status           int      `form:"status"`     // 1:enable 2:disable
+func (a *Menu) ToDomain() *menu.Menu {
+	item := new(menu.Menu)
+	structure.Copy(a, item)
+	return item
+}
+
+func MenuFromDomain(menu *menu.Menu) *Menu {
+	item := new(Menu)
+	structure.Copy(menu, item)
+	return item
 }
 
 type MenuQueryResult struct {
 	Data       Menus
-	PageResult *PaginationResult
+	PageResult *pagination.Pagination
 }
 
 type Menus []*Menu
+
+func MenusFromDomain(menus menu.Menus) Menus {
+	list := make([]*Menu, len(menus))
+	for i, item := range menus {
+		structure.Copy(item, list[i])
+	}
+	return list
+}
 
 func (a Menus) Len() int {
 	return len(a)
@@ -168,16 +182,9 @@ type MenuAction struct {
 	Resources MenuActionResources `yaml:"resources,omitempty" json:"resources"`
 }
 
-type MenuActionQueryParam struct {
-	PaginationParam
-	OrderFields
-	MenuID string
-	IDs    []string
-}
-
 type MenuActionQueryResult struct {
 	Data       MenuActions
-	PageResult *PaginationResult
+	PageResult *pagination.Pagination
 }
 
 type MenuActions []*MenuAction
@@ -213,16 +220,9 @@ type MenuActionResource struct {
 	Path     string `yaml:"path" binding:"required" json:"path"`
 }
 
-type MenuActionResourceQueryParam struct {
-	PaginationParam
-	OrderFields
-	MenuID  string   // menu id
-	MenuIDs []string // menu ids
-}
-
 type MenuActionResourceQueryResult struct {
 	Data       MenuActionResources
-	PageResult *PaginationResult
+	PageResult *pagination.Pagination
 }
 
 type MenuActionResources []*MenuActionResource

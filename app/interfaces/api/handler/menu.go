@@ -6,7 +6,8 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/request"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
 )
 
 type Menu interface {
@@ -32,7 +33,7 @@ type menuHandler struct {
 
 func (a *menuHandler) Query(c *gin.Context) {
 	ctx := c.Request.Context()
-	var params schema.MenuQueryParam
+	var params request.MenuQueryParam
 	if err := api.ParseQuery(c, &params); err != nil {
 		api.ResError(c, err)
 		return
@@ -58,14 +59,14 @@ func (a *menuHandler) Query(c *gin.Context) {
 	}
 	api.ResPage(
 		c,
-		result,
-		schema.PaginationResult{}.FromDomain(p),
+		response.MenusFromDomain(result),
+		p,
 	)
 }
 
 func (a *menuHandler) QueryTree(c *gin.Context) {
 	ctx := c.Request.Context()
-	var params schema.MenuQueryParam
+	var params request.MenuQueryParam
 	if err := api.ParseQuery(c, &params); err != nil {
 		api.ResError(c, err)
 		return
@@ -89,7 +90,7 @@ func (a *menuHandler) QueryTree(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	api.ResList(c, result.ToTree())
+	api.ResList(c, response.MenusFromDomain(result).ToTree())
 }
 
 func (a *menuHandler) Get(c *gin.Context) {
@@ -99,35 +100,35 @@ func (a *menuHandler) Get(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	api.ResSuccess(c, item)
+	api.ResSuccess(c, response.MenuFromDomain(item))
 }
 
 func (a *menuHandler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.Menu
+	var item response.Menu
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
 	}
 
 	item.Creator = api.GetUserID(c)
-	result, err := a.menuApp.Create(ctx, item)
+	result, err := a.menuApp.Create(ctx, item.ToDomain())
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResSuccess(c, result)
+	api.ResSuccess(c, response.NewIDResult(result))
 }
 
 func (a *menuHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.Menu
+	var item response.Menu
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
 	}
 
-	err := a.menuApp.Update(ctx, c.Param("id"), item)
+	err := a.menuApp.Update(ctx, c.Param("id"), item.ToDomain())
 	if err != nil {
 		api.ResError(c, err)
 		return

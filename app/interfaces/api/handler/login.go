@@ -6,7 +6,8 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/request"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
 	"github.com/linzhengen/ddd-gin-admin/configs"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
@@ -35,7 +36,7 @@ type login struct {
 
 func (a *login) GetCaptcha(c *gin.Context) {
 	captchaID := captcha.NewLen(configs.C.Captcha.Length)
-	item := &schema.LoginCaptcha{
+	item := &response.LoginCaptcha{
 		CaptchaID: captchaID,
 	}
 	api.ResSuccess(c, item)
@@ -73,7 +74,7 @@ func (a *login) ResCaptcha(c *gin.Context) {
 
 func (a *login) Login(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.LoginParam
+	var item request.LoginParam
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
@@ -98,12 +99,12 @@ func (a *login) Login(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	schemaTokenInfo := new(schema.LoginTokenInfo)
-	structure.Copy(tokenInfo, schemaTokenInfo)
+	respTokenInfo := new(response.LoginTokenInfo)
+	structure.Copy(tokenInfo, respTokenInfo)
 	ctx = logger.NewUserIDContext(ctx, userID)
 	ctx = logger.NewTagContext(ctx, "__login__")
 	logger.WithContext(ctx).Infof("logged in")
-	api.ResSuccess(c, schemaTokenInfo)
+	api.ResSuccess(c, respTokenInfo)
 }
 
 func (a *login) Logout(c *gin.Context) {
@@ -128,7 +129,7 @@ func (a *login) RefreshToken(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	schemaTokenInfo := new(schema.LoginTokenInfo)
+	schemaTokenInfo := new(response.LoginTokenInfo)
 	structure.Copy(tokenInfo, schemaTokenInfo)
 	api.ResSuccess(c, schemaTokenInfo)
 }
@@ -140,12 +141,12 @@ func (a *login) GetUserInfo(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	schemaInfo := &schema.UserLoginInfo{
+	schemaInfo := &response.UserLoginInfo{
 		UserID:   info.ID,
 		UserName: info.UserName,
 		RealName: info.RealName,
 	}
-	roles := make([]*schema.Role, len(info.Roles))
+	roles := make([]*response.Role, len(info.Roles))
 	for i, item := range info.Roles {
 		structure.Copy(item, roles[i])
 	}
@@ -160,7 +161,7 @@ func (a *login) QueryUserMenuTree(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	schemaMenus := make([]*schema.MenuTrees, len(menus))
+	schemaMenus := make([]*response.MenuTrees, len(menus))
 	for i, item := range menus {
 		structure.Copy(item, schemaMenus[i])
 	}
@@ -169,7 +170,7 @@ func (a *login) QueryUserMenuTree(c *gin.Context) {
 
 func (a *login) UpdatePassword(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.UpdatePasswordParam
+	var item request.UpdatePasswordParam
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return

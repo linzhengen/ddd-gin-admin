@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	errors2 "github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
+
+	errors2 "github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -72,15 +74,15 @@ func ParseForm(c *gin.Context, obj interface{}) error {
 }
 
 func ResOK(c *gin.Context) {
-	ResSuccess(c, schema.StatusResult{Status: schema.OKStatus})
+	ResSuccess(c, response.StatusResult{Status: response.OKStatus})
 }
 
 func ResList(c *gin.Context, v interface{}) {
-	ResSuccess(c, schema.ListResult{List: v})
+	ResSuccess(c, response.ListResult{List: v})
 }
 
-func ResPage(c *gin.Context, v interface{}, pr *schema.PaginationResult) {
-	list := schema.ListResult{
+func ResPage(c *gin.Context, v interface{}, pr *pagination.Pagination) {
+	list := response.ListResult{
 		List:       v,
 		Pagination: pr,
 	}
@@ -132,9 +134,9 @@ func ResError(c *gin.Context, err error, status ...int) {
 		}
 	}
 
-	eitem := schema.ErrorItem{
+	eitem := response.ErrorItem{
 		Code:    res.Code,
 		Message: res.Message,
 	}
-	ResJSON(c, res.StatusCode, schema.ErrorResult{Error: eitem})
+	ResJSON(c, res.StatusCode, response.ErrorResult{Error: eitem})
 }

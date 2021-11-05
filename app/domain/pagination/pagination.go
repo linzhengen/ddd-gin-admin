@@ -1,16 +1,16 @@
 package pagination
 
 type Pagination struct {
-	Total    int
-	Current  uint
-	PageSize uint
+	Total    int  `json:"total"`    // Total count
+	Current  uint `json:"current"`  // Current Page
+	PageSize uint `json:"pageSize"` // Page Size
 }
 
 type Param struct {
-	Pagination bool
-	OnlyCount  bool
-	Current    uint
-	PageSize   uint
+	Pagination bool `form:"-"`                                     // Pagination
+	OnlyCount  bool `form:"-"`                                     // Only count
+	Current    uint `form:"current,default=1"`                     // Current page
+	PageSize   uint `form:"pageSize,default=10" binding:"max=100"` // Page size
 }
 
 func (a Param) GetCurrent() uint {
