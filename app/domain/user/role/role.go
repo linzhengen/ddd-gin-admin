@@ -3,6 +3,8 @@ package role
 import (
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
 
@@ -16,7 +18,10 @@ type Role struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
+	RoleMenus rolemenu.RoleMenus
 }
+
+type Roles []*Role
 
 type QueryParam struct {
 	PaginationParam pagination.Param

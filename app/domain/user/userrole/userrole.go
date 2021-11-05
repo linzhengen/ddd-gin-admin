@@ -24,3 +24,11 @@ func (a UserRoles) ToRoleIDs() []string {
 	}
 	return ids
 }
+
+func (a UserRoles) ToUserIDMap() map[string]UserRoles {
+	m := make(map[string]UserRoles)
+	for _, item := range a {
+		m[item.UserID] = append(m[item.UserID], item)
+	}
+	return m
+}

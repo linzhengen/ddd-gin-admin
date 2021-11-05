@@ -6,11 +6,7 @@
 package injector
 
 import (
-	"context"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure"
 
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/role"
 
@@ -23,9 +19,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/console/command"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
-	"github.com/linzhengen/ddd-gin-admin/injector/console"
 
 	// "github.com/linzhengen/ddd-gin-admin/infrastructure/api/mock"
 	"github.com/google/wire"
@@ -85,38 +79,6 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 
 		// injector
 		NewApiInjector,
-	)
-	return nil, nil, nil
-}
-
-func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error) {
-	wire.Build(
-		// init
-		console.InitGormDB,
-
-		// factory
-		factory.NewMenu,
-		factory.NewMenuAction,
-		factory.NewMenuActionResource,
-
-		// persistence
-		infrastructure.NewDbMigration,
-		persistence.NewTrans,
-		persistence.NewMenu,
-		persistence.NewMenuAction,
-		persistence.NewMenuActionResource,
-
-		// service
-		service.NewMenu,
-
-		// application
-		application.NewDbMigrationConsole,
-		application.NewDbSeedConsole,
-
-		// command
-		command.NewMigrateCommand,
-		command.NewSeedCommand,
-		command.NewCliCommands,
 	)
 	return nil, nil, nil
 }

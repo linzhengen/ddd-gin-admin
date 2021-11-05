@@ -32,3 +32,11 @@ func (a MenuActionResources) ToMap() map[string]*MenuActionResource {
 	}
 	return m
 }
+
+func (a MenuActionResources) ToActionIDMap() map[string]MenuActionResources {
+	m := make(map[string]MenuActionResources)
+	for _, item := range a {
+		m[item.ActionID] = append(m[item.ActionID], item)
+	}
+	return m
+}

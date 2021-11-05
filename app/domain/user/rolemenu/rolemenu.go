@@ -18,6 +18,14 @@ type QueryParam struct {
 	RoleIDs         []string
 }
 
+func (a RoleMenus) ToMap() map[string]*RoleMenu {
+	m := make(map[string]*RoleMenu)
+	for _, item := range a {
+		m[item.MenuID+"-"+item.ActionID] = item
+	}
+	return m
+}
+
 func (a RoleMenus) ToMenuIDs() []string {
 	var idList []string
 	m := make(map[string]struct{})
@@ -46,4 +54,12 @@ func (a RoleMenus) ToActionIDs() []string {
 	}
 
 	return idList
+}
+
+func (a RoleMenus) ToRoleIDMap() map[string]RoleMenus {
+	m := make(map[string]RoleMenus)
+	for _, item := range a {
+		m[item.RoleID] = append(m[item.RoleID], item)
+	}
+	return m
 }
