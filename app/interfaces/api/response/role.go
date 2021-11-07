@@ -7,15 +7,15 @@ import (
 )
 
 type Role struct {
-	ID        string    `json:"id"`                                    // ID
-	Name      string    `json:"name" binding:"required"`               // Name
-	Sequence  int       `json:"sequence"`                              // Sequence
-	Memo      string    `json:"memo"`                                  // Memo
-	Status    int       `json:"status" binding:"required,max=2,min=1"` // Status(1:enable 2:disable)
-	Creator   string    `json:"creator"`                               // Creator
-	CreatedAt time.Time `json:"created_at"`                            // CreatedAt
-	UpdatedAt time.Time `json:"updated_at"`                            // UpdatedAt
-	RoleMenus RoleMenus `json:"role_menus" binding:"required,gt=0"`    // RoleMenus
+	ID        string    `json:"id"`         // ID
+	Name      string    `json:"name"`       // Name
+	Sequence  int       `json:"sequence"`   // Sequence
+	Memo      string    `json:"memo"`       // Memo
+	Status    int       `json:"status"`     // Status(1:enable 2:disable)
+	Creator   string    `json:"creator"`    // Creator
+	CreatedAt time.Time `json:"created_at"` // CreatedAt
+	UpdatedAt time.Time `json:"updated_at"` // UpdatedAt
+	RoleMenus RoleMenus `json:"role_menus"` // RoleMenus
 }
 
 type RoleQueryResult struct {

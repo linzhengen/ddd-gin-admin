@@ -17,7 +17,7 @@ func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 	return gormx.GetDBWithModel(ctx, defDB, new(Model))
 }
 
-func NewMenu(db *gorm.DB) menu.Repository {
+func NewRepository(db *gorm.DB) menu.Repository {
 	return &repository{
 		db: db,
 	}

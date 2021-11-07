@@ -1,8 +1,20 @@
 package request
 
 import (
+	"time"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
+
+type Role struct {
+	Name      string    `json:"name" binding:"required"`               // Name
+	Sequence  int       `json:"sequence"`                              // Sequence
+	Memo      string    `json:"memo"`                                  // Memo
+	Status    int       `json:"status" binding:"required,max=2,min=1"` // Status(1:enable 2:disable)
+	Creator   string    `json:"creator"`                               // Creator
+	CreatedAt time.Time `json:"created_at"`                            // CreatedAt
+	UpdatedAt time.Time `json:"updated_at"`                            // UpdatedAt
+}
 
 type RoleQueryParam struct {
 	PaginationParam pagination.Param

@@ -1,8 +1,22 @@
 package request
 
 import (
+	"time"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
+
+type User struct {
+	ID        string    `json:"id"`         // ID
+	UserName  string    `json:"user_name"`  // User Name
+	RealName  string    `json:"real_name"`  // Real Name
+	Password  string    `json:"password"`   // Password
+	Phone     string    `json:"phone"`      // Phone
+	Email     string    `json:"email"`      // Email
+	Status    int       `json:"status"`     // Status(1:enable 2:disable)
+	Creator   string    `json:"creator"`    // Creator
+	CreatedAt time.Time `json:"created_at"` // CreatedAt
+}
 
 type UserQueryParam struct {
 	PaginationParam pagination.Param

@@ -13,7 +13,7 @@ type Router interface {
 }
 
 func NewRouter(
-	auth auth.Author,
+	auth auth.Repository,
 	casbinEnforcer *casbin.SyncedEnforcer,
 	loginHandler handler.Login,
 	menuHandler handler.Menu,
@@ -33,7 +33,7 @@ func NewRouter(
 }
 
 type router struct {
-	auth           auth.Author
+	auth           auth.Repository
 	casbinEnforcer *casbin.SyncedEnforcer
 	loginHandler   handler.Login
 	menuHandler    handler.Menu

@@ -17,7 +17,7 @@ func wrapUserAuthContext(c *gin.Context, userID string) {
 	c.Request = c.Request.WithContext(ctx)
 }
 
-func UserAuthMiddleware(a auth.Author, skippers ...SkipperFunc) gin.HandlerFunc {
+func UserAuthMiddleware(a auth.Repository, skippers ...SkipperFunc) gin.HandlerFunc {
 	if !configs.C.JWTAuth.Enable {
 		return func(c *gin.Context) {
 			wrapUserAuthContext(c, configs.C.Root.UserName)

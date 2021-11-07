@@ -3,8 +3,11 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/app/application"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/request"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
 )
 
 type Role interface {
@@ -19,49 +22,64 @@ type Role interface {
 }
 
 func NewRole(roleApp application.Role) Role {
-	return &role{roleApp: roleApp}
+	return &roleHandler{roleApp: roleApp}
 }
 
-type role struct {
+type roleHandler struct {
 	roleApp application.Role
 }
 
-func (a *role) Query(c *gin.Context) {
+func (a *roleHandler) Query(c *gin.Context) {
 	ctx := c.Request.Context()
-	var params schema.RoleQueryParam
+	var params request.RoleQueryParam
 	if err := api.ParseQuery(c, &params); err != nil {
 		api.ResError(c, err)
 		return
 	}
 
-	params.Pagination = true
-	params.OrderFields = schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC))
-	result, err := a.roleApp.Query(ctx, params)
+	domainParams := role.QueryParam{
+		PaginationParam: pagination.Param{Pagination: true},
+		OrderFields:     pagination.NewOrderFields(pagination.NewOrderField("sequence", pagination.OrderByDESC)),
+		IDs:             params.IDs,
+		Name:            params.Name,
+		QueryValue:      params.QueryValue,
+		UserID:          params.UserID,
+		Status:          params.Status,
+	}
+	result, p, err := a.roleApp.Query(ctx, domainParams)
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResPage(c, result.Data, result.PageResult)
+	api.ResPage(c, result, p)
 }
 
-func (a *role) QuerySelect(c *gin.Context) {
+func (a *roleHandler) QuerySelect(c *gin.Context) {
 	ctx := c.Request.Context()
-	var params schema.RoleQueryParam
+	var params request.RoleQueryParam
 	if err := api.ParseQuery(c, &params); err != nil {
 		api.ResError(c, err)
 		return
 	}
 
-	params.OrderFields = schema.NewOrderFields(schema.NewOrderField("sequence", schema.OrderByDESC))
-	result, err := a.roleApp.Query(ctx, params)
+	domainParams := role.QueryParam{
+		PaginationParam: pagination.Param{Pagination: true},
+		OrderFields:     pagination.NewOrderFields(pagination.NewOrderField("sequence", pagination.OrderByDESC)),
+		IDs:             params.IDs,
+		Name:            params.Name,
+		QueryValue:      params.QueryValue,
+		UserID:          params.UserID,
+		Status:          params.Status,
+	}
+	result, _, err := a.roleApp.Query(ctx, domainParams)
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResList(c, result.Data)
+	api.ResList(c, result)
 }
 
-func (a *role) Get(c *gin.Context) {
+func (a *roleHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.roleApp.Get(ctx, c.Param("id"))
 	if err != nil {
@@ -71,9 +89,9 @@ func (a *role) Get(c *gin.Context) {
 	api.ResSuccess(c, item)
 }
 
-func (a *role) Create(c *gin.Context) {
+func (a *roleHandler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.Role
+	var item request.Role
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
@@ -88,9 +106,9 @@ func (a *role) Create(c *gin.Context) {
 	api.ResSuccess(c, result)
 }
 
-func (a *role) Update(c *gin.Context) {
+func (a *roleHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.Role
+	var item response.Role
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
@@ -104,7 +122,7 @@ func (a *role) Update(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *role) Delete(c *gin.Context) {
+func (a *roleHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.roleApp.Delete(ctx, c.Param("id"))
 	if err != nil {
@@ -114,7 +132,7 @@ func (a *role) Delete(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *role) Enable(c *gin.Context) {
+func (a *roleHandler) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.roleApp.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
@@ -124,7 +142,7 @@ func (a *role) Enable(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *role) Disable(c *gin.Context) {
+func (a *roleHandler) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.roleApp.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {

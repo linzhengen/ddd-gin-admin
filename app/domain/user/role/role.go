@@ -32,3 +32,11 @@ type QueryParam struct {
 	UserID          string
 	Status          int
 }
+
+func (a Roles) ToMap() map[string]*Role {
+	m := make(map[string]*Role)
+	for _, item := range a {
+		m[item.ID] = item
+	}
+	return m
+}

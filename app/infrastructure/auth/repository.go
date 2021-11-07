@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/golang-jwt/jwt"
+
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 )
 

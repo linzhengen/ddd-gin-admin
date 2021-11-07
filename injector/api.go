@@ -9,8 +9,6 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
-
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/casbin/casbin/v2"
@@ -24,23 +22,20 @@ import (
 
 func NewApiInjector(
 	engine *gin.Engine,
-	auth auth.Author,
+	auth auth.Repository,
 	casbinEnforcer *casbin.SyncedEnforcer,
-	menuBll service.Menu,
 ) *ApiInjector {
 	return &ApiInjector{
 		engine:         engine,
 		auth:           auth,
 		casbinEnforcer: casbinEnforcer,
-		menuBll:        menuBll,
 	}
 }
 
 type ApiInjector struct {
 	engine         *gin.Engine
-	auth           auth.Author
+	auth           auth.Repository
 	casbinEnforcer *casbin.SyncedEnforcer
-	menuBll        service.Menu
 }
 
 func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
@@ -75,13 +70,6 @@ func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
 	injector, injectorCleanFunc, err := BuildApiInjector()
 	if err != nil {
 		return nil, err
-	}
-
-	if configs.C.Menu.Enable && configs.C.Menu.Data != "" {
-		err = injector.menuBll.InitData(ctx, configs.C.Menu.Data)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	httpServerCleanFunc := api.InitHTTPServer(ctx, injector.engine)

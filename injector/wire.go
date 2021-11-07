@@ -6,22 +6,18 @@
 package injector
 
 import (
-	"github.com/linzhengen/ddd-gin-admin/app/domain"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/role"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
-
 	"github.com/linzhengen/ddd-gin-admin/app/application"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/casbin"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/trans"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/role"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/rolemenu"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/userrole"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
-	// "github.com/linzhengen/ddd-gin-admin/infrastructure/api/mock"
 	"github.com/google/wire"
 )
 
@@ -30,52 +26,27 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		// init,
 		api.InitGormDB,
 		api.InitAuth,
-		api.InitCasbin,
 		api.InitGinEngine,
 
-		// persistence
-		persistence.NewTrans,
-		user.NewUser,
-		role.NewRole,
-		persistence.NewUserRole,
-		persistence.NewMenu,
-		persistence.NewRoleMenu,
-		persistence.NewMenuAction,
-		persistence.NewMenuActionResource,
-
-		// factory
-		factory.NewMenu,
-		factory.NewMenuAction,
-		factory.NewMenuActionResource,
-		factory.NewRole,
-		factory.NewRoleMenu,
-		factory.NewUser,
-		factory.NewUserRole,
-
-		// service
-		service.NewLogin,
-		service.NewMenu,
-		service.NewRole,
-		service.NewUser,
+		// infrastructure
+		menu.NewRepository,
+		menuaction.NewRepository,
+		menuactionresource.NewRepository,
+		user.NewRepository,
+		userrole.NewRepository,
+		rolemenu.NewRepository,
+		role.NewRepository,
+		trans.NewRepository,
+		//auth.NewRepository,
 
 		// application
-		domain.NewLogin,
 		application.NewMenu,
 		application.NewRole,
 		application.NewUser,
-
-		// command
-		handler.NewMenu,
-		handler.NewRole,
-		handler.NewLogin,
-		handler.NewUser,
-		handler.NewHealthCheck,
+		application.NewLogin,
 
 		// router
 		router.NewRouter,
-
-		// lib
-		casbin.NewCasbinAdapter,
 
 		// injector
 		NewApiInjector,

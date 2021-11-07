@@ -3,6 +3,8 @@ package application
 import (
 	"context"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
@@ -23,21 +25,23 @@ type User interface {
 	Query(ctx context.Context, params user.QueryParams) (user.Users, *pagination.Pagination, error)
 	QueryShow(ctx context.Context, params user.QueryParams) (user.Users, *pagination.Pagination, error)
 	Get(ctx context.Context, id string) (*user.User, error)
-	Create(ctx context.Context, item *user.User) (string, error)
-	Update(ctx context.Context, id string, item *user.User) error
+	Create(ctx context.Context, item *user.User, roleIDs []string) (string, error)
+	Update(ctx context.Context, id string, item *user.User, roleIDs []string) error
 	Delete(ctx context.Context, id string) error
 	UpdateStatus(ctx context.Context, id string, status int) error
 }
 
 func NewUser(
+	authRepo auth.Repository,
 	rbacRepo rbac.Repository,
 	enforcer *casbin.SyncedEnforcer,
 	transRepo trans.Repository,
 	userRepo user.Repository,
-	userRoleRepo user.Repository,
+	userRoleRepo userrole.Repository,
 	roleRepo role.Repository,
 ) User {
 	return &userApp{
+		authRepo:     authRepo,
 		rbacRepo:     rbacRepo,
 		enforcer:     enforcer,
 		transRepo:    transRepo,
@@ -48,6 +52,7 @@ func NewUser(
 }
 
 type userApp struct {
+	authRepo     auth.Repository
 	rbacRepo     rbac.Repository
 	enforcer     *casbin.SyncedEnforcer
 	transRepo    trans.Repository
@@ -87,7 +92,7 @@ func (a *userApp) QueryShow(ctx context.Context, params user.QueryParams) (user.
 		return nil, nil, err
 	}
 
-	return result, pr, nil
+	return result.FillRoles(userRoleResult.ToUserIDMap(), roleResult.ToMap()), pr, nil
 }
 
 func (a *userApp) Get(ctx context.Context, id string) (*user.User, error) {
@@ -105,46 +110,51 @@ func (a *userApp) Get(ctx context.Context, id string) (*user.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	item.Roles = a.userRoleFactory.ToSchemaList(userRoleResult)
-
-	return user, nil
-}
-
-func (a *userApp) Create(ctx context.Context, item schema.User) (*schema.IDResult, error) {
-	err := a.checkUserName(ctx, item)
+	roleResult, _, err := a.roleRepo.Query(ctx, role.QueryParam{
+		IDs: userRoleResult.ToRoleIDs(),
+	})
 	if err != nil {
 		return nil, err
+	}
+	return item.FillRoles(userRoleResult.ToUserIDMap(), roleResult.ToMap()), nil
+}
+
+func (a *userApp) Create(ctx context.Context, item *user.User, roleIDs []string) (string, error) {
+	err := a.checkUserName(ctx, item)
+	if err != nil {
+		return "", err
 	}
 
 	item.Password = hash.SHA1String(item.Password)
 	item.ID = uuid.MustString()
 	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
-		for _, urItem := range item.UserRoles {
+		for _, roleID := range roleIDs {
+			urItem := new(userrole.UserRole)
 			urItem.ID = uuid.MustString()
 			urItem.UserID = item.ID
-			err := a.userRoleRepo.Create(ctx, *a.userRoleFactory.ToEntity(urItem))
+			urItem.RoleID = roleID
+			err := a.userRoleRepo.Create(ctx, urItem)
 			if err != nil {
 				return err
 			}
 		}
 
-		return a.userRepo.Create(ctx, *a.userFactory.ToEntity(&item))
+		return a.userRepo.Create(ctx, item)
 	})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	a.casbinAdapter.AddCasbinPolicyItemToChan(ctx, a.enforcer)
-	return schema.NewIDResult(item.ID), nil
+	a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	return item.ID, nil
 }
 
-func (a *userApp) checkUserName(ctx context.Context, item schema.User) error {
-	if item.UserName == schema.GetRootUser().UserName {
+func (a *userApp) checkUserName(ctx context.Context, item *user.User) error {
+	if rootUser := a.authRepo.FindRootUser(ctx, item.UserName); rootUser != nil {
 		return errors.New400Response("The user name is invalid")
 	}
-
-	_, pr, err := a.userRepo.Query(ctx, schema.UserQueryParam{
-		PaginationParam: schema.PaginationParam{OnlyCount: true},
+	_, pr, err := a.userRepo.Query(ctx, user.QueryParams{
+		PaginationParam: pagination.Param{OnlyCount: true},
 		UserName:        item.UserName,
 	})
 	if err != nil {
@@ -156,7 +166,7 @@ func (a *userApp) checkUserName(ctx context.Context, item schema.User) error {
 	return nil
 }
 
-func (a *userApp) Update(ctx context.Context, id string, item schema.User) error {
+func (a *userApp) Update(ctx context.Context, id string, item *user.User, roleIDs []string) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
@@ -180,12 +190,22 @@ func (a *userApp) Update(ctx context.Context, id string, item schema.User) error
 	item.ID = oldItem.ID
 	item.Creator = oldItem.Creator
 	item.CreatedAt = oldItem.CreatedAt
+
+	userRoleResult, _, err := a.userRoleRepo.Query(ctx, userrole.QueryParam{
+		UserID: id,
+	})
+	if err != nil {
+		return err
+	}
+
 	err = a.transRepo.Exec(ctx, func(ctx context.Context) error {
-		addUserRoles, delUserRoles := a.compareUserRoles(oldItem.UserRoles, item.UserRoles)
-		for _, rmitem := range addUserRoles {
-			rmitem.ID = uuid.MustString()
-			rmitem.UserID = id
-			err := a.userRoleRepo.Create(ctx, *a.userRoleFactory.ToEntity(rmitem))
+		addRoleIDs, delUserRoles := a.compareUserRoles(userRoleResult.ToMap(), roleIDs)
+		for _, roleID := range addRoleIDs {
+			urItem := new(userrole.UserRole)
+			urItem.ID = uuid.MustString()
+			urItem.UserID = item.ID
+			urItem.RoleID = roleID
+			err := a.userRoleRepo.Create(ctx, urItem)
 			if err != nil {
 				return err
 			}
@@ -198,29 +218,26 @@ func (a *userApp) Update(ctx context.Context, id string, item schema.User) error
 			}
 		}
 
-		return a.userRepo.Update(ctx, id, *a.userFactory.ToEntity(&item))
+		return a.userRepo.Update(ctx, id, item)
 	})
 	if err != nil {
 		return err
 	}
 
-	a.casbinAdapter.AddCasbinPolicyItemToChan(ctx, a.enforcer)
+	a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
-func (a *userApp) compareUserRoles(oldUserRoles, newUserRoles schema.UserRoles) (addList, delList schema.UserRoles) {
-	mOldUserRoles := oldUserRoles.ToMap()
-	mNewUserRoles := newUserRoles.ToMap()
-
-	for k, item := range mNewUserRoles {
-		if _, ok := mOldUserRoles[k]; ok {
-			delete(mOldUserRoles, k)
+func (a *userApp) compareUserRoles(oldUserRoles map[string]*userrole.UserRole, roleIDs []string) (addList []string, delList []*userrole.UserRole) {
+	for _, roleID := range roleIDs {
+		if _, ok := oldUserRoles[roleID]; ok {
+			delete(oldUserRoles, roleID)
 			continue
 		}
-		addList = append(addList, item)
+		addList = append(addList, roleID)
 	}
 
-	for _, item := range mOldUserRoles {
+	for _, item := range oldUserRoles {
 		delList = append(delList, item)
 	}
 	return
@@ -247,7 +264,7 @@ func (a *userApp) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	a.casbinAdapter.AddCasbinPolicyItemToChan(ctx, a.enforcer)
+	a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -266,6 +283,6 @@ func (a *userApp) UpdateStatus(ctx context.Context, id string, status int) error
 		return err
 	}
 
-	a.casbinAdapter.AddCasbinPolicyItemToChan(ctx, a.enforcer)
+	a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
