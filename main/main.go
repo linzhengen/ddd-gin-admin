@@ -22,7 +22,11 @@ import (
 )
 
 // VERSION You can specify the version number by compiling：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "0.4.0"
+var VERSION = "0.5.0"
+
+//go:generate go env -w GO111MODULE=on
+//go:generate go mod tidy
+//go:generate go mod download
 
 // @title ddd-gin-admin
 // @version 0.2.0
