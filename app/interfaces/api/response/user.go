@@ -3,6 +3,8 @@ package response
 import (
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
@@ -20,6 +22,12 @@ type User struct {
 	Creator   string    `json:"creator"`                               // Creator
 	CreatedAt time.Time `json:"created_at"`                            // CreatedAt
 	UserRoles UserRoles `json:"user_roles" binding:"required,gt=0"`    // UserRoles
+}
+
+func UserFromDomain(user *user.User) *User {
+	item := new(User)
+	structure.Copy(user, item)
+	return item
 }
 
 func (a *User) String() string {
@@ -44,6 +52,14 @@ func (a UserQueryResult) ToShowResult(mUserRoles map[string]UserRoles, mRoles ma
 }
 
 type Users []*User
+
+func UsersFromDomain(users user.Users) Users {
+	list := make([]*User, len(users))
+	for i, item := range users {
+		structure.Copy(item, list[i])
+	}
+	return list
+}
 
 func (a Users) ToIDs() []string {
 	idList := make([]string, len(a))

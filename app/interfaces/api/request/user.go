@@ -3,6 +3,9 @@ package request
 import (
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
 
@@ -16,6 +19,13 @@ type User struct {
 	Status    int       `json:"status"`     // Status(1:enable 2:disable)
 	Creator   string    `json:"creator"`    // Creator
 	CreatedAt time.Time `json:"created_at"` // CreatedAt
+	RoleIDs   []string  `json:"role_ids"`   // RoleIDs
+}
+
+func (a *User) ToDomain() *user.User {
+	item := new(user.User)
+	structure.Copy(a, item)
+	return item
 }
 
 type UserQueryParam struct {

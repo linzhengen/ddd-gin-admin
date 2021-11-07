@@ -3,6 +3,9 @@ package response
 import (
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
 
@@ -18,12 +21,26 @@ type Role struct {
 	RoleMenus RoleMenus `json:"role_menus"` // RoleMenus
 }
 
+func RoleFromDomain(role *role.Role) *Role {
+	item := new(Role)
+	structure.Copy(role, item)
+	return item
+}
+
 type RoleQueryResult struct {
 	Data       Roles
 	PageResult *pagination.Pagination
 }
 
 type Roles []*Role
+
+func RolesFromDomain(roles role.Roles) Roles {
+	list := make([]*Role, len(roles))
+	for i, item := range roles {
+		structure.Copy(item, list[i])
+	}
+	return list
+}
 
 func (a Roles) ToNames() []string {
 	names := make([]string, len(a))

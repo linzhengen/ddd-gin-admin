@@ -51,7 +51,7 @@ func (a *roleHandler) Query(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	api.ResPage(c, result, p)
+	api.ResPage(c, response.RolesFromDomain(result), p)
 }
 
 func (a *roleHandler) QuerySelect(c *gin.Context) {
@@ -76,7 +76,7 @@ func (a *roleHandler) QuerySelect(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	api.ResList(c, result)
+	api.ResList(c, response.RolesFromDomain(result))
 }
 
 func (a *roleHandler) Get(c *gin.Context) {
@@ -86,7 +86,7 @@ func (a *roleHandler) Get(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	api.ResSuccess(c, item)
+	api.ResSuccess(c, response.RoleFromDomain(item))
 }
 
 func (a *roleHandler) Create(c *gin.Context) {
@@ -98,23 +98,23 @@ func (a *roleHandler) Create(c *gin.Context) {
 	}
 
 	item.Creator = api.GetUserID(c)
-	result, err := a.roleApp.Create(ctx, item)
+	result, err := a.roleApp.Create(ctx, item.ToDomain())
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResSuccess(c, result)
+	api.ResSuccess(c, response.NewIDResult(result))
 }
 
 func (a *roleHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item response.Role
+	var item request.Role
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
 	}
 
-	err := a.roleApp.Update(ctx, c.Param("id"), item)
+	err := a.roleApp.Update(ctx, c.Param("id"), item.ToDomain())
 	if err != nil {
 		api.ResError(c, err)
 		return
