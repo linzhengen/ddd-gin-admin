@@ -69,7 +69,6 @@ func (a *login) ResCaptcha(c *gin.Context) {
 	c.Writer.Header().Set("Pragma", "no-cache")
 	c.Writer.Header().Set("Expires", "0")
 	c.Writer.Header().Set("Content-Type", "image/png")
-
 }
 
 func (a *login) Login(c *gin.Context) {

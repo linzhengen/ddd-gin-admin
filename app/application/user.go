@@ -31,8 +31,8 @@ type User interface {
 
 func NewUser(
 	authRepo auth.Repository,
-	//rbacRepo rbac.Repository,
-	//enforcer *casbin.SyncedEnforcer,
+	// rbacRepo rbac.Repository,
+	// enforcer *casbin.SyncedEnforcer,
 	transRepo trans.Repository,
 	userRepo user.Repository,
 	userRoleRepo userrole.Repository,
@@ -40,8 +40,8 @@ func NewUser(
 ) User {
 	return &userApp{
 		authRepo: authRepo,
-		//rbacRepo: rbacRepo,
-		//enforcer:     enforcer,
+		// rbacRepo: rbacRepo,
+		// enforcer:     enforcer,
 		transRepo:    transRepo,
 		userRepo:     userRepo,
 		userRoleRepo: userRoleRepo,
@@ -51,8 +51,8 @@ func NewUser(
 
 type userApp struct {
 	authRepo auth.Repository
-	//rbacRepo     rbac.Repository
-	//enforcer     *casbin.SyncedEnforcer
+	// rbacRepo     rbac.Repository
+	// enforcer     *casbin.SyncedEnforcer
 	transRepo    trans.Repository
 	userRepo     user.Repository
 	userRoleRepo userrole.Repository
@@ -143,7 +143,7 @@ func (a *userApp) Create(ctx context.Context, item *user.User, roleIDs []string)
 		return "", err
 	}
 
-	//a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	// a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return item.ID, nil
 }
 
@@ -222,7 +222,7 @@ func (a *userApp) Update(ctx context.Context, id string, item *user.User, roleID
 		return err
 	}
 
-	//a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	// a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -262,7 +262,7 @@ func (a *userApp) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	//a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	// a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -281,6 +281,6 @@ func (a *userApp) UpdateStatus(ctx context.Context, id string, status int) error
 		return err
 	}
 
-	//a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	// a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }

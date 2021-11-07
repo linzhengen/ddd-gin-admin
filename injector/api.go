@@ -22,19 +22,19 @@ import (
 func NewApiInjector(
 	engine *gin.Engine,
 	auth auth.Repository,
-	//casbinEnforcer *casbin.SyncedEnforcer,
+	// casbinEnforcer *casbin.SyncedEnforcer,
 ) *ApiInjector {
 	return &ApiInjector{
 		engine: engine,
 		auth:   auth,
-		//casbinEnforcer: casbinEnforcer,
+		// casbinEnforcer: casbinEnforcer,
 	}
 }
 
 type ApiInjector struct {
 	engine *gin.Engine
 	auth   auth.Repository
-	//casbinEnforcer *casbin.SyncedEnforcer
+	// casbinEnforcer *casbin.SyncedEnforcer
 }
 
 func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
