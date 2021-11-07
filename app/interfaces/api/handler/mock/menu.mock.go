@@ -19,9 +19,9 @@ type Menu struct{}
 // @Param status query int false "Status(1:enable 2:disable)"
 // @Param showStatus query int false "Show status(1:show 2:hide)"
 // @Param parentID query string false "Parent ID"
-// @Success 200 {object} schema.ListResult{list=[]schema.Menu} "Search Result"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.ListResult{list=[]schema.Menu} "Search Result"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus [get]
 func (a *Menu) Query(c *gin.Context) {
 }
@@ -32,9 +32,9 @@ func (a *Menu) Query(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Param status query int false "Status(1:enable 2:disable)"
 // @Param parentID query string false "Parent ID"
-// @Success 200 {object} schema.ListResult{list=[]schema.MenuTree} "Search Result"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.ListResult{list=[]schema.MenuTree} "Search Result"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus.tree [get]
 func (a *Menu) QueryTree(c *gin.Context) {
 }
@@ -44,10 +44,10 @@ func (a *Menu) QueryTree(c *gin.Context) {
 // @Summary Get by ID
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.Menu
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 404 {object} schema.ErrorResult "{error:{code:0,message:NotFound}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.Menu
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 404 {object} response.ErrorResult "{error:{code:0,message:NotFound}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus/{id} [get]
 func (a *Menu) Get(c *gin.Context) {
 }
@@ -56,11 +56,11 @@ func (a *Menu) Get(c *gin.Context) {
 // @Tags Menu
 // @Summary Create
 // @Security ApiKeyAuth
-// @Param body body schema.Menu true "Create"
-// @Success 200 {object} schema.IDResult
-// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:BadRequest}}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Param body body request.Menu true "Create"
+// @Success 200 {object} response.IDResult
+// @Failure 400 {object} response.ErrorResult "{error:{code:0,message:BadRequest}}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus [post]
 func (a *Menu) Create(c *gin.Context) {
 }
@@ -70,11 +70,11 @@ func (a *Menu) Create(c *gin.Context) {
 // @Summary Update
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Param body body schema.Menu true "Update"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:BadRequest}}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Param body body request.Menu true "Update"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 400 {object} response.ErrorResult "{error:{code:0,message:BadRequest}}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus/{id} [put]
 func (a *Menu) Update(c *gin.Context) {
 }
@@ -84,9 +84,9 @@ func (a *Menu) Update(c *gin.Context) {
 // @Summary Delete
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus/{id} [delete]
 func (a *Menu) Delete(c *gin.Context) {
 }
@@ -96,9 +96,9 @@ func (a *Menu) Delete(c *gin.Context) {
 // @Summary Enable
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus/{id}/enable [patch]
 func (a *Menu) Enable(c *gin.Context) {
 }
@@ -108,9 +108,9 @@ func (a *Menu) Enable(c *gin.Context) {
 // @Summary Disable
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus/{id}/disable [patch]
 func (a *Menu) Disable(c *gin.Context) {
 }

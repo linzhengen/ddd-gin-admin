@@ -18,9 +18,9 @@ type Role struct {
 // @Param pageSize query int true "Page size" default(10)
 // @Param queryValue query string false "Search value"
 // @Param status query int false "Status(1:enable 2:disable)"
-// @Success 200 {object} schema.ListResult{list=[]schema.Role} "Search Result"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.ListResult{list=[]schema.Role} "Search Result"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles [get]
 func (a *Role) Query(c *gin.Context) {
 }
@@ -31,10 +31,10 @@ func (a *Role) Query(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Param queryValue query string false "Search value"
 // @Param status query int false "Status(1:enable 2:disable)"
-// @Success 200 {object} schema.ListResult{list=[]schema.Role} "Search Result"
-// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:未知的查询类型}}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.ListResult{list=[]schema.Role} "Search Result"
+// @Failure 400 {object} response.ErrorResult "{error:{code:0,message:未知的查询类型}}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles.select [get]
 func (a *Role) QuerySelect(c *gin.Context) {
 }
@@ -44,10 +44,10 @@ func (a *Role) QuerySelect(c *gin.Context) {
 // @Summary Get by ID
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.Role
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 404 {object} schema.ErrorResult "{error:{code:0,message:NotFound}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.Role
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 404 {object} response.ErrorResult "{error:{code:0,message:NotFound}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles/{id} [get]
 func (a *Role) Get(c *gin.Context) {
 }
@@ -56,11 +56,11 @@ func (a *Role) Get(c *gin.Context) {
 // @Tags Role
 // @Summary Create
 // @Security ApiKeyAuth
-// @Param body body schema.Role true "Create"
-// @Success 200 {object} schema.IDResult
-// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:BadRequest}}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Param body body request.Role true "Create"
+// @Success 200 {object} response.IDResult
+// @Failure 400 {object} response.ErrorResult "{error:{code:0,message:BadRequest}}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles [post]
 func (a *Role) Create(c *gin.Context) {
 }
@@ -70,11 +70,11 @@ func (a *Role) Create(c *gin.Context) {
 // @Summary Update
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Param body body schema.Role true "Update"
-// @Success 200 {object} schema.Role
-// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:BadRequest}}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Param body body request.Role true "Update"
+// @Success 200 {object} response.Role
+// @Failure 400 {object} response.ErrorResult "{error:{code:0,message:BadRequest}}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles/{id} [put]
 func (a *Role) Update(c *gin.Context) {
 }
@@ -84,9 +84,9 @@ func (a *Role) Update(c *gin.Context) {
 // @Summary Delete
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles/{id} [delete]
 func (a *Role) Delete(c *gin.Context) {
 }
@@ -96,9 +96,9 @@ func (a *Role) Delete(c *gin.Context) {
 // @Summary Enable
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles/{id}/enable [patch]
 func (a *Role) Enable(c *gin.Context) {
 }
@@ -108,9 +108,9 @@ func (a *Role) Enable(c *gin.Context) {
 // @Summary Disable
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles/{id}/disable [patch]
 func (a *Role) Disable(c *gin.Context) {
 }
