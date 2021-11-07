@@ -3,13 +3,19 @@ package handler
 import (
 	"strings"
 
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/request"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
-
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
 )
 
 type User interface {
@@ -23,16 +29,16 @@ type User interface {
 }
 
 func NewUser(userApp application.User) User {
-	return &user{userApp: userApp}
+	return &userHandler{userApp: userApp}
 }
 
-type user struct {
+type userHandler struct {
 	userApp application.User
 }
 
-func (a *user) Query(c *gin.Context) {
+func (a *userHandler) Query(c *gin.Context) {
 	ctx := c.Request.Context()
-	var params schema.UserQueryParam
+	var params request.UserQueryParam
 	if err := api.ParseQuery(c, &params); err != nil {
 		api.ResError(c, err)
 		return
@@ -41,54 +47,61 @@ func (a *user) Query(c *gin.Context) {
 		params.RoleIDs = strings.Split(v, ",")
 	}
 
-	params.Pagination = true
-	result, err := a.userApp.QueryShow(ctx, params)
+	domainParams := user.QueryParams{
+		PaginationParam: pagination.Param{Pagination: true},
+		OrderFields:     nil,
+		UserName:        params.UserName,
+		QueryValue:      params.QueryValue,
+		Status:          params.Status,
+		RoleIDs:         params.RoleIDs,
+	}
+	result, p, err := a.userApp.QueryShow(ctx, domainParams)
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResPage(c, result.Data, result.PageResult)
+	api.ResPage(c, response.UsersFromDomain(result), p)
 }
 
-func (a *user) Get(c *gin.Context) {
+func (a *userHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	item, err := a.userApp.Get(ctx, c.Param("id"))
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResSuccess(c, item.CleanSecure())
+	api.ResSuccess(c, response.UserFromDomain(item).CleanSecure())
 }
 
-func (a *user) Create(c *gin.Context) {
+func (a *userHandler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.User
+	var item request.User
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
 	} else if item.Password == "" {
-		api.ResError(c, errors.New400Response("密码不能为空"))
+		api.ResError(c, errors.New400Response("password is empty"))
 		return
 	}
 
 	item.Creator = api.GetUserID(c)
-	result, err := a.userApp.Create(ctx, item)
+	result, err := a.userApp.Create(ctx, item.ToDomain(), item.RoleIDs)
 	if err != nil {
 		api.ResError(c, err)
 		return
 	}
-	api.ResSuccess(c, result)
+	api.ResSuccess(c, response.NewIDResult(result))
 }
 
-func (a *user) Update(c *gin.Context) {
+func (a *userHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item schema.User
+	var item request.User
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
 	}
 
-	err := a.userApp.Update(ctx, c.Param("id"), item)
+	err := a.userApp.Update(ctx, c.Param("id"), item.ToDomain(), item.RoleIDs)
 	if err != nil {
 		api.ResError(c, err)
 		return
@@ -96,7 +109,7 @@ func (a *user) Update(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *user) Delete(c *gin.Context) {
+func (a *userHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.userApp.Delete(ctx, c.Param("id"))
 	if err != nil {
@@ -106,7 +119,7 @@ func (a *user) Delete(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *user) Enable(c *gin.Context) {
+func (a *userHandler) Enable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.userApp.UpdateStatus(ctx, c.Param("id"), 1)
 	if err != nil {
@@ -116,7 +129,7 @@ func (a *user) Enable(c *gin.Context) {
 	api.ResOK(c)
 }
 
-func (a *user) Disable(c *gin.Context) {
+func (a *userHandler) Disable(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := a.userApp.UpdateStatus(ctx, c.Param("id"), 2)
 	if err != nil {

@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/contextx"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 	"github.com/linzhengen/ddd-gin-admin/configs"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 
@@ -17,7 +17,7 @@ func wrapUserAuthContext(c *gin.Context, userID string) {
 	c.Request = c.Request.WithContext(ctx)
 }
 
-func UserAuthMiddleware(a auth.Author, skippers ...SkipperFunc) gin.HandlerFunc {
+func UserAuthMiddleware(a auth.Repository, skippers ...SkipperFunc) gin.HandlerFunc {
 	if !configs.C.JWTAuth.Enable {
 		return func(c *gin.Context) {
 			wrapUserAuthContext(c, configs.C.Root.UserName)

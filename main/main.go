@@ -13,8 +13,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/linzhengen/ddd-gin-admin/injector/console"
-
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
 	"github.com/linzhengen/ddd-gin-admin/injector"
@@ -24,7 +22,11 @@ import (
 )
 
 // VERSION You can specify the version number by compiling：go build -ldflags "-X main.VERSION=x.x.x"
-var VERSION = "0.4.0"
+var VERSION = "0.5.0"
+
+//go:generate go env -w GO111MODULE=on
+//go:generate go mod tidy
+//go:generate go mod download
 
 // @title ddd-gin-admin
 // @version 0.2.0
@@ -45,7 +47,6 @@ func main() {
 	app.Usage = "RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE."
 	app.Commands = []*cli.Command{
 		newWebCmd(ctx),
-		newConsoleCmd(ctx),
 	}
 	err := app.Run(os.Args)
 	if err != nil {
@@ -87,26 +88,5 @@ func newWebCmd(ctx context.Context) *cli.Command {
 				api.SetMenuFile(c.String("menu")),
 				api.SetVersion(VERSION))
 		},
-	}
-}
-
-func newConsoleCmd(ctx context.Context) *cli.Command {
-	commands, cleanFunc, err := injector.InitConsole(ctx,
-		console.SetConfigFile("./configs/config.toml"),
-		console.SetVersion(VERSION))
-	return &cli.Command{
-		Name:  "console",
-		Usage: "Run console commands",
-		Before: func(c *cli.Context) error {
-			return err
-		},
-		After: func(c *cli.Context) error {
-			cleanFunc()
-			return nil
-		},
-		Action: func(c *cli.Context) error {
-			return nil
-		},
-		Subcommands: commands,
 	}
 }

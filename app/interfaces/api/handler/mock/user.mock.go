@@ -17,11 +17,11 @@ type User struct {
 // @Param current query int true "Current page" default(1)
 // @Param pageSize query int true "Page size" default(10)
 // @Param queryValue query string false "Search value"
-// @Param roleIDs query string false "角色ID(多个以英文逗号分隔)"
-// @Param status query int false "状态(1:启用 2:停用)"
-// @Success 200 {object} schema.ListResult{list=[]schema.UserShow} "Search Result"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Param roleIDs query string false "Role IDs(Comma division)"
+// @Param status query int false "Status (1: Enabled 2: Disabled)"
+// @Success 200 {object} response.ListResult{list=[]response.UserShow} "Search Result"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/users [get]
 func (a *User) Query(c *gin.Context) {
 }
@@ -31,10 +31,10 @@ func (a *User) Query(c *gin.Context) {
 // @Summary Get by ID
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.User
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 404 {object} schema.ErrorResult "{error:{code:0,message:NotFound}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.User
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 404 {object} response.ErrorResult "{error:{code:0,message:NotFound}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/users/{id} [get]
 func (a *User) Get(c *gin.Context) {
 }
@@ -43,11 +43,11 @@ func (a *User) Get(c *gin.Context) {
 // @Tags User
 // @Summary Create
 // @Security ApiKeyAuth
-// @Param body body schema.User true "Create"
-// @Success 200 {object} schema.IDResult
-// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:BadRequest}}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Param body body request.User true "Create"
+// @Success 200 {object} response.IDResult
+// @Failure 400 {object} response.ErrorResult "{error:{code:0,message:BadRequest}}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/users [post]
 func (a *User) Create(c *gin.Context) {
 }
@@ -57,11 +57,11 @@ func (a *User) Create(c *gin.Context) {
 // @Summary Update
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Param body body schema.User true "Update"
-// @Success 200 {object} schema.User
-// @Failure 400 {object} schema.ErrorResult "{error:{code:0,message:BadRequest}}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Param body body request.User true "Update"
+// @Success 200 {object} response.User
+// @Failure 400 {object} response.ErrorResult "{error:{code:0,message:BadRequest}}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/users/{id} [put]
 func (a *User) Update(c *gin.Context) {
 }
@@ -71,9 +71,9 @@ func (a *User) Update(c *gin.Context) {
 // @Summary Delete
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/users/{id} [delete]
 func (a *User) Delete(c *gin.Context) {
 }
@@ -83,9 +83,9 @@ func (a *User) Delete(c *gin.Context) {
 // @Summary Enable
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/users/{id}/enable [patch]
 func (a *User) Enable(c *gin.Context) {
 }
@@ -95,9 +95,9 @@ func (a *User) Enable(c *gin.Context) {
 // @Summary Disable
 // @Security ApiKeyAuth
 // @Param id path string true "UUID"
-// @Success 200 {object} schema.StatusResult "{status:OK}"
-// @Failure 401 {object} schema.ErrorResult "{error:{code:0,message:Unauthorized}}"
-// @Failure 500 {object} schema.ErrorResult "{error:{code:0,message:SystemError}}"
+// @Success 200 {object} response.StatusResult "{status:OK}"
+// @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
+// @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/users/{id}/disable [patch]
 func (a *User) Disable(c *gin.Context) {
 }

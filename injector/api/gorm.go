@@ -6,12 +6,19 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence/gormx"
+	menuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
+	menuActionInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
+	menuActionResourceInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
+	userInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
+	roleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/role"
+	roleMenuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/rolemenu"
+	userRoleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/userrole"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/jinzhu/gorm"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/entity"
 )
 
 func InitGormDB() (*gorm.DB, func(), error) {
@@ -63,12 +70,12 @@ func autoMigrate(db *gorm.DB) error {
 	}
 
 	return db.AutoMigrate(
-		new(entity.MenuAction),
-		new(entity.MenuActionResource),
-		new(entity.Menu),
-		new(entity.RoleMenu),
-		new(entity.Role),
-		new(entity.UserRole),
-		new(entity.User),
+		new(menuActionInfra.Model),
+		new(menuActionResourceInfra.Model),
+		new(menuInfra.Model),
+		new(roleInfra.Model),
+		new(roleMenuInfra.Model),
+		new(userRoleInfra.Model),
+		new(userInfra.Model),
 	).Error
 }

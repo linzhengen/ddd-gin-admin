@@ -3,61 +3,57 @@ package application
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/valueobject/schema"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuaction"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
 
 type Menu interface {
-	InitData(ctx context.Context, dataFile string) error
-	Query(ctx context.Context, params schema.MenuQueryParam) (*schema.MenuQueryResult, error)
-	Get(ctx context.Context, id string) (*schema.Menu, error)
-	QueryActions(ctx context.Context, id string) (schema.MenuActions, error)
-	Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error)
-	Update(ctx context.Context, id string, item schema.Menu) error
+	Query(ctx context.Context, params menu.QueryParam) (menu.Menus, *pagination.Pagination, error)
+	Get(ctx context.Context, id string) (*menu.Menu, error)
+	QueryActions(ctx context.Context, id string) (menuaction.MenuActions, error)
+	Create(ctx context.Context, item *menu.Menu) (string, error)
+	Update(ctx context.Context, id string, item *menu.Menu) error
 	Delete(ctx context.Context, id string) error
 	UpdateStatus(ctx context.Context, id string, status int) error
 }
 
 func NewMenu(
-	menuSvc service.Menu,
+	menuSvc menu.Service,
 ) Menu {
-	return &menu{
+	return &menuApp{
 		menuSvc: menuSvc,
 	}
 }
 
-type menu struct {
-	menuSvc service.Menu
+type menuApp struct {
+	menuSvc menu.Service
 }
 
-func (m menu) InitData(ctx context.Context, dataFile string) error {
-	return m.menuSvc.InitData(ctx, dataFile)
-}
-
-func (m menu) Query(ctx context.Context, params schema.MenuQueryParam) (*schema.MenuQueryResult, error) {
+func (m menuApp) Query(ctx context.Context, params menu.QueryParam) (menu.Menus, *pagination.Pagination, error) {
 	return m.menuSvc.Query(ctx, params)
 }
 
-func (m menu) Get(ctx context.Context, id string) (*schema.Menu, error) {
+func (m menuApp) Get(ctx context.Context, id string) (*menu.Menu, error) {
 	return m.menuSvc.Get(ctx, id)
 }
 
-func (m menu) QueryActions(ctx context.Context, id string) (schema.MenuActions, error) {
+func (m menuApp) QueryActions(ctx context.Context, id string) (menuaction.MenuActions, error) {
 	return m.menuSvc.QueryActions(ctx, id)
 }
 
-func (m menu) Create(ctx context.Context, item schema.Menu) (*schema.IDResult, error) {
-	panic("implement me")
+func (m menuApp) Create(ctx context.Context, item *menu.Menu) (string, error) {
+	return m.menuSvc.Create(ctx, item)
 }
 
-func (m menu) Update(ctx context.Context, id string, item schema.Menu) error {
-	panic("implement me")
+func (m menuApp) Update(ctx context.Context, id string, item *menu.Menu) error {
+	return m.menuSvc.Update(ctx, id, item)
 }
 
-func (m menu) Delete(ctx context.Context, id string) error {
-	panic("implement me")
+func (m menuApp) Delete(ctx context.Context, id string) error {
+	return m.menuSvc.Delete(ctx, id)
 }
 
-func (m menu) UpdateStatus(ctx context.Context, id string, status int) error {
-	panic("implement me")
+func (m menuApp) UpdateStatus(ctx context.Context, id string, status int) error {
+	return m.menuSvc.UpdateStatus(ctx, id, status)
 }

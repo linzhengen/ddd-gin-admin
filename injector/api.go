@@ -7,14 +7,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
-
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
@@ -24,23 +21,20 @@ import (
 
 func NewApiInjector(
 	engine *gin.Engine,
-	auth auth.Author,
-	casbinEnforcer *casbin.SyncedEnforcer,
-	menuBll service.Menu,
+	auth auth.Repository,
+	// casbinEnforcer *casbin.SyncedEnforcer,
 ) *ApiInjector {
 	return &ApiInjector{
-		engine:         engine,
-		auth:           auth,
-		casbinEnforcer: casbinEnforcer,
-		menuBll:        menuBll,
+		engine: engine,
+		auth:   auth,
+		// casbinEnforcer: casbinEnforcer,
 	}
 }
 
 type ApiInjector struct {
-	engine         *gin.Engine
-	auth           auth.Author
-	casbinEnforcer *casbin.SyncedEnforcer
-	menuBll        service.Menu
+	engine *gin.Engine
+	auth   auth.Repository
+	// casbinEnforcer *casbin.SyncedEnforcer
 }
 
 func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
@@ -75,13 +69,6 @@ func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
 	injector, injectorCleanFunc, err := BuildApiInjector()
 	if err != nil {
 		return nil, err
-	}
-
-	if configs.C.Menu.Enable && configs.C.Menu.Data != "" {
-		err = injector.menuBll.InitData(ctx, configs.C.Menu.Data)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	httpServerCleanFunc := api.InitHTTPServer(ctx, injector.engine)

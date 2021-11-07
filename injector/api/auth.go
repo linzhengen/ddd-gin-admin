@@ -2,20 +2,20 @@ package api
 
 import (
 	"github.com/golang-jwt/jwt"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
+	authinfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth/store/buntdb"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth/store/redis"
 	"github.com/linzhengen/ddd-gin-admin/configs"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth/jwtauth"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth/jwtauth/store/buntdb"
-	"github.com/linzhengen/ddd-gin-admin/pkg/auth/jwtauth/store/redis"
 )
 
-func InitAuth() (auth.Author, func(), error) {
+func InitAuth() (auth.Repository, func(), error) {
 	cfg := configs.C.JWTAuth
 
-	var opts []jwtauth.Option
-	opts = append(opts, jwtauth.SetExpired(cfg.Expired))
-	opts = append(opts, jwtauth.SetSigningKey([]byte(cfg.SigningKey)))
-	opts = append(opts, jwtauth.SetKeyfunc(func(t *jwt.Token) (interface{}, error) {
+	var opts []authinfra.Option
+	opts = append(opts, authinfra.SetExpired(cfg.Expired))
+	opts = append(opts, authinfra.SetSigningKey([]byte(cfg.SigningKey)))
+	opts = append(opts, authinfra.SetKeyFunc(func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, auth.ErrInvalidToken
 		}
@@ -31,9 +31,9 @@ func InitAuth() (auth.Author, func(), error) {
 	default:
 		method = jwt.SigningMethodHS512
 	}
-	opts = append(opts, jwtauth.SetSigningMethod(method))
+	opts = append(opts, authinfra.SetSigningMethod(method))
 
-	var store jwtauth.Store
+	var store authinfra.Store
 	switch cfg.Store {
 	case "redis":
 		rcfg := configs.C.Redis
@@ -51,7 +51,7 @@ func InitAuth() (auth.Author, func(), error) {
 		store = s
 	}
 
-	auth := jwtauth.New(store, opts...)
+	auth := authinfra.NewRepository(store, opts...)
 	cleanFunc := func() {
 		//nolint:errcheck
 		auth.Release()

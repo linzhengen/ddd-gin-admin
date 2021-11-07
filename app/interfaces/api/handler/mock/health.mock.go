@@ -13,7 +13,7 @@ type HealthCheck struct {
 // Get HealthCheck
 // @Tags HealthCheck
 // @Summary HealthCheck
-// @Success 200 {object} schema.HealthCheck
+// @Success 200 {object} response.HealthCheck
 // @Router /api/health [get]
 func (a *HealthCheck) Get(c *gin.Context) {
 }

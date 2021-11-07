@@ -6,20 +6,22 @@
 package injector
 
 import (
-	"context"
-
 	"github.com/linzhengen/ddd-gin-admin/app/application"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/factory"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/service"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/casbin"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/persistence"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+	menuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
+	menuActionInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
+	menuActionResourceInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
+
+	transInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/trans"
+	userInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
+	roleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/role"
+	roleMenuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/rolemenu"
+	userRoleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/userrole"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/console/command"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
-	"github.com/linzhengen/ddd-gin-admin/injector/console"
 
-	// "github.com/linzhengen/ddd-gin-admin/infrastructure/api/mock"
 	"github.com/google/wire"
 )
 
@@ -28,87 +30,41 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		// init,
 		api.InitGormDB,
 		api.InitAuth,
-		api.InitCasbin,
 		api.InitGinEngine,
 
-		// persistence
-		persistence.NewTrans,
-		persistence.NewUser,
-		persistence.NewRole,
-		persistence.NewUserRole,
-		persistence.NewMenu,
-		persistence.NewRoleMenu,
-		persistence.NewMenuAction,
-		persistence.NewMenuActionResource,
+		// domain
+		user.NewService,
+		menu.NewService,
 
-		// factory
-		factory.NewMenu,
-		factory.NewMenuAction,
-		factory.NewMenuActionResource,
-		factory.NewRole,
-		factory.NewRoleMenu,
-		factory.NewUser,
-		factory.NewUserRole,
-
-		// service
-		service.NewLogin,
-		service.NewMenu,
-		service.NewRole,
-		service.NewUser,
+		// infrastructure
+		menuInfra.NewRepository,
+		menuActionInfra.NewRepository,
+		menuActionResourceInfra.NewRepository,
+		userInfra.NewRepository,
+		userRoleInfra.NewRepository,
+		roleMenuInfra.NewRepository,
+		roleInfra.NewRepository,
+		transInfra.NewRepository,
+		//auth.NewRepository,
 
 		// application
-		application.NewLogin,
 		application.NewMenu,
 		application.NewRole,
 		application.NewUser,
+		application.NewLogin,
 
-		// command
-		handler.NewMenu,
-		handler.NewRole,
-		handler.NewLogin,
-		handler.NewUser,
+		// handler
 		handler.NewHealthCheck,
+		handler.NewUser,
+		handler.NewRole,
+		handler.NewMenu,
+		handler.NewLogin,
 
 		// router
 		router.NewRouter,
 
-		// lib
-		casbin.NewCasbinAdapter,
-
 		// injector
 		NewApiInjector,
-	)
-	return nil, nil, nil
-}
-
-func BuildConsoleInjector(ctx context.Context) (command.Commands, func(), error) {
-	wire.Build(
-		// init
-		console.InitGormDB,
-
-		// factory
-		factory.NewMenu,
-		factory.NewMenuAction,
-		factory.NewMenuActionResource,
-
-		// persistence
-		persistence.NewDbMigration,
-		persistence.NewTrans,
-		persistence.NewMenu,
-		persistence.NewMenuAction,
-		persistence.NewMenuActionResource,
-
-		// service
-		service.NewMenu,
-
-		// application
-		application.NewDbMigrationConsole,
-		application.NewDbSeedConsole,
-
-		// command
-		command.NewMigrateCommand,
-		command.NewSeedCommand,
-		command.NewCliCommands,
 	)
 	return nil, nil, nil
 }
