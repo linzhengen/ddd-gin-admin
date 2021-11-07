@@ -7,14 +7,18 @@ package injector
 
 import (
 	"github.com/linzhengen/ddd-gin-admin/app/application"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/trans"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/role"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/rolemenu"
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/userrole"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+	menuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
+	menuActionInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
+	menuActionResourceInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
+
+	transInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/trans"
+	userInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
+	roleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/role"
+	roleMenuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/rolemenu"
+	userRoleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/userrole"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
@@ -28,15 +32,19 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		api.InitAuth,
 		api.InitGinEngine,
 
+		// domain
+		user.NewService,
+		menu.NewService,
+
 		// infrastructure
-		menu.NewRepository,
-		menuaction.NewRepository,
-		menuactionresource.NewRepository,
-		user.NewRepository,
-		userrole.NewRepository,
-		rolemenu.NewRepository,
-		role.NewRepository,
-		trans.NewRepository,
+		menuInfra.NewRepository,
+		menuActionInfra.NewRepository,
+		menuActionResourceInfra.NewRepository,
+		userInfra.NewRepository,
+		userRoleInfra.NewRepository,
+		roleMenuInfra.NewRepository,
+		roleInfra.NewRepository,
+		transInfra.NewRepository,
 		//auth.NewRepository,
 
 		// application
@@ -44,6 +52,13 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		application.NewRole,
 		application.NewUser,
 		application.NewLogin,
+
+		// handler
+		handler.NewHealthCheck,
+		handler.NewUser,
+		handler.NewRole,
+		handler.NewMenu,
+		handler.NewLogin,
 
 		// router
 		router.NewRouter,

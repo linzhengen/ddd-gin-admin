@@ -11,7 +11,6 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
@@ -23,19 +22,19 @@ import (
 func NewApiInjector(
 	engine *gin.Engine,
 	auth auth.Repository,
-	casbinEnforcer *casbin.SyncedEnforcer,
+	//casbinEnforcer *casbin.SyncedEnforcer,
 ) *ApiInjector {
 	return &ApiInjector{
-		engine:         engine,
-		auth:           auth,
-		casbinEnforcer: casbinEnforcer,
+		engine: engine,
+		auth:   auth,
+		//casbinEnforcer: casbinEnforcer,
 	}
 }
 
 type ApiInjector struct {
-	engine         *gin.Engine
-	auth           auth.Repository
-	casbinEnforcer *casbin.SyncedEnforcer
+	engine *gin.Engine
+	auth   auth.Repository
+	//casbinEnforcer *casbin.SyncedEnforcer
 }
 
 func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {

@@ -12,10 +12,8 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/rbac"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
 
-	"github.com/casbin/casbin/v2"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/uuid"
@@ -33,17 +31,17 @@ type User interface {
 
 func NewUser(
 	authRepo auth.Repository,
-	rbacRepo rbac.Repository,
-	enforcer *casbin.SyncedEnforcer,
+	//rbacRepo rbac.Repository,
+	//enforcer *casbin.SyncedEnforcer,
 	transRepo trans.Repository,
 	userRepo user.Repository,
 	userRoleRepo userrole.Repository,
 	roleRepo role.Repository,
 ) User {
 	return &userApp{
-		authRepo:     authRepo,
-		rbacRepo:     rbacRepo,
-		enforcer:     enforcer,
+		authRepo: authRepo,
+		//rbacRepo: rbacRepo,
+		//enforcer:     enforcer,
 		transRepo:    transRepo,
 		userRepo:     userRepo,
 		userRoleRepo: userRoleRepo,
@@ -52,9 +50,9 @@ func NewUser(
 }
 
 type userApp struct {
-	authRepo     auth.Repository
-	rbacRepo     rbac.Repository
-	enforcer     *casbin.SyncedEnforcer
+	authRepo auth.Repository
+	//rbacRepo     rbac.Repository
+	//enforcer     *casbin.SyncedEnforcer
 	transRepo    trans.Repository
 	userRepo     user.Repository
 	userRoleRepo userrole.Repository
@@ -145,7 +143,7 @@ func (a *userApp) Create(ctx context.Context, item *user.User, roleIDs []string)
 		return "", err
 	}
 
-	a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	//a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return item.ID, nil
 }
 
@@ -224,7 +222,7 @@ func (a *userApp) Update(ctx context.Context, id string, item *user.User, roleID
 		return err
 	}
 
-	a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	//a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -264,7 +262,7 @@ func (a *userApp) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	//a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -283,6 +281,6 @@ func (a *userApp) UpdateStatus(ctx context.Context, id string, status int) error
 		return err
 	}
 
-	a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	//a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }

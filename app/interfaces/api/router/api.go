@@ -12,9 +12,9 @@ func (a *router) RegisterAPI(app *gin.Engine) {
 		middleware.AllowPathPrefixSkipper("/api/v1/pub/login"),
 	))
 
-	g.Use(middleware.CasbinMiddleware(a.casbinEnforcer,
-		middleware.AllowPathPrefixSkipper("/api/v1/pub"),
-	))
+	//g.Use(middleware.CasbinMiddleware(a.casbinEnforcer,
+	//	middleware.AllowPathPrefixSkipper("/api/v1/pub"),
+	//))
 
 	g.Use(middleware.RateLimiterMiddleware())
 	g.GET("health", a.healthHandler.Get)
