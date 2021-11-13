@@ -12,6 +12,10 @@ type Model struct {
 	RoleID string `gorm:"column:role_id;size:36;index;default:'';not null;"`
 }
 
+func (Model) TableName() string {
+	return "user_roles"
+}
+
 func (a Model) ToDomain() *userrole.UserRole {
 	item := new(userrole.UserRole)
 	structure.Copy(a, item)

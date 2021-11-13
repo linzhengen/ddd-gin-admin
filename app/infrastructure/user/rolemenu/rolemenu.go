@@ -12,6 +12,10 @@ type Model struct {
 	ActionID string `gorm:"column:action_id;size:36;index;default:'';not null;"`
 }
 
+func (Model) TableName() string {
+	return "role_menus"
+}
+
 func (a Model) ToDomain() *rolemenu.RoleMenu {
 	item := new(rolemenu.RoleMenu)
 	structure.Copy(a, item)

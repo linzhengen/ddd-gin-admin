@@ -6,6 +6,7 @@ require (
 	github.com/LyricTian/captcha v1.1.0
 	github.com/LyricTian/gzip v0.1.1
 	github.com/LyricTian/queue v1.2.0
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/casbin/casbin/v2 v2.38.1
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.4

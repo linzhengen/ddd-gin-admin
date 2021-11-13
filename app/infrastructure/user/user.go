@@ -22,6 +22,10 @@ type Model struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at;index;"`
 }
 
+func (Model) TableName() string {
+	return "users"
+}
+
 func (a Model) ToDomain() *user.User {
 	item := new(user.User)
 	structure.Copy(a, item)

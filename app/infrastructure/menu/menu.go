@@ -25,6 +25,10 @@ type Model struct {
 	DeletedAt  *time.Time `gorm:"column:deleted_at;index;"`
 }
 
+func (Model) TableName() string {
+	return "menus"
+}
+
 func (a Model) ToDomain() *menu.Menu {
 	item := new(menu.Menu)
 	structure.Copy(a, item)
