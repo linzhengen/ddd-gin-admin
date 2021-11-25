@@ -37,7 +37,7 @@ swagger:
 .PHONY: wire
 wire:
 	@hash wire > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		go install github.com/google/wire/cmd/wire; \
+		go install github.com/google/wire/cmd/wire@latest; \
 	fi
 	@wire gen ./injector
 
