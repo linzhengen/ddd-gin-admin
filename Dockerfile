@@ -1,4 +1,4 @@
-FROM golang:1.17.1-alpine3.14 as build-env
+FROM golang:1.17.3-alpine3.14 as build-env
 
 ARG VERSION
 
