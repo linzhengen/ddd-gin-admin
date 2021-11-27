@@ -2,11 +2,12 @@ package injector
 
 import (
 	"context"
-	"github.com/casbin/casbin/v2"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/casbin/casbin/v2"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 
@@ -26,15 +27,15 @@ func NewApiInjector(
 	casbinEnforcer *casbin.SyncedEnforcer,
 ) *ApiInjector {
 	return &ApiInjector{
-		engine: engine,
-		auth:   auth,
+		engine:         engine,
+		auth:           auth,
 		casbinEnforcer: casbinEnforcer,
 	}
 }
 
 type ApiInjector struct {
-	engine *gin.Engine
-	auth   auth.Repository
+	engine         *gin.Engine
+	auth           auth.Repository
 	casbinEnforcer *casbin.SyncedEnforcer
 }
 

@@ -22,24 +22,24 @@ func NewRouter(
 	healthHandler handler.HealthCheck,
 ) Router {
 	return &router{
-		auth: auth,
+		auth:           auth,
 		casbinEnforcer: casbinEnforcer,
-		loginHandler:  loginHandler,
-		menuHandler:   menuHandler,
-		roleHandler:   roleHandler,
-		userHandler:   userHandler,
-		healthHandler: healthHandler,
+		loginHandler:   loginHandler,
+		menuHandler:    menuHandler,
+		roleHandler:    roleHandler,
+		userHandler:    userHandler,
+		healthHandler:  healthHandler,
 	}
 }
 
 type router struct {
-	auth auth.Repository
+	auth           auth.Repository
 	casbinEnforcer *casbin.SyncedEnforcer
-	loginHandler  handler.Login
-	menuHandler   handler.Menu
-	roleHandler   handler.Role
-	userHandler   handler.User
-	healthHandler handler.HealthCheck
+	loginHandler   handler.Login
+	menuHandler    handler.Menu
+	roleHandler    handler.Role
+	userHandler    handler.User
+	healthHandler  handler.HealthCheck
 }
 
 func (a *router) Register(app *gin.Engine) error {
