@@ -13,6 +13,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/rbac"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/trans"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/role"
@@ -39,29 +40,38 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	userRepository := user.NewRepository(db)
 	roleRepository := role.NewRepository(db)
+	rolemenuRepository := rolemenu.NewRepository(db)
+	menuactionresourceRepository := menuactionresource.NewRepository(db)
+	userRepository := user.NewRepository(db)
 	userroleRepository := userrole.NewRepository(db)
+	rbacRepository := rbac.NewRepository(roleRepository, rolemenuRepository, menuactionresourceRepository, userRepository, userroleRepository)
+	rbacAdapter := application.NewRbacAdapter(rbacRepository)
+	syncedEnforcer, cleanup3, err := api.InitCasbin(rbacAdapter)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	service := user2.NewService(repository, userRepository, roleRepository, userroleRepository)
 	menuRepository := menu.NewRepository(db)
 	menuactionRepository := menuaction.NewRepository(db)
-	rolemenuRepository := rolemenu.NewRepository(db)
 	login := application.NewLogin(repository, userRepository, roleRepository, userroleRepository, service, menuRepository, menuactionRepository, rolemenuRepository)
 	handlerLogin := handler.NewLogin(login)
 	transRepository := trans.NewRepository(db)
-	menuactionresourceRepository := menuactionresource.NewRepository(db)
 	menuService := menu2.NewService(transRepository, menuRepository, menuactionRepository, menuactionresourceRepository)
 	applicationMenu := application.NewMenu(menuService)
 	handlerMenu := handler.NewMenu(applicationMenu)
-	applicationRole := application.NewRole(transRepository, roleRepository, rolemenuRepository, userRepository)
+	applicationRole := application.NewRole(rbacAdapter, syncedEnforcer, transRepository, roleRepository, rolemenuRepository, userRepository)
 	handlerRole := handler.NewRole(applicationRole)
-	applicationUser := application.NewUser(repository, transRepository, userRepository, userroleRepository, roleRepository)
+	applicationUser := application.NewUser(repository, rbacAdapter, syncedEnforcer, transRepository, userRepository, userroleRepository, roleRepository)
 	handlerUser := handler.NewUser(applicationUser)
 	healthCheck := handler.NewHealthCheck()
-	routerRouter := router.NewRouter(repository, handlerLogin, handlerMenu, handlerRole, handlerUser, healthCheck)
+	routerRouter := router.NewRouter(repository, syncedEnforcer, handlerLogin, handlerMenu, handlerRole, handlerUser, healthCheck)
 	engine := api.InitGinEngine(routerRouter)
-	apiInjector := NewApiInjector(engine, repository)
+	apiInjector := NewApiInjector(engine, repository, syncedEnforcer)
 	return apiInjector, func() {
+		cleanup3()
 		cleanup2()
 		cleanup()
 	}, nil

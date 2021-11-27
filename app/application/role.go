@@ -3,6 +3,8 @@ package application
 import (
 	"context"
 
+	"github.com/casbin/casbin/v2"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
@@ -23,16 +25,16 @@ type Role interface {
 }
 
 func NewRole(
-	// rbacRepo rbac.Repository,
-	// enforcer *casbin.SyncedEnforcer,
+	rbacAdapter RbacAdapter,
+	enforcer *casbin.SyncedEnforcer,
 	transRepo trans.Repository,
 	roleRepo role.Repository,
 	roleMenuRepo rolemenu.Repository,
 	userRepo user.Repository,
 ) Role {
 	return &roleApp{
-		// rbacRepo:     rbacRepo,
-		// enforcer:     enforcer,
+		rbacAdapter:  rbacAdapter,
+		enforcer:     enforcer,
 		transRepo:    transRepo,
 		roleRepo:     roleRepo,
 		roleMenuRepo: roleMenuRepo,
@@ -41,8 +43,8 @@ func NewRole(
 }
 
 type roleApp struct {
-	// rbacRepo     rbac.Repository
-	// enforcer     *casbin.SyncedEnforcer
+	rbacAdapter  RbacAdapter
+	enforcer     *casbin.SyncedEnforcer
 	transRepo    trans.Repository
 	roleRepo     role.Repository
 	roleMenuRepo rolemenu.Repository
@@ -106,7 +108,7 @@ func (a *roleApp) Create(ctx context.Context, item *role.Role) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	a.rbacAdapter.AddPolicyItemToChan(ctx, a.enforcer)
 	return item.ID, nil
 }
 
@@ -165,7 +167,7 @@ func (a *roleApp) Update(ctx context.Context, id string, item *role.Role) error 
 	if err != nil {
 		return err
 	}
-	// a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	a.rbacAdapter.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -219,7 +221,7 @@ func (a *roleApp) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	// a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	a.rbacAdapter.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }
 
@@ -236,6 +238,6 @@ func (a *roleApp) UpdateStatus(ctx context.Context, id string, status int) error
 	if err != nil {
 		return err
 	}
-	// a.rbacRepo.AddPolicyItemToChan(ctx, a.enforcer)
+	a.rbacAdapter.AddPolicyItemToChan(ctx, a.enforcer)
 	return nil
 }

@@ -13,6 +13,7 @@ import (
 	menuActionInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
 	menuActionResourceInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
 
+	rbacInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/rbac"
 	transInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/trans"
 	userInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
 	roleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/role"
@@ -31,6 +32,7 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		api.InitGormDB,
 		api.InitAuth,
 		api.InitGinEngine,
+		api.InitCasbin,
 
 		// domain
 		user.NewService,
@@ -45,13 +47,14 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		roleMenuInfra.NewRepository,
 		roleInfra.NewRepository,
 		transInfra.NewRepository,
-		//auth.NewRepository,
+		rbacInfra.NewRepository,
 
 		// application
 		application.NewMenu,
 		application.NewRole,
 		application.NewUser,
 		application.NewLogin,
+		application.NewRbacAdapter,
 
 		// handler
 		handler.NewHealthCheck,
