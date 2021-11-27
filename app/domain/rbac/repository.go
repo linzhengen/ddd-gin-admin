@@ -1,11 +1,8 @@
 package rbac
 
-import (
-	"context"
-)
+import "context"
 
 type Repository interface {
-	CreateAutoLoadPolicyChan() AutoLoadPolicyChan
-	GetAutoLoadPolicyChan() AutoLoadPolicyChan
-	AddPolicyItemToChan(ctx context.Context, e SyncedEnforcer)
+	ListRolesPolices(ctx context.Context) ([]string, error)
+	ListUsersPolices(ctx context.Context) ([]string, error)
 }
