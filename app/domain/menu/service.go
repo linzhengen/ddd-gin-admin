@@ -46,12 +46,12 @@ type service struct {
 }
 
 func (a *service) Query(ctx context.Context, params QueryParam) (Menus, *pagination.Pagination, error) {
-	menuActionResult, pr, err := a.menuActionRepo.Query(ctx, menuaction.QueryParam{})
+	menuActionResult, _, err := a.menuActionRepo.Query(ctx, menuaction.QueryParam{})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	menuResult, _, err := a.menuRepo.Query(ctx, params)
+	menuResult, pr, err := a.menuRepo.Query(ctx, params)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -29,7 +29,7 @@ import (
 func BuildApiInjector() (*ApiInjector, func(), error) {
 	wire.Build(
 		// init,
-		api.InitGormDB,
+		InitGormDB,
 		api.InitAuth,
 		api.InitGinEngine,
 		api.InitCasbin,
@@ -55,6 +55,7 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 		application.NewUser,
 		application.NewLogin,
 		application.NewRbacAdapter,
+		application.NewSeed,
 
 		// handler
 		handler.NewHealthCheck,

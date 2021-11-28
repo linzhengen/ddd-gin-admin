@@ -35,7 +35,7 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	db, cleanup2, err := api.InitGormDB()
+	db, cleanup2, err := InitGormDB()
 	if err != nil {
 		cleanup()
 		return nil, nil, err
@@ -69,7 +69,8 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	healthCheck := handler.NewHealthCheck()
 	routerRouter := router.NewRouter(repository, syncedEnforcer, handlerLogin, handlerMenu, handlerRole, handlerUser, healthCheck)
 	engine := api.InitGinEngine(routerRouter)
-	apiInjector := NewApiInjector(engine, repository, syncedEnforcer)
+	seed := application.NewSeed(menuService, transRepository)
+	apiInjector := NewApiInjector(engine, repository, syncedEnforcer, seed)
 	return apiInjector, func() {
 		cleanup3()
 		cleanup2()

@@ -7,6 +7,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/application"
+
 	"github.com/casbin/casbin/v2"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
@@ -25,11 +27,13 @@ func NewApiInjector(
 	engine *gin.Engine,
 	auth auth.Repository,
 	casbinEnforcer *casbin.SyncedEnforcer,
+	seed application.Seed,
 ) *ApiInjector {
 	return &ApiInjector{
 		engine:         engine,
 		auth:           auth,
 		casbinEnforcer: casbinEnforcer,
+		seed:           seed,
 	}
 }
 
@@ -37,6 +41,7 @@ type ApiInjector struct {
 	engine         *gin.Engine
 	auth           auth.Repository
 	casbinEnforcer *casbin.SyncedEnforcer
+	seed           application.Seed
 }
 
 func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
@@ -59,7 +64,7 @@ func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
 
 	logger.WithContext(ctx).Printf("starting server，run mode：%s，ver：%s，pid：%d", configs.C.RunMode, o.Version, os.Getpid())
 
-	loggerCleanFunc, err := api.InitLogger()
+	loggerCleanFunc, err := InitLogger()
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +77,12 @@ func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {
 	if err != nil {
 		return nil, err
 	}
-
+	if configs.C.Menu.Enable && configs.C.Menu.Data != "" {
+		err = injector.seed.Execute(ctx, configs.C.Menu.Data)
+		if err != nil {
+			return nil, err
+		}
+	}
 	httpServerCleanFunc := api.InitHTTPServer(ctx, injector.engine)
 
 	return func() {
