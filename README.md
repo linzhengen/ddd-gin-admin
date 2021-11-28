@@ -21,15 +21,8 @@ English | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
     <img src="docs/img/swagger.png">
 </div>
 
-## Project setup
-```
-go mod download
-```
 ## Compiles and hot-reloads for development
 ```
-# via air
-make air
-# via skaffold dev with minikube
 make skaffold-dev
 ```
 ## Starting tunnel via minikube for service ddd-gin-admin-web
