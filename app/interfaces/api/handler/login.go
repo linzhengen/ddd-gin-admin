@@ -147,7 +147,9 @@ func (a *login) GetUserInfo(c *gin.Context) {
 	}
 	roles := make([]*response.Role, len(info.Roles))
 	for i, item := range info.Roles {
-		structure.Copy(item, roles[i])
+		ts := new(response.Role)
+		structure.Copy(item, ts)
+		roles[i] = ts
 	}
 	schemaInfo.Roles = roles
 	api.ResSuccess(c, schemaInfo)
@@ -162,7 +164,9 @@ func (a *login) QueryUserMenuTree(c *gin.Context) {
 	}
 	schemaMenus := make([]*response.MenuTrees, len(menus))
 	for i, item := range menus {
-		structure.Copy(item, schemaMenus[i])
+		ts := new(response.MenuTrees)
+		structure.Copy(item, ts)
+		schemaMenus[i] = ts
 	}
 	api.ResList(c, schemaMenus)
 }

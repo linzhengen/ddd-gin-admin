@@ -56,7 +56,9 @@ type Users []*User
 func UsersFromDomain(users user.Users) Users {
 	list := make([]*User, len(users))
 	for i, item := range users {
-		structure.Copy(item, list[i])
+		ts := new(User)
+		structure.Copy(item, ts)
+		list[i] = ts
 	}
 	return list
 }

@@ -56,7 +56,9 @@ type Menus []*Menu
 func MenusFromDomain(menus menu.Menus) Menus {
 	list := make([]*Menu, len(menus))
 	for i, item := range menus {
-		structure.Copy(item, list[i])
+		ts := new(Menu)
+		structure.Copy(item, ts)
+		list[i] = ts
 	}
 	return list
 }
