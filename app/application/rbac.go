@@ -81,6 +81,7 @@ func (a *rbacAdapter) LoadPolicy(model casbinModel.Model) error {
 		return err
 	}
 	if len(policies) > 0 {
+		//nolint: errcheck
 		persist.LoadPolicyArray(policies, model)
 	}
 
@@ -90,6 +91,7 @@ func (a *rbacAdapter) LoadPolicy(model casbinModel.Model) error {
 		return err
 	}
 	if len(policies) > 0 {
+		//nolint: errcheck
 		persist.LoadPolicyArray(policies, model)
 	}
 	return nil
