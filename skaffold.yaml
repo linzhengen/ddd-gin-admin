@@ -10,18 +10,19 @@ profiles:
       artifacts:
         - image: ddd-gin-admin
           docker:
-            dockerfile: Dockerfile.dev
+            dockerfile: dev.Dockerfile
 #          sync:
 #            manual:
 #              - src: 'configs/*'
 #                dest: "/"
     deploy:
+      statusCheckDeadlineSeconds: 60
       helm:
         releases:
           - name: mariadb
             repo: https://charts.bitnami.com/bitnami
             remoteChart: mariadb
-            version: 9.4.0
+            version: 11.5.1
             namespace: mariadb
             createNamespace: true
             setValues:

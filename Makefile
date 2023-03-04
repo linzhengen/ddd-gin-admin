@@ -63,7 +63,7 @@ skaffold-build:
 
 .PHONY: skaffold-dev
 skaffold-dev:
-	skaffold dev -v debug -p dev
+	skaffold dev -v debug -p dev --wait-for-deletions=true --kube-context=minikube
 
 .PHONY: tunnel-svc-with-minikube
 tunnel-svc-with-minikube:
