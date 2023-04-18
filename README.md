@@ -1,9 +1,27 @@
 # ddd-gin-admin
 English | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
 
-`ddd-gin-admin` adopts the DDD architecture and provides the components needed to build a CMS. User permission management by RBAC.
+This repository is a sample web application using DDD (Domain-Driven Design) architecture and Gin framework. Here's an overview of the features and technology stack provided in this repository.
 
 [![golangci-lint](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml)
+
+## Features
+This web application provides the following features:
+
+- User registration, login, and logout
+- User list display, detailed display, editing, and deletion
+- Access control based on roles (administrator, general user)
+- API documentation using Swagger
+
+## Technology Stack
+This web application uses the following technology stack:
+
+- Golang
+- Gin - Web framework
+- GORM - ORM library
+- MySQL - Database
+- Swagger - API documentation generation tool
+- K8s / Skaffold / Docker - Containerization
 
 ## DDD Architecture
 + Domain: This is where the domain and business logic of the application is defined.
