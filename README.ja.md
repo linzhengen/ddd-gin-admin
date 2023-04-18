@@ -1,9 +1,27 @@
 # ddd-gin-admin
 [English](./README.md) | [简体中文](./README.zh-CN.md) | 日本語
 
-`ddd-gin-admin` はDDDアーキテクチャを採用し、CMSの構築に必要なコンポーネントを提供します。RBACによるユーザー権限管理。
+このリポジトリは、DDD（Domain-Driven Design）アーキテクチャとGinフレームワークを使用したWebアプリケーションのサンプルです。
 
 [![golangci-lint](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml)
+
+## 機能
+以下の機能を提供しています。
+
+- ユーザーの登録、ログイン、ログアウト
+- ユーザーの一覧表示、詳細表示、編集、削除
+- ロール（管理者、一般ユーザー）に基づくアクセス制御
+- Swaggerを使用したAPIドキュメント
+
+## 技術スタック
+以下の技術スタックを使用しています。
+
+- Golang
+- Gin - Webフレームワーク
+- GORM - ORMライブラリ
+- MySQL - データベース
+- Swagger - APIドキュメント生成ツール
+- K8s / Skaffold / Docker - コンテナ化
 
 ## DDD Architecture
 + Domain: Domain層は、アプリケーションのドメインとビジネスロジックが定義されます。
