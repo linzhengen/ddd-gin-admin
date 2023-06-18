@@ -1,4 +1,4 @@
-FROM golang:1.20.4-alpine3.17 as build-env
+FROM golang:1.20.5-alpine3.17 as build-env
 
 WORKDIR /go/src/app
 ADD . /go/src/app
