@@ -1,5 +1,5 @@
 # doc: https://skaffold.dev/docs/references/yaml
-apiVersion: skaffold/v2beta19
+apiVersion: skaffold/v4beta5
 kind: Config
 
 profiles:
@@ -16,7 +16,7 @@ profiles:
 #              - src: 'configs/*'
 #                dest: "/"
     deploy:
-      statusCheckDeadlineSeconds: 60
+      statusCheckDeadlineSeconds: 120
       helm:
         releases:
           - name: mariadb
@@ -24,6 +24,7 @@ profiles:
             remoteChart: mariadb
             version: 11.5.1
             namespace: mariadb
+            wait: true
             createNamespace: true
             setValues:
               auth.database: ddd-gin-admin

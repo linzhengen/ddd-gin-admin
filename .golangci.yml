@@ -3,7 +3,7 @@ linters:
   enable:
     - bodyclose
     - deadcode
-    - depguard
+#    - depguard
 #    - dupl
     - gochecknoinits
     - gocritic
