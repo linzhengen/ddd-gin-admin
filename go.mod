@@ -28,7 +28,7 @@ require (
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
 	github.com/tidwall/buntdb v1.3.0
-	github.com/urfave/cli/v2 v2.25.6
+	github.com/urfave/cli/v2 v2.25.7
 	golang.org/x/time v0.3.0
 	gopkg.in/yaml.v2 v2.4.0
 )
