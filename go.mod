@@ -15,7 +15,7 @@ require (
 	github.com/go-redis/redis_rate v6.5.0+incompatible
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/gops v0.3.28
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.4.0
 	github.com/google/wire v0.5.0
 	github.com/jinzhu/copier v0.4.0
 	github.com/jinzhu/gorm v1.9.16
