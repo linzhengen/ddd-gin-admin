@@ -1,4 +1,4 @@
-FROM golang:1.21.3-alpine3.17 as build-env
+FROM golang:1.21.5-alpine3.17 as build-env
 
 WORKDIR /go/src/app
 ADD . /go/src/app
@@ -6,7 +6,7 @@ ADD . /go/src/app
 RUN go mod download && \
     GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /go/src/app/main/app /go/src/app/main
 
-FROM alpine:3.18
+FROM alpine:3.19
 COPY --from=build-env /go/src/app/main/app /app
 COPY --from=build-env /go/src/app/configs/ /
 
