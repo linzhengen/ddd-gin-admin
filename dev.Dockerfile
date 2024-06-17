@@ -6,7 +6,7 @@ ADD . /go/src/app
 RUN go mod download && \
     GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /go/src/app/main/app /go/src/app/main
 
-FROM alpine:3.19
+FROM alpine:3.20
 COPY --from=build-env /go/src/app/main/app /app
 COPY --from=build-env /go/src/app/configs/ /
 
