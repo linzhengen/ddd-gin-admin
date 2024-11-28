@@ -18,7 +18,7 @@ type Role struct {
 // @Param pageSize query int true "Page size" default(10)
 // @Param queryValue query string false "Search value"
 // @Param status query int false "Status(1:enable 2:disable)"
-// @Success 200 {object} response.ListResult{list=[]schema.Role} "Search Result"
+// @Success 200 {object} response.ListResult{list=[]response.Role} "Search Result"
 // @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
 // @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/roles [get]
@@ -31,7 +31,7 @@ func (a *Role) Query(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Param queryValue query string false "Search value"
 // @Param status query int false "Status(1:enable 2:disable)"
-// @Success 200 {object} response.ListResult{list=[]schema.Role} "Search Result"
+// @Success 200 {object} response.ListResult{list=[]response.Role} "Search Result"
 // @Failure 400 {object} response.ErrorResult "{error:{code:0,message:未知的查询类型}}"
 // @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
 // @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"

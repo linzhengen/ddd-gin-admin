@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   pagination.Pagination:
     properties:
@@ -66,9 +65,13 @@ definitions:
         type: integer
       show_status:
         description: Show Status(1:show 2:hide)
+        maximum: 2
+        minimum: 1
         type: integer
       status:
         description: Menu Status(1:enable 2:disable)
+        maximum: 2
+        minimum: 1
         type: integer
       updated_at:
         description: UpdatedAt
@@ -97,6 +100,8 @@ definitions:
         type: integer
       status:
         description: Status(1:enable 2:disable)
+        maximum: 2
+        minimum: 1
         type: integer
       updated_at:
         description: UpdatedAt
@@ -164,9 +169,9 @@ definitions:
   response.ErrorResult:
     properties:
       error:
-        $ref: '#/definitions/response.ErrorItem'
+        allOf:
+        - $ref: '#/definitions/response.ErrorItem'
         description: Error
-        type: object
     type: object
   response.HealthCheck:
     properties:
@@ -186,11 +191,10 @@ definitions:
     properties:
       list:
         description: List
-        type: object
       pagination:
-        $ref: '#/definitions/pagination.Pagination'
+        allOf:
+        - $ref: '#/definitions/pagination.Pagination'
         description: Pagination
-        type: object
     type: object
   response.LoginCaptcha:
     properties:
@@ -213,9 +217,10 @@ definitions:
   response.Menu:
     properties:
       actions:
-        $ref: '#/definitions/response.MenuActions'
         description: Actions
-        type: object
+        items:
+          $ref: '#/definitions/response.MenuAction'
+        type: array
       created_at:
         description: CreatedAt
         type: string
@@ -248,9 +253,13 @@ definitions:
         type: integer
       show_status:
         description: Show Status(1:show 2:hide)
+        maximum: 2
+        minimum: 1
         type: integer
       status:
         description: Menu Status(1:enable 2:disable)
+        maximum: 2
+        minimum: 1
         type: integer
       updated_at:
         description: UpdatedAt
@@ -271,8 +280,9 @@ definitions:
       name:
         type: string
       resources:
-        $ref: '#/definitions/response.MenuActionResources'
-        type: object
+        items:
+          $ref: '#/definitions/response.MenuActionResource'
+        type: array
     required:
     - code
     - menu_id
@@ -292,14 +302,37 @@ definitions:
     - method
     - path
     type: object
-  response.MenuActionResources:
-    items:
-      $ref: '#/definitions/response.MenuActionResource'
-    type: array
-  response.MenuActions:
-    items:
-      $ref: '#/definitions/response.MenuAction'
-    type: array
+  response.MenuTree:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/response.MenuAction'
+        type: array
+      children:
+        items:
+          $ref: '#/definitions/response.MenuTree'
+        type: array
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+      parent_path:
+        type: string
+      router:
+        type: string
+      sequence:
+        type: integer
+      show_status:
+        description: 1:show 2:hide
+        type: integer
+      status:
+        description: 1:enable 2:disable
+        type: integer
+    type: object
   response.Role:
     properties:
       created_at:
@@ -318,9 +351,10 @@ definitions:
         description: Name
         type: string
       role_menus:
-        $ref: '#/definitions/response.RoleMenus'
         description: RoleMenus
-        type: object
+        items:
+          $ref: '#/definitions/response.RoleMenu'
+        type: array
       sequence:
         description: Sequence
         type: integer
@@ -350,20 +384,23 @@ definitions:
     - menu_id
     - role_id
     type: object
-  response.RoleMenus:
-    items:
-      $ref: '#/definitions/response.RoleMenu'
-    type: array
-  response.Roles:
-    items:
-      $ref: '#/definitions/response.Role'
-    type: array
   response.StatusResult:
     properties:
       status:
+        allOf:
+        - $ref: '#/definitions/response.StatusText'
         description: Result status
-        type: string
     type: object
+  response.StatusText:
+    enum:
+    - OK
+    - ERROR
+    - FAIL
+    type: string
+    x-enum-varnames:
+    - OKStatus
+    - ErrorStatus
+    - FailStatus
   response.User:
     properties:
       created_at:
@@ -389,14 +426,17 @@ definitions:
         type: string
       status:
         description: Status(1:enable 2:disable)
+        maximum: 2
+        minimum: 1
         type: integer
       user_name:
         description: User Name
         type: string
       user_roles:
-        $ref: '#/definitions/response.UserRoles'
         description: UserRoles
-        type: object
+        items:
+          $ref: '#/definitions/response.UserRole'
+        type: array
     required:
     - real_name
     - status
@@ -409,9 +449,10 @@ definitions:
         description: Real Name
         type: string
       roles:
-        $ref: '#/definitions/response.Roles'
         description: Role
-        type: object
+        items:
+          $ref: '#/definitions/response.Role'
+        type: array
       user_id:
         description: User ID
         type: string
@@ -431,10 +472,35 @@ definitions:
         description: User ID
         type: string
     type: object
-  response.UserRoles:
-    items:
-      $ref: '#/definitions/response.UserRole'
-    type: array
+  response.UserShow:
+    properties:
+      created_at:
+        description: CreatedAt
+        type: string
+      email:
+        description: Email
+        type: string
+      id:
+        description: ID
+        type: string
+      phone:
+        description: Phone
+        type: string
+      real_name:
+        description: Real Name
+        type: string
+      roles:
+        description: Roles
+        items:
+          $ref: '#/definitions/response.Role'
+        type: array
+      status:
+        description: Status(1:enable 2:disable)
+        type: integer
+      user_name:
+        description: User Name
+        type: string
+    type: object
 info:
   contact: {}
   description: RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE.
@@ -489,7 +555,14 @@ paths:
         "200":
           description: Search Result
           schema:
-            $ref: '#/definitions/response.ListResult'
+            allOf:
+            - $ref: '#/definitions/response.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/response.Menu'
+                  type: array
+              type: object
         "401":
           description: '{error:{code:0,message:Unauthorized}}'
           schema:
@@ -548,7 +621,14 @@ paths:
         "200":
           description: Search Result
           schema:
-            $ref: '#/definitions/response.ListResult'
+            allOf:
+            - $ref: '#/definitions/response.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/response.MenuTree'
+                  type: array
+              type: object
         "401":
           description: '{error:{code:0,message:Unauthorized}}'
           schema:
@@ -710,7 +790,14 @@ paths:
         "200":
           description: Search Result
           schema:
-            $ref: '#/definitions/response.ListResult'
+            allOf:
+            - $ref: '#/definitions/response.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/response.MenuTree'
+                  type: array
+              type: object
         "401":
           description: '{error:{code:0,message:Unauthorized}}'
           schema:
@@ -895,7 +982,14 @@ paths:
         "200":
           description: Search Result
           schema:
-            $ref: '#/definitions/response.ListResult'
+            allOf:
+            - $ref: '#/definitions/response.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/response.Role'
+                  type: array
+              type: object
         "401":
           description: '{error:{code:0,message:Unauthorized}}'
           schema:
@@ -954,7 +1048,14 @@ paths:
         "200":
           description: Search Result
           schema:
-            $ref: '#/definitions/response.ListResult'
+            allOf:
+            - $ref: '#/definitions/response.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/response.Role'
+                  type: array
+              type: object
         "400":
           description: '{error:{code:0,message:未知的查询类型}}'
           schema:
@@ -1145,7 +1246,14 @@ paths:
         "200":
           description: Search Result
           schema:
-            $ref: '#/definitions/response.ListResult'
+            allOf:
+            - $ref: '#/definitions/response.ListResult'
+            - properties:
+                list:
+                  items:
+                    $ref: '#/definitions/response.UserShow'
+                  type: array
+              type: object
         "401":
           description: '{error:{code:0,message:Unauthorized}}'
           schema:
@@ -1331,9 +1439,6 @@ paths:
       summary: Enable
       tags:
       - User
-schemes:
-- http
-- https
 securityDefinitions:
   ApiKeyAuth:
     in: header

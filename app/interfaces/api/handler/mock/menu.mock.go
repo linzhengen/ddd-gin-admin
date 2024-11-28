@@ -19,7 +19,7 @@ type Menu struct{}
 // @Param status query int false "Status(1:enable 2:disable)"
 // @Param showStatus query int false "Show status(1:show 2:hide)"
 // @Param parentID query string false "Parent ID"
-// @Success 200 {object} response.ListResult{list=[]schema.Menu} "Search Result"
+// @Success 200 {object} response.ListResult{list=[]response.Menu} "Search Result"
 // @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
 // @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus [get]
@@ -32,7 +32,7 @@ func (a *Menu) Query(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Param status query int false "Status(1:enable 2:disable)"
 // @Param parentID query string false "Parent ID"
-// @Success 200 {object} response.ListResult{list=[]schema.MenuTree} "Search Result"
+// @Success 200 {object} response.ListResult{list=[]response.MenuTree} "Search Result"
 // @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
 // @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/menus.tree [get]

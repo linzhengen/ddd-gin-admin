@@ -76,7 +76,7 @@ func (a *Login) GetUserInfo(c *gin.Context) {
 // @Tags Login
 // @Summary Get user menu tree
 // @Security ApiKeyAuth
-// @Success 200 {object} response.ListResult{list=[]schema.MenuTree} "Search Result"
+// @Success 200 {object} response.ListResult{list=[]response.MenuTree} "Search Result"
 // @Failure 401 {object} response.ErrorResult "{error:{code:0,message:Unauthorized}}"
 // @Failure 500 {object} response.ErrorResult "{error:{code:0,message:SystemError}}"
 // @Router /api/v1/pub/current/menutree [get]

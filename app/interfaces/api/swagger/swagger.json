@@ -1,8 +1,4 @@
 {
-    "schemes": [
-        "http",
-        "https"
-    ],
     "swagger": "2.0",
     "info": {
         "description": "RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE.",
@@ -14,7 +10,6 @@
         },
         "version": "0.2.0"
     },
-    "basePath": "/",
     "paths": {
         "/api/health": {
             "get": {
@@ -89,7 +84,22 @@
                     "200": {
                         "description": "Search Result",
                         "schema": {
-                            "$ref": "#/definitions/response.ListResult"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.Menu"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -184,7 +194,22 @@
                     "200": {
                         "description": "Search Result",
                         "schema": {
-                            "$ref": "#/definitions/response.ListResult"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.MenuTree"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -444,7 +469,22 @@
                     "200": {
                         "description": "Search Result",
                         "schema": {
-                            "$ref": "#/definitions/response.ListResult"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.MenuTree"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -737,7 +777,22 @@
                     "200": {
                         "description": "Search Result",
                         "schema": {
-                            "$ref": "#/definitions/response.ListResult"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.Role"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -832,7 +887,22 @@
                     "200": {
                         "description": "Search Result",
                         "schema": {
-                            "$ref": "#/definitions/response.ListResult"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.Role"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1134,7 +1204,22 @@
                     "200": {
                         "description": "Search Result",
                         "schema": {
-                            "$ref": "#/definitions/response.ListResult"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.ListResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.UserShow"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1523,11 +1608,15 @@
                 },
                 "show_status": {
                     "description": "Show Status(1:show 2:hide)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "status": {
                     "description": "Menu Status(1:enable 2:disable)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "updated_at": {
                     "description": "UpdatedAt",
@@ -1564,7 +1653,9 @@
                 },
                 "status": {
                     "description": "Status(1:enable 2:disable)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "updated_at": {
                     "description": "UpdatedAt",
@@ -1655,8 +1746,11 @@
             "properties": {
                 "error": {
                     "description": "Error",
-                    "type": "object",
-                    "$ref": "#/definitions/response.ErrorItem"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.ErrorItem"
+                        }
+                    ]
                 }
             }
         },
@@ -1685,13 +1779,15 @@
             "type": "object",
             "properties": {
                 "list": {
-                    "description": "List",
-                    "type": "object"
+                    "description": "List"
                 },
                 "pagination": {
                     "description": "Pagination",
-                    "type": "object",
-                    "$ref": "#/definitions/pagination.Pagination"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/pagination.Pagination"
+                        }
+                    ]
                 }
             }
         },
@@ -1731,8 +1827,10 @@
             "properties": {
                 "actions": {
                     "description": "Actions",
-                    "type": "object",
-                    "$ref": "#/definitions/response.MenuActions"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MenuAction"
+                    }
                 },
                 "created_at": {
                     "description": "CreatedAt",
@@ -1776,11 +1874,15 @@
                 },
                 "show_status": {
                     "description": "Show Status(1:show 2:hide)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "status": {
                     "description": "Menu Status(1:enable 2:disable)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "updated_at": {
                     "description": "UpdatedAt",
@@ -1809,8 +1911,10 @@
                     "type": "string"
                 },
                 "resources": {
-                    "type": "object",
-                    "$ref": "#/definitions/response.MenuActionResources"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MenuActionResource"
+                    }
                 }
             }
         },
@@ -1835,16 +1939,50 @@
                 }
             }
         },
-        "response.MenuActionResources": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/response.MenuActionResource"
-            }
-        },
-        "response.MenuActions": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/response.MenuAction"
+        "response.MenuTree": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MenuAction"
+                    }
+                },
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MenuTree"
+                    }
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "parent_path": {
+                    "type": "string"
+                },
+                "router": {
+                    "type": "string"
+                },
+                "sequence": {
+                    "type": "integer"
+                },
+                "show_status": {
+                    "description": "1:show 2:hide",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "1:enable 2:disable",
+                    "type": "integer"
+                }
             }
         },
         "response.Role": {
@@ -1872,8 +2010,10 @@
                 },
                 "role_menus": {
                     "description": "RoleMenus",
-                    "type": "object",
-                    "$ref": "#/definitions/response.RoleMenus"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.RoleMenu"
+                    }
                 },
                 "sequence": {
                     "description": "Sequence",
@@ -1915,26 +2055,31 @@
                 }
             }
         },
-        "response.RoleMenus": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/response.RoleMenu"
-            }
-        },
-        "response.Roles": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/response.Role"
-            }
-        },
         "response.StatusResult": {
             "type": "object",
             "properties": {
                 "status": {
                     "description": "Result status",
-                    "type": "string"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.StatusText"
+                        }
+                    ]
                 }
             }
+        },
+        "response.StatusText": {
+            "type": "string",
+            "enum": [
+                "OK",
+                "ERROR",
+                "FAIL"
+            ],
+            "x-enum-varnames": [
+                "OKStatus",
+                "ErrorStatus",
+                "FailStatus"
+            ]
         },
         "response.User": {
             "type": "object",
@@ -1975,7 +2120,9 @@
                 },
                 "status": {
                     "description": "Status(1:enable 2:disable)",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 2,
+                    "minimum": 1
                 },
                 "user_name": {
                     "description": "User Name",
@@ -1983,8 +2130,10 @@
                 },
                 "user_roles": {
                     "description": "UserRoles",
-                    "type": "object",
-                    "$ref": "#/definitions/response.UserRoles"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.UserRole"
+                    }
                 }
             }
         },
@@ -1997,8 +2146,10 @@
                 },
                 "roles": {
                     "description": "Role",
-                    "type": "object",
-                    "$ref": "#/definitions/response.Roles"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Role"
+                    }
                 },
                 "user_id": {
                     "description": "User ID",
@@ -2027,10 +2178,44 @@
                 }
             }
         },
-        "response.UserRoles": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/response.UserRole"
+        "response.UserShow": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "CreatedAt",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "Email",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "Phone",
+                    "type": "string"
+                },
+                "real_name": {
+                    "description": "Real Name",
+                    "type": "string"
+                },
+                "roles": {
+                    "description": "Roles",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Role"
+                    }
+                },
+                "status": {
+                    "description": "Status(1:enable 2:disable)",
+                    "type": "integer"
+                },
+                "user_name": {
+                    "description": "User Name",
+                    "type": "string"
+                }
             }
         }
     },
