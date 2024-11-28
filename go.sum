@@ -8,10 +8,6 @@ github.com/LyricTian/captcha v1.2.0 h1:SXmXj9B1KHBTsVv9rXVVTsKdgNlHrSeb4Memlw+wk
 github.com/LyricTian/captcha v1.2.0/go.mod h1:tpNDvMWf9XBnkfPB2Tyx7lxDWTgfZ9wA4o7Yl50FWs4=
 github.com/LyricTian/gzip v0.1.1 h1:R8lzUek+tFN4frAXNWOhIKoJaLyFLVOnogBJMBMj9xY=
 github.com/LyricTian/gzip v0.1.1/go.mod h1:JT7ISZwfIQvoUG2Z/RFjTQA7vBObrGAi9OLXTA+Vycs=
-github.com/LyricTian/queue v1.3.0 h1:1xEFZlteW6iu5Qbrz7ZsiSKMKaxY1bQHsbx0jrB1pDA=
-github.com/LyricTian/queue v1.3.0/go.mod h1:pbkoplz/zRToCay3pRjz75P8fQAgvkRKJdEzVUQYhXY=
-github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 h1:JYp7IbQjafoB+tBA3gMyHYHrpOtNuDiK/uB5uXxq5wM=
-github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/bmatcuk/doublestar/v4 v4.6.1/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
 github.com/bmatcuk/doublestar/v4 v4.7.1 h1:fdDeAqgT47acgwd9bd9HxJRDmc9UAmPpc+2m0CXv75Q=
 github.com/bmatcuk/doublestar/v4 v4.7.1/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
@@ -191,8 +187,6 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
 github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
-github.com/rs/xid v1.6.0 h1:fV591PaemRlL6JfRxGDEPl69wICngIQ3shQtzfy2gxU=
-github.com/rs/xid v1.6.0/go.mod h1:7XoLgs4eV+QndskICGsho+ADou8ySMSjJKDIan90Nz0=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
