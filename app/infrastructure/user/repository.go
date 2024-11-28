@@ -7,10 +7,10 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
-	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
+	"gorm.io/gorm"
 )
 
 func NewRepository(db *gorm.DB) user.Repository {
@@ -39,8 +39,7 @@ func (a *repository) Query(ctx context.Context, params user.QueryParams) (user.U
 		// todo: serviceへ移動
 		subQuery := userrole.GetModelDB(ctx, a.db).
 			Select("user_id").
-			Where("role_id IN (?)", v).
-			SubQuery()
+			Where("role_id IN (?)", v)
 		db = db.Where("id IN ?", subQuery)
 	}
 	if v := params.QueryValue; v != "" {

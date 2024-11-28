@@ -18,7 +18,7 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func InitGormDB() (*gorm.DB, func(), error) {
@@ -77,5 +77,5 @@ func autoMigrate(db *gorm.DB) error {
 		new(roleMenuInfra.Model),
 		new(userRoleInfra.Model),
 		new(userInfra.Model),
-	).Error
+	)
 }

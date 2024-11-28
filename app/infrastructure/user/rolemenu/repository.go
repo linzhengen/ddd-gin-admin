@@ -8,8 +8,8 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
 
-	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
+	"gorm.io/gorm"
 )
 
 func NewRepository(db *gorm.DB) rolemenu.Repository {

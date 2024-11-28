@@ -2,7 +2,7 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
+#    - deadcode
 #    - depguard
 #    - dupl
     - gochecknoinits
@@ -19,10 +19,10 @@ linters:
     - nolintlint
     - rowserrcheck
     - staticcheck
-    - structcheck
+#    - structcheck
 #    - typecheck
     - unconvert
     - unparam
-    - varcheck
+#    - varcheck
     - whitespace
     - errcheck

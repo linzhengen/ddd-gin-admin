@@ -82,7 +82,6 @@ func (s seedApp) readMenuData(name string) (SeedMenus, error) {
 
 	var data SeedMenus
 	d := yaml.NewDecoder(file)
-	d.SetStrict(true)
 	err = d.Decode(&data)
 	log.Printf("%+v", data)
 	return data, err

@@ -11,8 +11,8 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 
-	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
+	"gorm.io/gorm"
 )
 
 func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
@@ -34,11 +34,11 @@ func (a *repository) Query(ctx context.Context, params menuactionresource.QueryP
 	if v := params.MenuID; v != "" {
 		subQuery := menuaction.GetModelDB(ctx, a.db).
 			Where("menu_id=?", v).
-			Select("id").SubQuery()
+			Select("id")
 		db = db.Where("action_id IN ?", subQuery)
 	}
 	if v := params.MenuIDs; len(v) > 0 {
-		subQuery := menuaction.GetModelDB(ctx, a.db).Where("menu_id IN (?)", v).Select("id").SubQuery()
+		subQuery := menuaction.GetModelDB(ctx, a.db).Where("menu_id IN (?)", v).Select("id")
 		db = db.Where("action_id IN ?", subQuery)
 	}
 
@@ -88,7 +88,7 @@ func (a *repository) DeleteByActionID(ctx context.Context, actionID string) erro
 }
 
 func (a *repository) DeleteByMenuID(ctx context.Context, menuID string) error {
-	subQuery := menuaction.GetModelDB(ctx, a.db).Where("menu_id=?", menuID).Select("id").SubQuery()
+	subQuery := menuaction.GetModelDB(ctx, a.db).Where("menu_id=?", menuID).Select("id")
 	result := GetModelDB(ctx, a.db).Where("action_id IN ?", subQuery).Delete(Model{})
 	return errors.WithStack(result.Error)
 }

@@ -9,9 +9,9 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 
-	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
+	"gorm.io/gorm"
 )
 
 func NewRepository(db *gorm.DB) role.Repository {
@@ -41,7 +41,7 @@ func (a *repository) Query(ctx context.Context, params role.QueryParam) (role.Ro
 		subQuery := userrole.GetModelDB(ctx, a.db).
 			Where("deleted_at is null").
 			Where("user_id=?", v).
-			Select("role_id").SubQuery()
+			Select("role_id")
 		db = db.Where("id IN ?", subQuery)
 	}
 	if v := params.QueryValue; v != "" {

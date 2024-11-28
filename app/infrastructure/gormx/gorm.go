@@ -1,14 +1,25 @@
 package gormx
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
-	"github.com/jinzhu/gorm"
-	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
+	"gorm.io/gorm/schema"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+
+	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
+	"gorm.io/gorm"
+	gormLogger "gorm.io/gorm/logger"
+
+	_ "gorm.io/driver/mysql"
+	_ "gorm.io/driver/postgres"
+	_ "gorm.io/driver/sqlite"
 )
 
 type Config struct {
@@ -22,11 +33,33 @@ type Config struct {
 }
 
 func NewDB(c *Config) (*gorm.DB, func(), error) {
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return c.TablePrefix + defaultTableName
+	var dialector gorm.Dialector
+
+	switch strings.ToLower(c.DBType) {
+	case "mysql":
+		dialector = mysql.Open(c.DSN)
+	case "postgres":
+		dialector = postgres.Open(c.DSN)
+	case "sqlite3":
+		_ = os.MkdirAll(filepath.Dir(c.DSN), os.ModePerm)
+		dialector = sqlite.Open(c.DSN)
+	default:
+		panic(fmt.Sprintf("unsupported database type: %s", c.DBType))
 	}
 
-	db, err := gorm.Open(c.DBType, c.DSN)
+	ormCfg := &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   c.TablePrefix,
+			SingularTable: true,
+		},
+		Logger: gormLogger.Discard,
+	}
+
+	if c.Debug {
+		ormCfg.Logger = gormLogger.Default
+	}
+
+	db, err := gorm.Open(dialector, ormCfg)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -35,21 +68,22 @@ func NewDB(c *Config) (*gorm.DB, func(), error) {
 		db = db.Debug()
 	}
 
+	sqlDB, err := db.DB()
+
 	cleanFunc := func() {
-		err := db.Close()
+		err := sqlDB.Close()
 		if err != nil {
 			logger.Errorf("Gorm db close error: %s", err.Error())
 		}
 	}
 
-	err = db.DB().Ping()
+	err = sqlDB.Ping()
 	if err != nil {
 		return nil, cleanFunc, err
 	}
 
-	db.SingularTable(true)
-	db.DB().SetMaxIdleConns(c.MaxIdleConns)
-	db.DB().SetMaxOpenConns(c.MaxOpenConns)
-	db.DB().SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
+	sqlDB.SetMaxIdleConns(c.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(c.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
 	return db, cleanFunc, nil
 }

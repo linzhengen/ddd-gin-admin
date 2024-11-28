@@ -1,16 +1,12 @@
 package injector
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
-	loggerhook "github.com/linzhengen/ddd-gin-admin/pkg/logger/hook"
-	loggergormhook "github.com/linzhengen/ddd-gin-admin/pkg/logger/hook/gorm"
-	"github.com/sirupsen/logrus"
 )
 
 func InitLogger() (func(), error) {
@@ -40,56 +36,9 @@ func InitLogger() (func(), error) {
 		}
 	}
 
-	var hook *loggerhook.Hook
-	if c.EnableHook {
-		var hookLevels []logrus.Level
-		for _, lvl := range c.HookLevels {
-			plvl, err := logrus.ParseLevel(lvl)
-			if err != nil {
-				return nil, err
-			}
-			hookLevels = append(hookLevels, plvl)
-		}
-
-		if c.Hook.IsGorm() {
-			hc := configs.C.LogGormHook
-
-			var dsn string
-			switch hc.DBType {
-			case "mysql":
-				dsn = configs.C.MySQL.DSN()
-			case "sqlite3":
-				dsn = configs.C.Sqlite3.DSN()
-			case "postgres":
-				dsn = configs.C.Postgres.DSN()
-			default:
-				return nil, errors.New("unknown db")
-			}
-
-			h := loggerhook.New(loggergormhook.New(&loggergormhook.Config{
-				DBType:       hc.DBType,
-				DSN:          dsn,
-				MaxLifetime:  hc.MaxLifetime,
-				MaxOpenConns: hc.MaxOpenConns,
-				MaxIdleConns: hc.MaxIdleConns,
-				TableName:    hc.Table,
-			}),
-				loggerhook.SetMaxWorkers(c.HookMaxThread),
-				loggerhook.SetMaxQueues(c.HookMaxBuffer),
-				loggerhook.SetLevels(hookLevels...),
-			)
-			logger.AddHook(h)
-			hook = h
-		}
-	}
-
 	return func() {
 		if file != nil {
 			file.Close()
-		}
-
-		if hook != nil {
-			hook.Flush()
 		}
 	}, nil
 }

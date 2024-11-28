@@ -1,10 +1,13 @@
 # doc: https://skaffold.dev/docs/references/yaml
-apiVersion: skaffold/v4beta5
+apiVersion: skaffold/v4beta11
 kind: Config
 
 profiles:
   - name: dev
     build:
+      local:
+        concurrency: 0
+        tryImportMissing: true
       tagPolicy:
         gitCommit: {}
       artifacts:

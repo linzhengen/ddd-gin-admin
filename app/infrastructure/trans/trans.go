@@ -5,8 +5,8 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
 
-	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
+	"gorm.io/gorm"
 )
 
 func NewRepository(db *gorm.DB) trans.Repository {

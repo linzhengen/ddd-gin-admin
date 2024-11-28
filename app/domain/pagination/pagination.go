@@ -1,9 +1,9 @@
 package pagination
 
 type Pagination struct {
-	Total    int  `json:"total"`    // Total count
-	Current  uint `json:"current"`  // Current Page
-	PageSize uint `json:"pageSize"` // Page Size
+	Total    int64 `json:"total"`    // Total count
+	Current  uint  `json:"current"`  // Current Page
+	PageSize uint  `json:"pageSize"` // Page Size
 }
 
 type Param struct {

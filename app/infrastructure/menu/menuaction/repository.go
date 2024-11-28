@@ -9,8 +9,8 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 
-	"github.com/jinzhu/gorm"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
+	"gorm.io/gorm"
 )
 
 func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {

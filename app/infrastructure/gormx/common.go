@@ -10,7 +10,7 @@ import (
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type TransFunc func(context.Context) error
@@ -55,7 +55,7 @@ func GetDBWithModel(ctx context.Context, defDB *gorm.DB, m interface{}) *gorm.DB
 
 func WrapPageQuery(ctx context.Context, db *gorm.DB, pp pagination.Param, out interface{}) (*pagination.Pagination, error) {
 	if pp.OnlyCount {
-		var count int
+		var count int64
 		err := db.Count(&count).Error
 		if err != nil {
 			return nil, err
@@ -79,8 +79,8 @@ func WrapPageQuery(ctx context.Context, db *gorm.DB, pp pagination.Param, out in
 	}, nil
 }
 
-func FindPage(ctx context.Context, db *gorm.DB, pp pagination.Param, out interface{}) (int, error) {
-	var count int
+func FindPage(ctx context.Context, db *gorm.DB, pp pagination.Param, out interface{}) (int64, error) {
+	var count int64
 	err := db.Count(&count).Error
 	if err != nil {
 		return 0, err
@@ -91,10 +91,10 @@ func FindPage(ctx context.Context, db *gorm.DB, pp pagination.Param, out interfa
 
 	current, pageSize := pp.GetCurrent(), pp.GetPageSize()
 	if current > 0 && pageSize > 0 {
-		db = db.Offset((current - 1) * pageSize).Limit(pageSize)
+		db = db.Offset(int((current - 1) * pageSize)).Limit(int(pageSize))
 	}
 	if pageSize > 0 {
-		db = db.Limit(pageSize)
+		db = db.Limit(int(pageSize))
 	}
 
 	err = db.Find(out).Error
@@ -113,7 +113,7 @@ func FindOne(ctx context.Context, db *gorm.DB, out interface{}) (bool, error) {
 }
 
 func Check(ctx context.Context, db *gorm.DB) (bool, error) {
-	var count int
+	var count int64
 	result := db.Count(&count)
 	if err := result.Error; err != nil {
 		return false, err
