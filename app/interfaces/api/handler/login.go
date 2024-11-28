@@ -114,7 +114,7 @@ func (a *login) Logout(c *gin.Context) {
 		ctx = logger.NewTagContext(ctx, "__logout__")
 		err := a.loginApp.DestroyToken(ctx, api.GetToken(c))
 		if err != nil {
-			logger.WithContext(ctx).Errorf(err.Error())
+			logger.WithContext(ctx).Error(err.Error())
 		}
 		logger.WithContext(ctx).Infof("lougged out")
 	}

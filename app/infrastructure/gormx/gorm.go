@@ -69,7 +69,9 @@ func NewDB(c *Config) (*gorm.DB, func(), error) {
 	}
 
 	sqlDB, err := db.DB()
-
+	if err != nil {
+		return nil, nil, err
+	}
 	cleanFunc := func() {
 		err := sqlDB.Close()
 		if err != nil {

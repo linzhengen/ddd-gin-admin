@@ -115,7 +115,7 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 
 		srv.SetKeepAlivesEnabled(false)
 		if err := srv.Shutdown(ctx); err != nil {
-			logger.WithContext(ctx).Errorf(err.Error())
+			logger.WithContext(ctx).Error(err.Error())
 		}
 	}
 }

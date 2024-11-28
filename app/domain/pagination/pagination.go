@@ -2,22 +2,22 @@ package pagination
 
 type Pagination struct {
 	Total    int64 `json:"total"`    // Total count
-	Current  uint  `json:"current"`  // Current Page
-	PageSize uint  `json:"pageSize"` // Page Size
+	Current  int   `json:"current"`  // Current Page
+	PageSize int   `json:"pageSize"` // Page Size
 }
 
 type Param struct {
 	Pagination bool `form:"-"`                                     // Pagination
 	OnlyCount  bool `form:"-"`                                     // Only count
-	Current    uint `form:"current,default=1"`                     // Current page
-	PageSize   uint `form:"pageSize,default=10" binding:"max=100"` // Page size
+	Current    int  `form:"current,default=1"`                     // Current page
+	PageSize   int  `form:"pageSize,default=10" binding:"max=100"` // Page size
 }
 
-func (a Param) GetCurrent() uint {
+func (a Param) GetCurrent() int {
 	return a.Current
 }
 
-func (a Param) GetPageSize() uint {
+func (a Param) GetPageSize() int {
 	pageSize := a.PageSize
 	if a.PageSize == 0 {
 		pageSize = 100

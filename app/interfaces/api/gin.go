@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -54,21 +53,21 @@ func GetBody(c *gin.Context) []byte {
 
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
-		return errors2.Wrap400Response(err, fmt.Sprintf("400 Bad Request - %s", err.Error()))
+		return errors2.Wrap400Response(err, "400 Bad Request - "+err.Error())
 	}
 	return nil
 }
 
 func ParseQuery(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindQuery(obj); err != nil {
-		return errors2.Wrap400Response(err, fmt.Sprintf("400 Bad Request - %s", err.Error()))
+		return errors2.Wrap400Response(err, "400 Bad Request - "+err.Error())
 	}
 	return nil
 }
 
 func ParseForm(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindWith(obj, binding.Form); err != nil {
-		return errors2.Wrap400Response(err, fmt.Sprintf("解析请求参数发生错误 - %s", err.Error()))
+		return errors2.Wrap400Response(err, "400 Bad Request - "+err.Error())
 	}
 	return nil
 }
@@ -130,7 +129,7 @@ func ResError(c *gin.Context, err error, status ...int) {
 		if status := res.StatusCode; status >= 400 && status < 500 {
 			logger.WithContext(ctx).Warnf(err.Error())
 		} else if status >= 500 {
-			logger.WithContext(logger.NewStackContext(ctx, err)).Errorf(err.Error())
+			logger.WithContext(logger.NewStackContext(ctx, err)).Error(err.Error())
 		}
 	}
 
