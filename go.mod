@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/LyricTian/captcha v1.2.0
 	github.com/LyricTian/gzip v0.1.1
-	github.com/casbin/casbin/v2 v2.101.0
+	github.com/casbin/casbin/v2 v2.102.0
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-redis/redis v6.15.9+incompatible
@@ -29,8 +29,8 @@ require (
 	golang.org/x/time v0.8.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.7
-	gorm.io/driver/postgres v1.5.10
-	gorm.io/driver/sqlite v1.5.6
+	gorm.io/driver/postgres v1.5.11
+	gorm.io/driver/sqlite v1.5.7
 	gorm.io/gorm v1.25.12
 )
 
