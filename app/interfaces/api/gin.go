@@ -127,7 +127,7 @@ func ResError(c *gin.Context, err error, status ...int) {
 		}
 
 		if status := res.StatusCode; status >= 400 && status < 500 {
-			logger.WithContext(ctx).Warnf(err.Error())
+			logger.WithContext(ctx).Warn(err)
 		} else if status >= 500 {
 			logger.WithContext(logger.NewStackContext(ctx, err)).Error(err.Error())
 		}
