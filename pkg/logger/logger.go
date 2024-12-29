@@ -33,8 +33,8 @@ func StandardLogger() *Logger {
 	return logrus.StandardLogger()
 }
 
-func SetLevel(level int) {
-	logrus.SetLevel(logrus.Level(uint32(level)))
+func SetLevel(level uint32) {
+	logrus.SetLevel(logrus.Level(level))
 }
 
 func SetFormatter(format string) {

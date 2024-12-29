@@ -120,8 +120,8 @@ func (s seedApp) createMenus(ctx context.Context, parentID string, list SeedMenu
 			if err != nil {
 				return err
 			}
-
-			if &item != nil && item.Children != nil && len(item.Children) > 0 {
+			_item := &item
+			if _item != nil && item.Children != nil && len(item.Children) > 0 {
 				err := s.createMenus(ctx, menuID, item.Children)
 				if err != nil {
 					return err

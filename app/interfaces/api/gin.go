@@ -53,21 +53,21 @@ func GetBody(c *gin.Context) []byte {
 
 func ParseJSON(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindJSON(obj); err != nil {
-		return errors2.Wrap400Response(err, "400 Bad Request - "+err.Error())
+		return errors2.Wrap400Response(err, "400 Bad Request - %v", err)
 	}
 	return nil
 }
 
 func ParseQuery(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindQuery(obj); err != nil {
-		return errors2.Wrap400Response(err, "400 Bad Request - "+err.Error())
+		return errors2.Wrap400Response(err, "400 Bad Request - %v", err)
 	}
 	return nil
 }
 
 func ParseForm(c *gin.Context, obj interface{}) error {
 	if err := c.ShouldBindWith(obj, binding.Form); err != nil {
-		return errors2.Wrap400Response(err, "400 Bad Request - "+err.Error())
+		return errors2.Wrap400Response(err, "400 Bad Request - %v", err)
 	}
 	return nil
 }

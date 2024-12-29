@@ -105,7 +105,7 @@ func (h LogHook) IsMongo() bool {
 }
 
 type Log struct {
-	Level         int
+	Level         uint32
 	Format        string
 	Output        string
 	OutputFile    string
