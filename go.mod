@@ -26,7 +26,7 @@ require (
 	github.com/swaggo/swag v1.16.4
 	github.com/tidwall/buntdb v1.3.2
 	github.com/urfave/cli/v2 v2.27.5
-	golang.org/x/time v0.8.0
+	golang.org/x/time v0.9.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/driver/postgres v1.5.11
