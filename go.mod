@@ -9,7 +9,7 @@ require (
 	github.com/gin-contrib/cors v1.7.3
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-redis/redis v6.15.9+incompatible
-	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-redis/redis/v9 v9.7.0
 	github.com/go-redis/redis_rate v6.5.0+incompatible
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/gops v0.3.28
