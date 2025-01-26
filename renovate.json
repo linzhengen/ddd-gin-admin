@@ -1,36 +1,16 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
-  "semanticCommits": false,
   "postUpdateOptions": [
     "gomodTidy"
   ],
-  "commitMessagePrefix": "chore(all): ",
-  "commitMessageAction": "update",
-  "ignorePaths": [
-    "**/Dockerfile"
-  ],
-  "groupName": "everything",
   "packageRules": [
     {
-      "updateTypes": [
-        "major"
-      ],
-      "enabled": false
-    },
-    {
-      "packageNames": [
-        "golang.org/x/tools",
-        "cloud.google.com/go/pubsublite",
-        "contrib.go.opencensus.io/exporter/stackdriver"
-      ],
-      "enabled": false
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "automergeType": "pr"
     }
-  ],
-  "force": {
-    "constraints": {
-      "go": "1.20"
-    }
-  }
+  ]
 }
