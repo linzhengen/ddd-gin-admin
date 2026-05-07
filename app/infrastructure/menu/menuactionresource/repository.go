@@ -85,7 +85,12 @@ func (a *repository) DeleteByActionID(ctx context.Context, actionID string) erro
 }
 
 func (a *repository) DeleteByMenuID(ctx context.Context, menuID string) error {
-	subQuery := menuaction.GetModelDB(ctx, a.db).Where("menu_id=?", menuID).Select("id")
-	result := GetModelDB(ctx, a.db).Where("action_id IN ?", subQuery).Delete(Model{})
+	// Use two-step query instead of subquery for SQLite compatibility
+	var actionIDs []string
+	menuaction.GetModelDB(ctx, a.db).Where("menu_id=?", menuID).Pluck("id", &actionIDs)
+	if len(actionIDs) == 0 {
+		return nil
+	}
+	result := GetModelDB(ctx, a.db).Where("action_id IN ?", actionIDs).Delete(Model{})
 	return errors.WithStack(result.Error)
 }

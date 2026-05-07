@@ -70,7 +70,7 @@ func BuildApiInjector() (*ApiInjector, func(), error) {
 	routerRouter := router.NewRouter(repository, syncedEnforcer, handlerLogin, handlerMenu, handlerRole, handlerUser, healthCheck)
 	engine := api.InitGinEngine(routerRouter)
 	seed := application.NewSeed(menuService, transRepository)
-	apiInjector := NewApiInjector(engine, repository, syncedEnforcer, seed)
+	apiInjector := NewApiInjector(engine, db, repository, syncedEnforcer, seed)
 	return apiInjector, func() {
 		cleanup3()
 		cleanup2()

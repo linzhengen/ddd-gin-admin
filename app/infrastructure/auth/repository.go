@@ -6,9 +6,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
+	domainErrors "github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 )
 
 const defaultKey = "ddd-gin-admin"
@@ -20,7 +19,7 @@ var defaultOptions = options{
 	signingKey:    []byte(defaultKey),
 	keyFunc: func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, auth.ErrInvalidToken
+			return nil, domainErrors.ErrInvalidToken
 		}
 		return []byte(defaultKey), nil
 	},
@@ -56,7 +55,7 @@ func SetRootUser(id, password string) Option {
 	return func(o *options) {
 		o.rootUser = auth.RootUser{
 			UserName: id,
-			Password: hash.MD5String(password),
+			Password: password,
 		}
 	}
 }
@@ -126,7 +125,7 @@ func (a *repositoryImpl) parseToken(tokenString string) (*jwt.RegisteredClaims, 
 	if err != nil {
 		return nil, err
 	} else if !token.Valid {
-		return nil, auth.ErrInvalidToken
+		return nil, domainErrors.ErrInvalidToken
 	}
 
 	return token.Claims.(*jwt.RegisteredClaims), nil
@@ -147,7 +146,7 @@ func (a *repositoryImpl) DestroyToken(ctx context.Context, tokenString string) e
 
 	// save black list token when use store
 	return a.callStore(func(store Store) error {
-		expired := claims.ExpiresAt.Time.Sub(time.Now())
+		expired := time.Until(claims.ExpiresAt.Time)
 		if expired <= 0 {
 			return nil
 		}
@@ -157,7 +156,7 @@ func (a *repositoryImpl) DestroyToken(ctx context.Context, tokenString string) e
 
 func (a *repositoryImpl) ParseUserID(ctx context.Context, tokenString string) (string, error) {
 	if tokenString == "" {
-		return "", auth.ErrInvalidToken
+		return "", domainErrors.ErrInvalidToken
 	}
 
 	claims, err := a.parseToken(tokenString)
@@ -169,7 +168,7 @@ func (a *repositoryImpl) ParseUserID(ctx context.Context, tokenString string) (s
 		if exists, err := store.Check(ctx, tokenString); err != nil {
 			return err
 		} else if exists {
-			return auth.ErrInvalidToken
+			return domainErrors.ErrInvalidToken
 		}
 		return nil
 	})

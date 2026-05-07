@@ -4,6 +4,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	authinfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth/store/buntdb"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth/store/redis"
@@ -18,7 +19,7 @@ func InitAuth() (auth.Repository, func(), error) {
 	opts = append(opts, authinfra.SetSigningKey([]byte(cfg.SigningKey)))
 	opts = append(opts, authinfra.SetKeyFunc(func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, auth.ErrInvalidToken
+			return nil, errors.ErrInvalidToken
 		}
 		return []byte(cfg.SigningKey), nil
 	}))
@@ -33,6 +34,7 @@ func InitAuth() (auth.Repository, func(), error) {
 		method = jwt.SigningMethodHS512
 	}
 	opts = append(opts, authinfra.SetSigningMethod(method))
+	opts = append(opts, authinfra.SetRootUser(configs.C.Root.UserName, configs.C.Root.Password))
 
 	var store authinfra.Store
 	switch cfg.Store {

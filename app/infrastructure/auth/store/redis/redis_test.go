@@ -2,7 +2,9 @@ package redis
 
 import (
 	"context"
+	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -12,17 +14,24 @@ const (
 )
 
 func TestStore(t *testing.T) {
+	// Skip if Redis is not available (e.g., CI, local dev without Redis)
+	conn, err := net.DialTimeout("tcp", addr, time.Second)
+	if err != nil {
+		t.Skipf("Redis not available at %s: %v", addr, err)
+	}
+	_ = conn.Close()
+
 	store := NewStore(&Config{
 		Addr:      addr,
 		DB:        1,
 		KeyPrefix: "prefix",
 	})
 
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	key := "test"
 	ctx := context.Background()
-	err := store.Set(ctx, key, 0)
+	err = store.Set(ctx, key, 0)
 	assert.Nil(t, err)
 
 	b, err := store.Check(ctx, key)

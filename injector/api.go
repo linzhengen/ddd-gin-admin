@@ -9,6 +9,7 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
@@ -20,12 +21,14 @@ import (
 
 func NewApiInjector(
 	engine *gin.Engine,
+	db *gorm.DB,
 	auth auth.Repository,
 	casbinEnforcer *casbin.SyncedEnforcer,
 	seed application.Seed,
 ) *ApiInjector {
 	return &ApiInjector{
 		engine:         engine,
+		db:             db,
 		auth:           auth,
 		casbinEnforcer: casbinEnforcer,
 		seed:           seed,
@@ -34,9 +37,18 @@ func NewApiInjector(
 
 type ApiInjector struct {
 	engine         *gin.Engine
+	db             *gorm.DB
 	auth           auth.Repository
 	casbinEnforcer *casbin.SyncedEnforcer
 	seed           application.Seed
+}
+
+func (a *ApiInjector) GetEngine() *gin.Engine {
+	return a.engine
+}
+
+func (a *ApiInjector) GetDB() *gorm.DB {
+	return a.db
 }
 
 func initHttpServer(ctx context.Context, opts ...api.Option) (func(), error) {

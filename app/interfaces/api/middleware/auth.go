@@ -34,7 +34,7 @@ func UserAuthMiddleware(a auth.Repository, skippers ...SkipperFunc) gin.HandlerF
 
 		userID, err := a.ParseUserID(c.Request.Context(), api.GetToken(c))
 		if err != nil {
-			if err == auth.ErrInvalidToken {
+			if err == errors.ErrInvalidToken {
 				if configs.C.IsDebugMode() {
 					wrapUserAuthContext(c, configs.C.Root.UserName)
 					c.Next()

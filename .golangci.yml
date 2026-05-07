@@ -1,28 +1,41 @@
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     - bodyclose
-#    - deadcode
-#    - depguard
-#    - dupl
+    - errcheck
     - gochecknoinits
     - gocritic
     - gocyclo
-    - gofmt
-    - goimports
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - misspell
     - nolintlint
     - rowserrcheck
     - staticcheck
-#    - structcheck
-#    - typecheck
     - unconvert
     - unparam
-#    - varcheck
     - whitespace
-    - errcheck
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

@@ -36,10 +36,12 @@ func (a *repository) Query(ctx context.Context, params role.QueryParam) (role.Ro
 	}
 	if v := params.UserID; v != "" {
 		// todo: serviceへ移動
-		subQuery := userrole.GetModelDB(ctx, a.db).
-			Where("user_id=?", v).
-			Select("role_id")
-		db = db.Where("id IN ?", subQuery)
+		var roleIDs []string
+		userrole.GetModelDB(ctx, a.db).Where("user_id=?", v).Pluck("role_id", &roleIDs)
+		if len(roleIDs) == 0 {
+			roleIDs = append(roleIDs, "")
+		}
+		db = db.Where("id IN (?)", roleIDs)
 	}
 	if v := params.QueryValue; v != "" {
 		v = "%" + v + "%"
