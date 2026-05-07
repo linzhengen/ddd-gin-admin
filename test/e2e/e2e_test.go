@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/LyricTian/captcha"
-	captchastore "github.com/LyricTian/captcha/store"
+	"github.com/linzhengen/ddd-gin-admin/pkg/captcha"
+	captchastore "github.com/linzhengen/ddd-gin-admin/pkg/captcha/store"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 

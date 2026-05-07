@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LyricTian/captcha"
-	"github.com/LyricTian/captcha/store"
-	"github.com/go-redis/redis/v8"
 	"github.com/google/gops/agent"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
+	"github.com/linzhengen/ddd-gin-admin/pkg/captcha"
+	"github.com/linzhengen/ddd-gin-admin/pkg/captcha/store"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 

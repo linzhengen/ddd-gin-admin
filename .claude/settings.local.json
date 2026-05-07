@@ -7,7 +7,8 @@
       "Bash(gofmt:*)",
       "Bash(golangci-lint run:*)",
       "Bash(grep:*)",
-      "mcp__context7__resolve-library-id"
+      "mcp__context7__resolve-library-id",
+      "Bash(ls:*)"
     ]
   }
 }

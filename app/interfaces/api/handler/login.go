@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/LyricTian/captcha"
+	"github.com/linzhengen/ddd-gin-admin/pkg/captcha"
 	"github.com/gin-gonic/gin"
 
 	"github.com/linzhengen/ddd-gin-admin/app/application"
