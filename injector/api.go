@@ -7,20 +7,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/application"
-
 	"github.com/casbin/casbin/v2"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
-
-	"github.com/linzhengen/ddd-gin-admin/configs"
-
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/injector/api"
 
-	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
-
+	"github.com/linzhengen/ddd-gin-admin/app/application"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 	_ "github.com/linzhengen/ddd-gin-admin/app/interfaces/api/swagger"
+	"github.com/linzhengen/ddd-gin-admin/configs"
+	"github.com/linzhengen/ddd-gin-admin/injector/api"
+	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 
 func NewApiInjector(

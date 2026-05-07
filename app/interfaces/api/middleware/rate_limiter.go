@@ -4,16 +4,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
-
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
-
-	"github.com/linzhengen/ddd-gin-admin/configs"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"github.com/go-redis/redis_rate"
 	"golang.org/x/time/rate"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 )
 
 func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {

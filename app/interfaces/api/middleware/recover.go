@@ -6,11 +6,10 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
-
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 

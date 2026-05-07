@@ -6,17 +6,12 @@ import (
 	"github.com/casbin/casbin/v2"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
-
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-
+	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/uuid"
 )

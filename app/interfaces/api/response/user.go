@@ -3,10 +3,8 @@ package response
 import (
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )

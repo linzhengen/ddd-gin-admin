@@ -3,11 +3,10 @@ package api
 import (
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/application"
-
-	"github.com/linzhengen/ddd-gin-admin/configs"
-
 	"github.com/casbin/casbin/v2"
+
+	"github.com/linzhengen/ddd-gin-admin/app/application"
+	"github.com/linzhengen/ddd-gin-admin/configs"
 )
 
 func InitCasbin(adapter application.RbacAdapter) (*casbin.SyncedEnforcer, func(), error) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
 

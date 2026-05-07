@@ -1,7 +1,8 @@
 package api
 
 import (
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 	authinfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth"
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/auth/store/buntdb"

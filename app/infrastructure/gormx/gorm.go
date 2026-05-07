@@ -7,19 +7,17 @@ import (
 	"strings"
 	"time"
 
-	"gorm.io/gorm/schema"
-
 	"gorm.io/driver/mysql"
+	_ "gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
+	_ "gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
-
-	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
+	_ "gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 
-	_ "gorm.io/driver/mysql"
-	_ "gorm.io/driver/postgres"
-	_ "gorm.io/driver/sqlite"
+	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 
 type Config struct {

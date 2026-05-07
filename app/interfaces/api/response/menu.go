@@ -4,13 +4,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
 
 type Menu struct {

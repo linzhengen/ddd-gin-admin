@@ -12,7 +12,6 @@ import (
 	menuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
 	menuActionInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
 	menuActionResourceInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
-
 	rbacInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/rbac"
 	transInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/trans"
 	userInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user"
@@ -22,7 +21,6 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/handler"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
 	"github.com/linzhengen/ddd-gin-admin/injector/api"
-
 	"github.com/google/wire"
 )
 

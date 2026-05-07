@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"

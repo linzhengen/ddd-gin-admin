@@ -2,7 +2,6 @@ package userrole
 
 import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
-
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
 

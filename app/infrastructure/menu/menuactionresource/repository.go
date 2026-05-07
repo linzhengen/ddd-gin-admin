@@ -3,16 +3,13 @@ package menuactionresource
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuactionresource"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
+	"gorm.io/gorm"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
-
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuactionresource"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
-	"gorm.io/gorm"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
 )
 
 func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {

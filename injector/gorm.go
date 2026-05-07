@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"gorm.io/gorm"
+
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 	menuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
 	menuActionInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
 	menuActionResourceInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuactionresource"
@@ -13,12 +16,7 @@ import (
 	roleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/role"
 	roleMenuInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/rolemenu"
 	userRoleInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/user/userrole"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
-
 	"github.com/linzhengen/ddd-gin-admin/configs"
-
-	"gorm.io/gorm"
 )
 
 func InitGormDB() (*gorm.DB, func(), error) {

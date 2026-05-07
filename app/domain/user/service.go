@@ -3,9 +3,8 @@ package user
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/auth"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
 )

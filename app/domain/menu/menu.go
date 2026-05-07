@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuaction"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
 

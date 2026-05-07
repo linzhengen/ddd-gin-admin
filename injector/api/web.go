@@ -3,11 +3,12 @@ package api
 import (
 	"github.com/LyricTian/gzip"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/middleware"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
 	"github.com/linzhengen/ddd-gin-admin/configs"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func InitGinEngine(r router.Router) *gin.Engine {

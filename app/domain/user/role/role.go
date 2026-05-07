@@ -3,9 +3,8 @@ package role
 import (
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
 )
 
 type Role struct {

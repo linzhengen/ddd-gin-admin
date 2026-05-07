@@ -3,10 +3,10 @@ package handler
 import (
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
-
 	"github.com/gin-gonic/gin"
+
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
 )
 
 type HealthCheck interface {

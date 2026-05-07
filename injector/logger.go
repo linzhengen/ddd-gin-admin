@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"github.com/linzhengen/ddd-gin-admin/configs"
-
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 )
 

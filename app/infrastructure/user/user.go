@@ -3,9 +3,8 @@ package user
 import (
 	"time"
 
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
 
 type Model struct {

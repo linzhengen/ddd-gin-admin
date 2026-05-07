@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/koding/multiconfig"
+
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/json"
 )
 

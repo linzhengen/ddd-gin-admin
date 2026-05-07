@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/middleware"
 )
 

@@ -3,10 +3,9 @@ package response
 import (
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
 
 type Role struct {

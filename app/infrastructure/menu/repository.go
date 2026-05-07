@@ -3,14 +3,12 @@ package menu
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
-
-	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 	"gorm.io/gorm"
+
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/gormx"
 )
 
 func GetModelDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {

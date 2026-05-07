@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/rbac"
-
 	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuactionresource"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/rbac"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"

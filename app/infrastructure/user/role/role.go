@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
-
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
 

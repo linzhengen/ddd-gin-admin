@@ -3,19 +3,15 @@ package handler
 import (
 	"strings"
 
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
-	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
-
-	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/request"
-
-	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/gin-gonic/gin"
 
 	"github.com/linzhengen/ddd-gin-admin/app/application"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/user"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
-
-	"github.com/gin-gonic/gin"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/request"
+	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
 )
 
 type User interface {
