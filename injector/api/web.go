@@ -1,10 +1,12 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/LyricTian/gzip"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files/v2"
+	"github.com/swaggo/swag"
 
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/middleware"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/router"
@@ -51,7 +53,41 @@ func InitGinEngine(r router.Router) *gin.Engine {
 
 	// Swagger
 	if configs.C.Swagger {
-		app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		app.GET("/swagger/*any", func(c *gin.Context) {
+			path := c.Param("any")
+			// Gin includes the leading "/" in the catch-all param, strip it.
+			if len(path) > 0 && path[0] == '/' {
+				path = path[1:]
+			}
+			switch path {
+			case "doc.json":
+				doc, err := swag.ReadDoc()
+				if err != nil {
+					c.String(http.StatusInternalServerError, "failed to read swagger doc")
+					return
+				}
+				c.String(http.StatusOK, doc)
+			case "swagger-initializer.js":
+				c.Header("Content-Type", "application/javascript; charset=utf-8")
+				c.String(http.StatusOK, `window.onload = function() {
+  window.ui = SwaggerUIBundle({
+    url: "doc.json",
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: "StandaloneLayout"
+  });
+};`)
+			default:
+				http.StripPrefix("/swagger/", http.FileServer(http.FS(swaggerFiles.FS))).ServeHTTP(c.Writer, c.Request)
+			}
+		})
 	}
 
 	// Website

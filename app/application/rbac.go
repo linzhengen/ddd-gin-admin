@@ -77,9 +77,8 @@ func (a *rbacAdapter) LoadPolicy(model casbinModel.Model) error {
 		logger.WithContext(ctx).Errorf("Load casbin role policy error: %s", err.Error())
 		return err
 	}
-	if len(policies) > 0 {
-		//nolint: errcheck
-		persist.LoadPolicyArray(policies, model)
+	for _, policy := range policies {
+		persist.LoadPolicyLine(policy, model)
 	}
 
 	policies, err = a.rbacRepo.ListUsersPolicies(ctx)
@@ -87,9 +86,8 @@ func (a *rbacAdapter) LoadPolicy(model casbinModel.Model) error {
 		logger.WithContext(ctx).Errorf("Load casbin user policy error: %s", err.Error())
 		return err
 	}
-	if len(policies) > 0 {
-		//nolint: errcheck
-		persist.LoadPolicyArray(policies, model)
+	for _, policy := range policies {
+		persist.LoadPolicyLine(policy, model)
 	}
 	return nil
 }

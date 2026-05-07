@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 type Config struct {
@@ -42,12 +42,12 @@ func NewStoreWithClusterClient(cli *redis.ClusterClient, keyPrefix string) *Stor
 }
 
 type redisClient interface {
-	Get(key string) *redis.StringCmd
-	Set(key string, value interface{}, expiration time.Duration) *redis.StatusCmd
-	Expire(key string, expiration time.Duration) *redis.BoolCmd
-	Exists(keys ...string) *redis.IntCmd
+	Get(ctx context.Context, key string) *redis.StringCmd
+	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd
+	Expire(ctx context.Context, key string, expiration time.Duration) *redis.BoolCmd
+	Exists(ctx context.Context, keys ...string) *redis.IntCmd
 	TxPipeline() redis.Pipeliner
-	Del(keys ...string) *redis.IntCmd
+	Del(ctx context.Context, keys ...string) *redis.IntCmd
 	Close() error
 }
 
@@ -61,12 +61,12 @@ func (s *Store) wrapperKey(key string) string {
 }
 
 func (s *Store) Set(ctx context.Context, tokenString string, expiration time.Duration) error {
-	cmd := s.cli.Set(s.wrapperKey(tokenString), "1", expiration)
+	cmd := s.cli.Set(ctx, s.wrapperKey(tokenString), "1", expiration)
 	return cmd.Err()
 }
 
 func (s *Store) Delete(ctx context.Context, tokenString string) (bool, error) {
-	cmd := s.cli.Del(s.wrapperKey(tokenString))
+	cmd := s.cli.Del(ctx, s.wrapperKey(tokenString))
 	if err := cmd.Err(); err != nil {
 		return false, err
 	}
@@ -74,7 +74,7 @@ func (s *Store) Delete(ctx context.Context, tokenString string) (bool, error) {
 }
 
 func (s *Store) Check(ctx context.Context, tokenString string) (bool, error) {
-	cmd := s.cli.Exists(s.wrapperKey(tokenString))
+	cmd := s.cli.Exists(ctx, s.wrapperKey(tokenString))
 	if err := cmd.Err(); err != nil {
 		return false, err
 	}
