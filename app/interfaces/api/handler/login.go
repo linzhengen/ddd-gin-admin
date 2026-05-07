@@ -58,6 +58,10 @@ func (a *login) ResCaptcha(c *gin.Context) {
 	}
 
 	cfg := configs.C.Captcha
+	c.Writer.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	c.Writer.Header().Set("Pragma", "no-cache")
+	c.Writer.Header().Set("Expires", "0")
+	c.Writer.Header().Set("Content-Type", "image/png")
 	err := captcha.WriteImage(c.Writer, captchaID, cfg.Width, cfg.Height)
 	if err != nil {
 		if err == captcha.ErrNotFound {
@@ -66,10 +70,6 @@ func (a *login) ResCaptcha(c *gin.Context) {
 		api.ResError(c, err)
 		return
 	}
-	c.Writer.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	c.Writer.Header().Set("Pragma", "no-cache")
-	c.Writer.Header().Set("Expires", "0")
-	c.Writer.Header().Set("Content-Type", "image/png")
 }
 
 func (a *login) Login(c *gin.Context) {
@@ -117,7 +117,7 @@ func (a *login) Logout(c *gin.Context) {
 		if err != nil {
 			logger.WithContext(ctx).Error(err.Error())
 		}
-		logger.WithContext(ctx).Infof("lougged out")
+		logger.WithContext(ctx).Infof("logged out")
 	}
 	api.ResOK(c)
 }

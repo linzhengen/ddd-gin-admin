@@ -7,10 +7,10 @@ type Pagination struct {
 }
 
 type Param struct {
-	Pagination bool `form:"-"`                                     // Pagination
-	OnlyCount  bool `form:"-"`                                     // Only count
-	Current    int  `form:"current,default=1"`                     // Current page
-	PageSize   int  `form:"pageSize,default=10" binding:"max=100"` // Page size
+	Pagination bool // Pagination
+	OnlyCount  bool // Only count
+	Current    int  // Current page
+	PageSize   int  // Page size
 }
 
 func (a Param) GetCurrent() int {

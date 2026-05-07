@@ -61,8 +61,10 @@ func (l loginApp) Verify(ctx context.Context, userName, password string) (*user.
 	if rootUser := l.authRepo.FindRootUser(ctx, userName); rootUser != nil {
 		if password == rootUser.Password {
 			return &user.User{
+				ID:       rootUser.UserName,
 				UserName: rootUser.UserName,
 				Password: rootUser.Password,
+				Status:   1,
 			}, nil
 		}
 	}
@@ -106,6 +108,7 @@ func (l loginApp) GetLoginInfo(ctx context.Context, userID string) (*user.User, 
 }
 
 func (l loginApp) UpdatePassword(ctx context.Context, userID string, oldPassword, newPassword string) error {
+	// Block root user password changes early (userID is the root username for root logins)
 	if rootUser := l.authRepo.FindRootUser(ctx, userID); rootUser != nil {
 		return errors.New400Response("The root user is not allowed to update the password")
 	}

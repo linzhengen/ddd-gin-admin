@@ -60,20 +60,19 @@ func (a *rbacAdapter) AddPolicyItemToChan(ctx context.Context, e *casbin.SyncedE
 		return
 	}
 
-	if len(autoLoadPolicyChan) > 0 {
-		logger.WithContext(ctx).Infof("The load casbin policy is already in the wait queue")
-		return
-	}
-
-	autoLoadPolicyChan <- &PolicyItem{
+	select {
+	case autoLoadPolicyChan <- &PolicyItem{
 		Ctx:      ctx,
 		Enforcer: e,
+	}:
+	default:
+		logger.WithContext(ctx).Infof("The load casbin policy is already in the wait queue")
 	}
 }
 
 func (a *rbacAdapter) LoadPolicy(model casbinModel.Model) error {
 	ctx := context.Background()
-	policies, err := a.rbacRepo.ListRolesPolices(ctx)
+	policies, err := a.rbacRepo.ListRolesPolicies(ctx)
 	if err != nil {
 		logger.WithContext(ctx).Errorf("Load casbin role policy error: %s", err.Error())
 		return err
@@ -83,7 +82,7 @@ func (a *rbacAdapter) LoadPolicy(model casbinModel.Model) error {
 		persist.LoadPolicyArray(policies, model)
 	}
 
-	policies, err = a.rbacRepo.ListUsersPolices(ctx)
+	policies, err = a.rbacRepo.ListUsersPolicies(ctx)
 	if err != nil {
 		logger.WithContext(ctx).Errorf("Load casbin user policy error: %s", err.Error())
 		return err

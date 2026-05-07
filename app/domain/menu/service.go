@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuaction"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/menu/menuactionresource"
@@ -45,16 +44,18 @@ type service struct {
 }
 
 func (a *service) Query(ctx context.Context, params QueryParam) (Menus, *pagination.Pagination, error) {
-	menuActionResult, _, err := a.menuActionRepo.Query(ctx, menuaction.QueryParam{})
-	if err != nil {
-		return nil, nil, err
-	}
-
 	menuResult, pr, err := a.menuRepo.Query(ctx, params)
 	if err != nil {
 		return nil, nil, err
 	}
-	menuResult.FillMenuAction(menuActionResult.ToMenuIDMap())
+
+	if len(menuResult) > 0 {
+		menuActionResult, _, err := a.menuActionRepo.Query(ctx, menuaction.QueryParam{})
+		if err != nil {
+			return nil, nil, err
+		}
+		menuResult.FillMenuAction(menuActionResult.ToMenuIDMap())
+	}
 	return menuResult, pr, nil
 }
 
@@ -329,7 +330,7 @@ func (a *service) updateChildParentPath(ctx context.Context, oldItem, newItem *M
 	}
 
 	opath := a.joinParentPath(oldItem.ParentPath, oldItem.ID)
-	result, _, err := a.menuRepo.Query(contextx.NewNoTrans(ctx), QueryParam{
+	result, _, err := a.menuRepo.Query(ctx, QueryParam{
 		PrefixParentPath: opath,
 	})
 	if err != nil {

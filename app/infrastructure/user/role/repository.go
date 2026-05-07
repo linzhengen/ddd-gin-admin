@@ -37,7 +37,6 @@ func (a *repository) Query(ctx context.Context, params role.QueryParam) (role.Ro
 	if v := params.UserID; v != "" {
 		// todo: serviceへ移動
 		subQuery := userrole.GetModelDB(ctx, a.db).
-			Where("deleted_at is null").
 			Where("user_id=?", v).
 			Select("role_id")
 		db = db.Where("id IN ?", subQuery)

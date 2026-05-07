@@ -99,12 +99,12 @@ func (a *repositoryImpl) FindRootUser(ctx context.Context, userName string) *aut
 
 func (a *repositoryImpl) GenerateToken(ctx context.Context, userID string) (*auth.Auth, error) {
 	now := time.Now()
-	expiresAt := now.Add(time.Duration(a.opts.expired) * time.Second).Unix()
+	expiresAt := now.Add(time.Duration(a.opts.expired) * time.Second)
 
-	token := jwt.NewWithClaims(a.opts.signingMethod, &jwt.StandardClaims{
-		IssuedAt:  now.Unix(),
-		ExpiresAt: expiresAt,
-		NotBefore: now.Unix(),
+	token := jwt.NewWithClaims(a.opts.signingMethod, jwt.RegisteredClaims{
+		IssuedAt:  jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(expiresAt),
+		NotBefore: jwt.NewNumericDate(now),
 		Subject:   userID,
 	})
 
@@ -114,22 +114,22 @@ func (a *repositoryImpl) GenerateToken(ctx context.Context, userID string) (*aut
 	}
 
 	tokenInfo := &auth.Auth{
-		ExpiresAt:   expiresAt,
+		ExpiresAt:   expiresAt.Unix(),
 		TokenType:   a.opts.tokenType,
 		AccessToken: tokenString,
 	}
 	return tokenInfo, nil
 }
 
-func (a *repositoryImpl) parseToken(tokenString string) (*jwt.StandardClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, a.opts.keyFunc)
+func (a *repositoryImpl) parseToken(tokenString string) (*jwt.RegisteredClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, a.opts.keyFunc)
 	if err != nil {
 		return nil, err
 	} else if !token.Valid {
 		return nil, auth.ErrInvalidToken
 	}
 
-	return token.Claims.(*jwt.StandardClaims), nil
+	return token.Claims.(*jwt.RegisteredClaims), nil
 }
 
 func (a *repositoryImpl) callStore(fn func(Store) error) error {
@@ -147,8 +147,10 @@ func (a *repositoryImpl) DestroyToken(ctx context.Context, tokenString string) e
 
 	// save black list token when use store
 	return a.callStore(func(store Store) error {
-		//nolint:gosimple
-		expired := time.Unix(claims.ExpiresAt, 0).Sub(time.Now())
+		expired := claims.ExpiresAt.Time.Sub(time.Now())
+		if expired <= 0 {
+			return nil
+		}
 		return store.Set(ctx, tokenString, expired)
 	})
 }

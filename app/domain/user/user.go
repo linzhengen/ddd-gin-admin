@@ -6,7 +6,11 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/role"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/userrole"
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
+)
+
+const (
+	StatusEnabled  = 1
+	StatusDisabled = 2
 )
 
 type User struct {
@@ -25,8 +29,19 @@ type User struct {
 }
 
 func (a User) FillRoles(userRoles map[string]userrole.UserRoles, roles map[string]*role.Role) *User {
-	u := new(User)
-	structure.Copy(a, u)
+	u := &User{
+		ID:        a.ID,
+		UserName:  a.UserName,
+		RealName:  a.RealName,
+		Password:  a.Password,
+		Email:     a.Email,
+		Phone:     a.Phone,
+		Status:    a.Status,
+		Creator:   a.Creator,
+		CreatedAt: a.CreatedAt,
+		UpdatedAt: a.UpdatedAt,
+		DeletedAt: a.DeletedAt,
+	}
 	for _, roleID := range userRoles[a.ID].ToRoleIDs() {
 		if v, ok := roles[roleID]; ok {
 			u.Roles = append(u.Roles, v)

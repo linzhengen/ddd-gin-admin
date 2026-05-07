@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
@@ -39,7 +40,7 @@ func GetDB(ctx context.Context, defDB *gorm.DB) *gorm.DB {
 			if contextx.FromTransLock(ctx) {
 				if dbType := configs.C.Gorm.DBType; dbType == "mysql" ||
 					dbType == "postgres" {
-					db = db.Set("gorm:query_option", "FOR UPDATE")
+					db = db.Clauses(clause.Locking{Strength: "UPDATE"})
 				}
 			}
 			return db
@@ -91,8 +92,7 @@ func FindPage(ctx context.Context, db *gorm.DB, pp pagination.Param, out interfa
 	current, pageSize := pp.GetCurrent(), pp.GetPageSize()
 	if current > 0 && pageSize > 0 {
 		db = db.Offset((current - 1) * pageSize).Limit(pageSize)
-	}
-	if pageSize > 0 {
+	} else if pageSize > 0 {
 		db = db.Limit(pageSize)
 	}
 

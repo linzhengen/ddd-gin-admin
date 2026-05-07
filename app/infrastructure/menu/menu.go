@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
-	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
 
 type Model struct {
@@ -30,7 +29,30 @@ func (Model) TableName() string {
 
 func (a Model) ToDomain() *menu.Menu {
 	item := new(menu.Menu)
-	structure.Copy(a, item)
+	item.ID = a.ID
+	item.Name = a.Name
+	item.Sequence = a.Sequence
+	if a.Icon != nil {
+		item.Icon = *a.Icon
+	}
+	if a.Router != nil {
+		item.Router = *a.Router
+	}
+	if a.ParentID != nil {
+		item.ParentID = *a.ParentID
+	}
+	if a.ParentPath != nil {
+		item.ParentPath = *a.ParentPath
+	}
+	item.ShowStatus = a.ShowStatus
+	item.Status = a.Status
+	if a.Memo != nil {
+		item.Memo = *a.Memo
+	}
+	item.Creator = a.Creator
+	item.CreatedAt = a.CreatedAt
+	item.UpdatedAt = a.UpdatedAt
+	item.DeletedAt = a.DeletedAt
 	return item
 }
 
@@ -44,6 +66,29 @@ func toDomainList(menus []*Model) []*menu.Menu {
 
 func domainToModel(m *menu.Menu) *Model {
 	item := new(Model)
-	structure.Copy(m, item)
+	item.ID = m.ID
+	item.Name = m.Name
+	item.Sequence = m.Sequence
+	if m.Icon != "" {
+		item.Icon = &m.Icon
+	}
+	if m.Router != "" {
+		item.Router = &m.Router
+	}
+	if m.ParentID != "" {
+		item.ParentID = &m.ParentID
+	}
+	if m.ParentPath != "" {
+		item.ParentPath = &m.ParentPath
+	}
+	item.ShowStatus = m.ShowStatus
+	item.Status = m.Status
+	if m.Memo != "" {
+		item.Memo = &m.Memo
+	}
+	item.Creator = m.Creator
+	item.CreatedAt = m.CreatedAt
+	item.UpdatedAt = m.UpdatedAt
+	item.DeletedAt = m.DeletedAt
 	return item
 }

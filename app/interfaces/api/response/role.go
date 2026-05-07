@@ -34,8 +34,9 @@ type RoleQueryResult struct {
 type Roles []*Role
 
 func RolesFromDomain(roles role.Roles) Roles {
-	list := make([]*Role, len(roles))
+	list := make(Roles, len(roles))
 	for i, item := range roles {
+		list[i] = new(Role)
 		structure.Copy(item, list[i])
 	}
 	return list

@@ -106,7 +106,7 @@ func (a *menuHandler) Get(c *gin.Context) {
 
 func (a *menuHandler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item response.Menu
+	var item request.Menu
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return
@@ -123,7 +123,7 @@ func (a *menuHandler) Create(c *gin.Context) {
 
 func (a *menuHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	var item response.Menu
+	var item request.Menu
 	if err := api.ParseJSON(c, &item); err != nil {
 		api.ResError(c, err)
 		return

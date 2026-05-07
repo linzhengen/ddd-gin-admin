@@ -3,7 +3,9 @@ package request
 import (
 	"time"
 
+	"github.com/linzhengen/ddd-gin-admin/app/domain/menu"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
+	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )
 
 type Menu struct {
@@ -20,6 +22,12 @@ type Menu struct {
 	Creator    string    `json:"creator"`                                    // Creator
 	CreatedAt  time.Time `json:"created_at"`                                 // CreatedAt
 	UpdatedAt  time.Time `json:"updated_at"`                                 // UpdatedAt
+}
+
+func (a *Menu) ToDomain() *menu.Menu {
+	item := new(menu.Menu)
+	structure.Copy(a, item)
+	return item
 }
 
 type MenuQueryParam struct {

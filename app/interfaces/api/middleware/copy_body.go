@@ -24,20 +24,20 @@ func CopyBodyMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 			return
 		}
 
-		var requestBody []byte
-		isGzip := false
 		safe := &io.LimitedReader{R: c.Request.Body, N: maxMemory}
+		rawBody, _ := io.ReadAll(safe)
 
+		var requestBody []byte
 		if c.GetHeader("Content-Encoding") == "gzip" {
-			reader, err := gzip.NewReader(safe)
+			reader, err := gzip.NewReader(bytes.NewReader(rawBody))
 			if err == nil {
-				isGzip = true
 				requestBody, _ = io.ReadAll(reader)
+				reader.Close()
+			} else {
+				requestBody = rawBody
 			}
-		}
-
-		if !isGzip {
-			requestBody, _ = io.ReadAll(safe)
+		} else {
+			requestBody = rawBody
 		}
 
 		c.Request.Body.Close()

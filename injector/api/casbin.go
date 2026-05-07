@@ -13,7 +13,7 @@ func InitCasbin(adapter application.RbacAdapter) (*casbin.SyncedEnforcer, func()
 	adapter.CreateAutoLoadPolicyChan()
 	cfg := configs.C.Casbin
 	if cfg.Model == "" {
-		return new(casbin.SyncedEnforcer), nil, nil
+		return new(casbin.SyncedEnforcer), func() {}, nil
 	}
 
 	e, err := casbin.NewSyncedEnforcer(cfg.Model)

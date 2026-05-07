@@ -7,6 +7,11 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/user/rolemenu"
 )
 
+const (
+	StatusEnabled  = 1
+	StatusDisabled = 2
+)
+
 type Role struct {
 	ID        string
 	Name      string

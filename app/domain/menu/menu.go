@@ -8,6 +8,13 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/domain/pagination"
 )
 
+const (
+	StatusEnabled  = 1
+	StatusDisabled = 2
+	ShowStatusShow = 1
+	ShowStatusHide = 2
+)
+
 type Menu struct {
 	ID         string
 	Name       string

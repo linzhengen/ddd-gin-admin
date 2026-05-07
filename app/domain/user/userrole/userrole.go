@@ -36,7 +36,7 @@ func (a UserRoles) ToUserIDMap() map[string]UserRoles {
 func (a UserRoles) ToMap() map[string]*UserRole {
 	m := make(map[string]*UserRole)
 	for _, item := range a {
-		m[item.RoleID] = item
+		m[item.UserID+":"+item.RoleID] = item
 	}
 	return m
 }

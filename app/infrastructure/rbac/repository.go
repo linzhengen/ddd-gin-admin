@@ -36,7 +36,7 @@ type repository struct {
 	userRoleRepo     userrole.Repository
 }
 
-func (a *repository) ListRolesPolices(ctx context.Context) ([]string, error) {
+func (a *repository) ListRolesPolicies(ctx context.Context) ([]string, error) {
 	roleResult, _, err := a.roleRepo.Query(ctx, role.QueryParam{
 		Status: 1,
 	})
@@ -68,10 +68,10 @@ func (a *repository) ListRolesPolices(ctx context.Context) ([]string, error) {
 					for _, mr := range mrs {
 						if mr.Path == "" || mr.Method == "" {
 							continue
-						} else if _, ok := mcache[mr.Path+mr.Method]; ok {
+						} else if _, ok := mcache[mr.Method+"|"+mr.Path]; ok {
 							continue
 						}
-						mcache[mr.Path+mr.Method] = struct{}{}
+						mcache[mr.Method+"|"+mr.Path] = struct{}{}
 						policy := fmt.Sprintf("p,%s,%s,%s", item.ID, mr.Path, mr.Method)
 						policies = append(policies, policy)
 					}
@@ -83,7 +83,7 @@ func (a *repository) ListRolesPolices(ctx context.Context) ([]string, error) {
 	return policies, nil
 }
 
-func (a *repository) ListUsersPolices(ctx context.Context) ([]string, error) {
+func (a *repository) ListUsersPolicies(ctx context.Context) ([]string, error) {
 	userResult, _, err := a.userRepo.Query(ctx, user.QueryParams{
 		Status: 1,
 	})

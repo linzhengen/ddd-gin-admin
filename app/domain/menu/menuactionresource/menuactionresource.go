@@ -28,7 +28,7 @@ func (a MenuActionResources) ToMenuActionIDMap() map[string]MenuActionResources 
 func (a MenuActionResources) ToMap() map[string]*MenuActionResource {
 	m := make(map[string]*MenuActionResource)
 	for _, item := range a {
-		m[item.Method+item.Path] = item
+		m[item.Method+"|"+item.Path] = item
 	}
 	return m
 }
