@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/LyricTian/gzip"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files/v2"
 	"github.com/swaggo/swag"
