@@ -2,12 +2,10 @@ package middleware
 
 import (
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
-	"github.com/go-redis/redis_rate"
-	"golang.org/x/time/rate"
+	"github.com/go-redis/redis_rate/v10"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api"
@@ -30,7 +28,6 @@ func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 	})
 
 	limiter := redis_rate.NewLimiter(ring)
-	limiter.Fallback = rate.NewLimiter(rate.Inf, 0)
 
 	return func(c *gin.Context) {
 		if SkipHandler(c, skippers...) {
@@ -40,14 +37,18 @@ func RateLimiterMiddleware(skippers ...SkipperFunc) gin.HandlerFunc {
 
 		userID := api.GetUserID(c)
 		if userID != "" {
-			limit := cfg.Count
-			rate, delay, allowed := limiter.AllowMinute(userID, limit)
-			if !allowed {
+			limit := redis_rate.PerSecond(int(cfg.Count))
+			res, err := limiter.Allow(c.Request.Context(), userID, limit)
+			if err != nil {
+				c.Next()
+				return
+			}
+			if res.Allowed == 0 {
 				h := c.Writer.Header()
-				h.Set("X-RateLimit-Limit", strconv.FormatInt(limit, 10))
-				h.Set("X-RateLimit-Remaining", strconv.FormatInt(limit-rate, 10))
-				delaySec := int64(delay / time.Second)
-				h.Set("X-RateLimit-Delay", strconv.FormatInt(delaySec, 10))
+				h.Set("X-RateLimit-Limit", strconv.FormatInt(cfg.Count, 10))
+				h.Set("X-RateLimit-Remaining", strconv.Itoa(res.Remaining))
+				retryAfterSec := int64(res.RetryAfter.Seconds())
+				h.Set("X-RateLimit-Delay", strconv.FormatInt(retryAfterSec, 10))
 				api.ResError(c, errors.ErrTooManyRequests)
 				return
 			}
