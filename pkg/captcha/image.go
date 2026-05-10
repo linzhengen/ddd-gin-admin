@@ -74,9 +74,9 @@ func (m *Image) getRandomPalette() color.Palette {
 	p[0] = color.RGBA{0xFF, 0xFF, 0xFF, 0x00}
 	// Primary color.
 	prim := color.RGBA{
-		uint8(m.rng.Intn(129)),
-		uint8(m.rng.Intn(129)),
-		uint8(m.rng.Intn(129)),
+		uint8(m.rng.Intn(129) & 0xFF),
+		uint8(m.rng.Intn(129) & 0xFF),
+		uint8(m.rng.Intn(129) & 0xFF),
 		0xFF,
 	}
 	p[1] = prim
@@ -165,7 +165,7 @@ func (m *Image) fillWithCircles(n, maxradius int) {
 	maxx := m.Bounds().Max.X
 	maxy := m.Bounds().Max.Y
 	for i := 0; i < n; i++ {
-		colorIdx := uint8(m.rng.Int(1, circleCount-1))
+		colorIdx := uint8(m.rng.Int(1, circleCount-1) & 0xFF)
 		r := m.rng.Int(1, maxradius)
 		m.drawCircle(m.rng.Int(r, maxx-r), m.rng.Int(r, maxy-r), r, colorIdx)
 	}
@@ -231,10 +231,10 @@ func (m *Image) randomBrightness(c color.RGBA, max uint8) color.RGBA {
 	}
 	n := m.rng.Intn(int(max-maxc)) - int(minc)
 	return color.RGBA{
-		uint8(int(c.R) + n),
-		uint8(int(c.G) + n),
-		uint8(int(c.B) + n),
-		uint8(c.A),
+		uint8((int(c.R) + n) & 0xFF),
+		uint8((int(c.G) + n) & 0xFF),
+		uint8((int(c.B) + n) & 0xFF),
+		c.A,
 	}
 }
 

@@ -216,7 +216,7 @@ func (p *siprng) Int63() int64 {
 }
 
 func (p *siprng) Uint32() uint32 {
-	return uint32(p.Uint64())
+	return uint32(p.Uint64() & 0xFFFFFFFF)
 }
 
 func (p *siprng) Int31() int32 {

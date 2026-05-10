@@ -88,7 +88,6 @@ func (s *redisStore) Set(id string, digits []byte) {
 	if err := cmd.Err(); err != nil {
 		s.printf("redis execution set command error: %s", err.Error())
 	}
-	return
 }
 
 func (s *redisStore) Get(id string, clear bool) []byte {

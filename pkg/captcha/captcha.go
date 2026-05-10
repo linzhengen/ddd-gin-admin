@@ -84,7 +84,7 @@ func WriteImage(w io.Writer, id string, width, height int) error {
 // Verify returns true if the given digits are the ones that were used to
 // create the given captcha id.
 func Verify(id string, digits []byte) bool {
-	if digits == nil || len(digits) == 0 {
+	if len(digits) == 0 {
 		return false
 	}
 	reald := getStore().Get(id, true)

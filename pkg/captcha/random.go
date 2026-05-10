@@ -9,6 +9,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"io"
+	"sync"
 )
 
 // idLen is a length of captcha id string.
@@ -19,12 +20,17 @@ var idChars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345
 
 // rngKey is a secret key used to deterministically derive seeds for
 // PRNGs used in image. Generated once during initialization.
-var rngKey [32]byte
+var (
+	rngKey     [32]byte
+	rngKeyOnce sync.Once
+)
 
-func init() {
-	if _, err := io.ReadFull(rand.Reader, rngKey[:]); err != nil {
-		panic("captcha: error reading random source: " + err.Error())
-	}
+func setRNGKey() {
+	rngKeyOnce.Do(func() {
+		if _, err := io.ReadFull(rand.Reader, rngKey[:]); err != nil {
+			panic("captcha: error reading random source: " + err.Error())
+		}
+	})
 }
 
 // Purposes for seed derivation.
@@ -34,12 +40,13 @@ const (
 
 // deriveSeed returns a 16-byte PRNG seed from rngKey, purpose, id and digits.
 func deriveSeed(purpose byte, id string, digits []byte) (out [16]byte) {
+	setRNGKey()
 	var buf [sha256.Size]byte
 	h := hmac.New(sha256.New, rngKey[:])
-	h.Write([]byte{purpose})
-	io.WriteString(h, id)
-	h.Write([]byte{0})
-	h.Write(digits)
+	_, _ = h.Write([]byte{purpose})
+	_, _ = io.WriteString(h, id)
+	_, _ = h.Write([]byte{0})
+	_, _ = h.Write(digits)
 	sum := h.Sum(buf[:0])
 	copy(out[:], sum)
 	return
@@ -69,7 +76,7 @@ func randomBytesMod(length int, mod byte) (b []byte) {
 	if mod == 0 {
 		panic("captcha: bad mod argument for randomBytesMod")
 	}
-	maxrb := 255 - byte(256%int(mod))
+	maxrb := 255 - byte((256%int(mod))&0xFF)
 	b = make([]byte, length)
 	i := 0
 	for {
@@ -89,7 +96,7 @@ func randomBytesMod(length int, mod byte) (b []byte) {
 
 // randomID returns a new random id string.
 func randomID() string {
-	b := randomBytesMod(idLen, byte(len(idChars)))
+	b := randomBytesMod(idLen, byte(len(idChars)&0xFF))
 	for i, c := range b {
 		b[i] = idChars[c]
 	}
