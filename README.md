@@ -3,7 +3,7 @@ English | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
 
 This repository is a sample web application using DDD (Domain-Driven Design) architecture and Gin framework. Here's an overview of the features and technology stack provided in this repository.
 
-[![golangci-lint](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml)
+[![CI](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/ci.yaml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/ci.yaml)
 
 ## Features
 This web application provides the following features:

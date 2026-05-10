@@ -3,7 +3,7 @@
 
 这个仓库是一个使用DDD（领域驱动设计）架构和Gin框架的Web应用程序示例。以下是提供在这个仓库中的功能和技术栈的概述。
 
-[![golangci-lint](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml)
+[![CI](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/ci.yaml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/ci.yaml)
 
 ## 功能
 此Web应用程序提供以下功能：
