@@ -11,10 +11,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/linzhengen/ddd-gin-admin/pkg/captcha"
-	captchastore "github.com/linzhengen/ddd-gin-admin/pkg/captcha/store"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gorm.io/gorm"
 
 	"github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu"
 	menuActionInfra "github.com/linzhengen/ddd-gin-admin/app/infrastructure/menu/menuaction"
@@ -26,8 +25,9 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
 	"github.com/linzhengen/ddd-gin-admin/configs"
 	"github.com/linzhengen/ddd-gin-admin/injector"
+	"github.com/linzhengen/ddd-gin-admin/pkg/captcha"
+	captchastore "github.com/linzhengen/ddd-gin-admin/pkg/captcha/store"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/hash"
-	"gorm.io/gorm"
 )
 
 var (

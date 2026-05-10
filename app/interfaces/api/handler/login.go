@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linzhengen/ddd-gin-admin/pkg/captcha"
 
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/app/domain/errors"
@@ -10,6 +9,7 @@ import (
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/request"
 	"github.com/linzhengen/ddd-gin-admin/app/interfaces/api/response"
 	"github.com/linzhengen/ddd-gin-admin/configs"
+	"github.com/linzhengen/ddd-gin-admin/pkg/captcha"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
 	"github.com/linzhengen/ddd-gin-admin/pkg/util/structure"
 )

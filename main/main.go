@@ -14,12 +14,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/linzhengen/ddd-gin-admin/injector/api"
+	"github.com/urfave/cli/v3"
 
 	"github.com/linzhengen/ddd-gin-admin/injector"
-
+	"github.com/linzhengen/ddd-gin-admin/injector/api"
 	"github.com/linzhengen/ddd-gin-admin/pkg/logger"
-	"github.com/urfave/cli/v2"
 )
 
 // VERSION You can specify the version number by compiling：go build -ldflags "-X main.VERSION=x.x.x"
@@ -42,14 +41,15 @@ var VERSION = "0.5.0"
 func main() {
 	logger.SetVersion(VERSION)
 	ctx := logger.NewTagContext(context.Background(), "__main__")
-	app := cli.NewApp()
-	app.Name = "ddd-gin-admin"
-	app.Version = VERSION
-	app.Usage = "RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE."
-	app.Commands = []*cli.Command{
-		newWebCmd(ctx),
+	app := &cli.Command{
+		Name:    "ddd-gin-admin",
+		Version: VERSION,
+		Usage:   "RBAC scaffolding based on DDD + GIN + GORM + CASBIN + WIRE.",
+		Commands: []*cli.Command{
+			newWebCmd(ctx),
+		},
 	}
-	err := app.Run(os.Args)
+	err := app.Run(ctx, os.Args)
 	if err != nil {
 		logger.WithContext(ctx).Error(err)
 	}
@@ -81,7 +81,7 @@ func newWebCmd(ctx context.Context) *cli.Command {
 				Usage: "static file dir",
 			},
 		},
-		Action: func(c *cli.Context) error {
+		Action: func(_ context.Context, c *cli.Command) error {
 			return injector.RunServer(ctx,
 				api.SetConfigFile(c.String("conf")),
 				api.SetModelFile(c.String("model")),

@@ -3,10 +3,10 @@ package trans
 import (
 	"context"
 
-	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
+	"gorm.io/gorm"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/contextx"
-	"gorm.io/gorm"
+	"github.com/linzhengen/ddd-gin-admin/app/domain/trans"
 )
 
 func NewRepository(db *gorm.DB) trans.Repository {

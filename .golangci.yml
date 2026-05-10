@@ -32,7 +32,13 @@ linters:
 formatters:
   enable:
     - gofmt
-    - goimports
+    - gci
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/linzhengen/ddd-gin-admin)
   exclusions:
     generated: lax
     paths:
