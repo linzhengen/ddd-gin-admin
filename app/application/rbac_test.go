@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/casbin/casbin/v2"
-	casbinModel "github.com/casbin/casbin/v2/model"
+	"github.com/casbin/casbin/v3"
+	casbinModel "github.com/casbin/casbin/v3/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -110,6 +110,14 @@ m = g(r.sub, p.sub) == true && keyMatch2(r.obj, p.obj) == true && regexMatch(r.a
 		ok, err := e.Enforce("nobody", "/api/v1/test", "GET")
 		require.NoError(t, err)
 		assert.False(t, ok)
+	})
+
+	t.Run("Verify Casbin v3 EnforceEx", func(t *testing.T) {
+		// EnforceEx returns the matched rule
+		ok, matchedRule, err := e.EnforceEx("test-user-001", "/api/v1/test", "GET")
+		require.NoError(t, err)
+		assert.True(t, ok)
+		assert.Equal(t, []string{"test-role-001", "/api/v1/test", "GET"}, matchedRule)
 	})
 }
 

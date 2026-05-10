@@ -3,7 +3,8 @@ package api
 import (
 	"time"
 
-	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v3"
+	"github.com/casbin/casbin/v3/log"
 
 	"github.com/linzhengen/ddd-gin-admin/app/application"
 	"github.com/linzhengen/ddd-gin-admin/configs"
@@ -20,7 +21,17 @@ func InitCasbin(adapter application.RbacAdapter) (*casbin.SyncedEnforcer, func()
 	if err != nil {
 		return nil, nil, err
 	}
-	e.EnableLog(cfg.Debug)
+	if cfg.Debug {
+		l := log.NewDefaultLogger()
+		_ = l.SetEventTypes([]log.EventType{
+			log.EventEnforce,
+			log.EventAddPolicy,
+			log.EventRemovePolicy,
+			log.EventLoadPolicy,
+			log.EventSavePolicy,
+		})
+		e.SetLogger(l)
+	}
 
 	err = e.InitWithModelAndAdapter(e.GetModel(), adapter)
 	if err != nil {

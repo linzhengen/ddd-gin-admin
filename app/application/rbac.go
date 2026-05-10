@@ -3,9 +3,9 @@ package application
 import (
 	"context"
 
-	"github.com/casbin/casbin/v2"
-	casbinModel "github.com/casbin/casbin/v2/model"
-	"github.com/casbin/casbin/v2/persist"
+	"github.com/casbin/casbin/v3"
+	casbinModel "github.com/casbin/casbin/v3/model"
+	"github.com/casbin/casbin/v3/persist"
 
 	"github.com/linzhengen/ddd-gin-admin/app/domain/rbac"
 	"github.com/linzhengen/ddd-gin-admin/configs"
