@@ -3,7 +3,7 @@
 
 このリポジトリは、DDD（Domain-Driven Design）アーキテクチャとGinフレームワークを使用したWebアプリケーションのサンプルです。
 
-[![golangci-lint](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/golangci-lint.yml)
+[![CI](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/ci.yaml/badge.svg)](https://github.com/linzhengen/ddd-gin-admin/actions/workflows/ci.yaml)
 
 ## 機能
 以下の機能を提供しています。
