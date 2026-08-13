@@ -17,7 +17,7 @@ require (
 	github.com/koding/multiconfig v0.0.0-20171124222453-69c27309b2d7
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.22.0
-	github.com/sirupsen/logrus v1.9.4
+	github.com/sirupsen/logrus v1.10.0
 	github.com/stretchr/testify v1.11.1
 	github.com/swaggo/files/v2 v2.0.2
 	github.com/swaggo/swag v1.16.6
